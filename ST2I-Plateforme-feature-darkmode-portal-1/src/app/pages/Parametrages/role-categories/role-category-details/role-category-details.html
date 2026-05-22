@@ -1,0 +1,86 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="card ui-card">
+  <div class="bar bar-row">
+    <span>Détails de la catégorie</span>
+
+    <div class="bar-actions">
+      <p-button
+        icon="pi pi-arrow-left"
+        label="Retour"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="back()">
+      </p-button>
+
+      <p-button
+        icon="pi pi-pencil"
+        label="Modifier"
+        severity="info"
+        [disabled]="!category"
+        (onClick)="edit()">
+      </p-button>
+    </div>
+  </div>
+
+  <div class="block">
+
+    <div *ngIf="loading" class="loading-box">
+      <i class="pi pi-spin pi-spinner"></i>
+      Chargement de la catégorie...
+    </div>
+
+    <ng-container *ngIf="!loading && category">
+
+      <div class="hero">
+        <div class="hero-icon" [style.background]="category.color || '#dbeafe'">
+          <i class="pi pi-tags"></i>
+        </div>
+
+        <div>
+          <h2>{{ category.name }}</h2>
+          <p>{{ category.description || 'Aucune description disponible.' }}</p>
+        </div>
+      </div>
+
+      <div class="details-grid">
+
+        <div class="info-card">
+          <span class="label">Identifiant</span>
+          <span class="value">#{{ category.id }}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Couleur</span>
+          <span class="color-badge" *ngIf="category.color">
+            <span class="color-dot" [style.background]="category.color"></span>
+            {{ category.color }}
+          </span>
+          <span class="text-faint" *ngIf="!category.color">—</span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Créé le</span>
+          <span class="value">
+            {{ category.createdAt ? (category.createdAt | date:'dd/MM/yyyy HH:mm') : '—' }}
+          </span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Dernière modification</span>
+          <span class="value">
+            {{ category.updatedAt ? (category.updatedAt | date:'dd/MM/yyyy HH:mm') : '—' }}
+          </span>
+        </div>
+
+      </div>
+
+    </ng-container>
+
+    <div *ngIf="!loading && !category" class="empty-box">
+      <i class="pi pi-info-circle"></i>
+      Aucune catégorie trouvée.
+    </div>
+
+  </div>
+</div>

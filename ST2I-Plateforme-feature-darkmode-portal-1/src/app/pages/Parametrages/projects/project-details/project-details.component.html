@@ -1,0 +1,225 @@
+<p-toast position="top-right"></p-toast>
+
+<!-- ===== LOADING ===== -->
+<div *ngIf="loading" class="card ui-card">
+  <div class="bar">Chargement...</div>
+
+  <div class="loading-msg">
+    <i class="pi pi-spin pi-spinner"></i>
+    Chargement des données...
+  </div>
+</div>
+
+<!-- ===== NOT FOUND ===== -->
+<div *ngIf="!loading && !project" class="card ui-card">
+  <div class="bar">Projet introuvable</div>
+
+  <div class="loading-msg">
+    <i class="pi pi-exclamation-triangle" style="color:#dc2626"></i>
+    Aucun projet trouvé.
+  </div>
+</div>
+
+<!-- ===== CONTENT ===== -->
+<div *ngIf="!loading && project">
+
+  <!-- ===== GENERAL INFO ===== -->
+  <div class="card ui-card">
+    <div class="bar">Informations Générales</div>
+
+    <div class="row">
+      <b>Nom</b>
+      <span>{{ project.name || '—' }}</span>
+    </div>
+
+    <div class="row">
+      <b>Client</b>
+      <span>{{ project.clientName || '—' }}</span>
+    </div>
+
+    <div class="row">
+      <b>Statut</b>
+      <span class="status-badge" [ngClass]="statusClass(project.status)">
+        {{ formatStatus(project.status) }}
+      </span>
+    </div>
+
+    <div class="row">
+      <b>Budget</b>
+      <span class="budget-badge">
+        {{ formatBudget(project.budget) }}
+      </span>
+    </div>
+
+    <div class="row">
+      <b>Date début</b>
+      <span>{{ formatDate(project.startDate) }}</span>
+    </div>
+
+    <div class="row">
+      <b>Date fin</b>
+      <span>{{ formatDate(project.endDate) }}</span>
+    </div>
+
+    <div class="row">
+      <b>Description</b>
+      <span>{{ project.description || '—' }}</span>
+    </div>
+
+    <div class="row">
+      <b>Date de création</b>
+      <span>{{ formatDateTime(project.createdAt) }}</span>
+    </div>
+
+    <div class="row">
+      <b>Dernière modification</b>
+      <span>{{ formatDateTime(project.updatedAt) }}</span>
+    </div>
+  </div>
+
+  <!-- ===== TEAM INFO ===== -->
+  <div class="card ui-card">
+    <div class="bar">Équipe Affectée</div>
+
+    <div *ngIf="loadingTeam" class="loading-msg">
+      <i class="pi pi-spin pi-spinner"></i>
+      Chargement de l'équipe...
+    </div>
+
+    <ng-container *ngIf="!loadingTeam">
+      <div *ngIf="!hasTeam()" class="empty-box">
+        <i class="pi pi-users"></i>
+        <span>Aucune équipe affectée à ce projet</span>
+      </div>
+
+      <ng-container *ngIf="hasTeam()">
+        <div class="row">
+          <b>Nom de l'équipe</b>
+          <span>{{ project.teamName || team?.name || ('Équipe #' + project.teamId) }}</span>
+        </div>
+
+        <div class="row">
+          <b>Statut équipe</b>
+          <span class="team-badge">
+            {{ team?.status || 'ASSIGNED' }}
+          </span>
+        </div>
+
+        <div class="row">
+          <b>Nombre de membres</b>
+          <span>{{ team?.members?.length || 0 }} membre(s)</span>
+        </div>
+
+        <div class="row" *ngIf="team?.description">
+          <b>Description équipe</b>
+          <span>{{ team?.description }}</span>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <!-- ===== DEPARTMENTS ===== -->
+  <div class="card ui-card">
+    <div class="bar bar-row">
+      <span>Départements Affectés</span>
+      <span class="count-badge">
+        {{ project.departmentIds?.length || 0 }}
+      </span>
+    </div>
+
+    <div *ngIf="loadingDepartments" class="loading-msg">
+      <i class="pi pi-spin pi-spinner"></i>
+      Chargement des départements...
+    </div>
+
+    <ng-container *ngIf="!loadingDepartments">
+      <div *ngIf="!project.departmentIds || project.departmentIds.length === 0" class="empty-box">
+        <i class="pi pi-sitemap"></i>
+        <span>Aucun département affecté à ce projet</span>
+      </div>
+
+      <div *ngFor="let dep of departments" class="department-row">
+        <div class="department-icon">
+          <i class="pi pi-sitemap"></i>
+        </div>
+
+        <div class="department-info">
+          <span class="department-name">
+            {{ dep.name }}
+          </span>
+
+          <span class="department-meta">
+            {{ dep.code }} · {{ dep.type }}
+          </span>
+        </div>
+
+        <span class="status-badge active">
+          Actif
+        </span>
+      </div>
+
+      <div *ngFor="let depId of getDepartmentFallbackIds()" class="department-row">
+        <div class="department-icon">
+          <i class="pi pi-sitemap"></i>
+        </div>
+
+        <div class="department-info">
+          <span class="department-name">
+            Département #{{ depId }}
+          </span>
+
+          <span class="department-meta">
+            Détails indisponibles
+          </span>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- ===== TIMELINE ===== -->
+  <div class="card ui-card">
+    <div class="bar">Cycle de Vie du Projet</div>
+
+    <div class="timeline-wrap">
+      <div
+        class="timeline-step"
+        *ngFor="let step of timeline"
+        [ngClass]="timelineClass(step)">
+
+        <div class="timeline-dot">
+          <i [class]="step.icon"></i>
+        </div>
+
+        <div class="timeline-info">
+          <span class="timeline-label">
+            {{ step.label }}
+          </span>
+
+          <span class="timeline-desc">
+            {{ step.description }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <div class="details-footer">
+    <p-button
+      icon="pi pi-arrow-left"
+      label="Retour"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="back()">
+    </p-button>
+
+    <p-button
+      icon="pi pi-pencil"
+      label="Modifier"
+      severity="info"
+      [disabled]="!canEdit()"
+      (onClick)="edit()">
+    </p-button>
+  </div>
+
+</div>

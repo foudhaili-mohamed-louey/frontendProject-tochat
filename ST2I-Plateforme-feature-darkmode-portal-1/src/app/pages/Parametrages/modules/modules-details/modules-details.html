@@ -1,0 +1,26 @@
+<p-toast position="top-right"></p-toast>
+
+<!-- loading -->
+<div *ngIf="!module" class="card ui-card">
+  <div class="bar">Chargement...</div>
+  <div class="loading-msg">
+    <i class="pi pi-spin pi-spinner"></i>
+    Chargement des données...
+  </div>
+</div>
+
+<!-- details -->
+<div *ngIf="module" class="card ui-card">
+  <div class="bar">Détails du Module</div>
+
+  <div class="row">
+    <b>ID</b>
+    <span>{{ module.id }}</span>
+  </div>
+
+  <div class="row">
+    <b>Nom</b>
+    <span>{{ module.name }}</span>
+  </div>
+
+</div>

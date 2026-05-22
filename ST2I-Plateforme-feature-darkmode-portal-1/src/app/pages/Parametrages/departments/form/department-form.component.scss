@@ -1,0 +1,146 @@
+// department-form.component.scss
+
+:host {
+  --blue: #1f3b6d;
+  display: block;
+}
+
+.ui-card {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.bar {
+  background: var(--blue);
+  color: #fff;
+  padding: 0.9rem 1rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.block {
+  padding: 1.3rem 1.1rem;
+}
+
+.block-title {
+  font-weight: 700;
+  color: var(--blue);
+  padding-bottom: 0.55rem;
+  margin-bottom: 1.1rem;
+  border-bottom: 2px solid var(--blue);
+}
+
+.field {
+  margin-bottom: 1.1rem;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.45rem;
+  color: #1f2937;
+}
+
+.formgrid3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.field-full {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 992px) {
+  .formgrid3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .formgrid3 { grid-template-columns: 1fr; }
+}
+
+.select-field {
+  width: 100%;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  padding-right: 2.2rem !important;
+
+  &:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px rgba(31, 59, 109, 0.12);
+  }
+}
+
+.textarea-field {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #dbe4f3;
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  color: #1f2937;
+  resize: vertical;
+  font-family: inherit;
+  display: block;
+
+  &:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px rgba(31, 59, 109, 0.12);
+  }
+}
+
+// ===== INFO BOX =====
+.info-box {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  margin-top: 1.5rem;
+  color: #1e40af;
+
+  .pi-info-circle {
+    font-size: 1.3rem;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+  }
+
+  strong {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    font-size: 0.85rem;
+    line-height: 1.7;
+  }
+
+  code {
+    background: #dbeafe;
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+}
+
+// ===== FOOTER =====
+.footer-sticky {
+  position: sticky;
+  bottom: 0;
+  border-top: 1px solid #e6eaf2;
+  padding: 1rem 1.1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.9rem;
+  background: #fff;
+}

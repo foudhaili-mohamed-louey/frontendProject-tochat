@@ -1,0 +1,105 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="card ui-card">
+  <div class="bar">Ajouter un rôle projet</div>
+
+  <div class="block">
+    <div class="block-title">Informations du rôle</div>
+
+    <div class="formgrid3">
+
+      <div class="field">
+        <label>Nom *</label>
+        <input
+          pInputText
+          placeholder="Ex: Chef de projet"
+          [(ngModel)]="form.name" />
+      </div>
+
+      <div class="field">
+        <label>Catégorie *</label>
+        <select
+          class="p-inputtext w-full"
+          [(ngModel)]="form.roleCategoryId"
+          [disabled]="loadingCategories">
+          <option [ngValue]="0" disabled>
+            {{ loadingCategories ? 'Chargement...' : 'Sélectionner une catégorie' }}
+          </option>
+
+          <option *ngFor="let category of categories" [ngValue]="category.id">
+            {{ category.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Type de rôle *</label>
+        <select class="p-inputtext w-full" [(ngModel)]="form.uniqueRole">
+          <option [ngValue]="false">Rôle multiple</option>
+          <option [ngValue]="true">Rôle unique</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Niveau hiérarchique *</label>
+        <select class="p-inputtext w-full" [(ngModel)]="form.hierarchyLevel">
+          <option [ngValue]="1">Niveau 1 — Direction</option>
+          <option [ngValue]="2">Niveau 2 — Leadership</option>
+          <option [ngValue]="3">Niveau 3 — Analyse / Senior</option>
+          <option [ngValue]="4">Niveau 4 — Exécution</option>
+          <option [ngValue]="5">Niveau 5 — Support</option>
+        </select>
+      </div>
+
+      <div class="field preview-field">
+        <label>Aperçu hiérarchique</label>
+        <span class="level-preview">
+          {{ getHierarchyLabel(form.hierarchyLevel) }}
+        </span>
+      </div>
+
+      <div class="field full">
+        <label>Description</label>
+        <textarea
+          class="p-inputtext w-full"
+          rows="5"
+          placeholder="Description du rôle projet..."
+          [(ngModel)]="form.description">
+        </textarea>
+      </div>
+
+    </div>
+
+    <div class="info-box">
+      <i class="pi pi-info-circle"></i>
+      <div>
+        <strong>Règles de création</strong>
+        <ul>
+          <li>Le nom du rôle projet doit être unique</li>
+          <li>Le niveau hiérarchique contrôle qui peut superviser qui</li>
+          <li>Un superviseur doit avoir un niveau plus fort que le membre supervisé</li>
+          <li>Exemple : niveau 1 peut superviser niveau 2, 3, 4 ou 5</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-sticky">
+    <p-button
+      icon="pi pi-times"
+      label="Annuler"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="saving"
+      (onClick)="cancel()">
+    </p-button>
+
+    <p-button
+      icon="pi pi-save"
+      label="Sauvegarder"
+      severity="info"
+      [loading]="saving"
+      (onClick)="save()">
+    </p-button>
+  </div>
+</div>

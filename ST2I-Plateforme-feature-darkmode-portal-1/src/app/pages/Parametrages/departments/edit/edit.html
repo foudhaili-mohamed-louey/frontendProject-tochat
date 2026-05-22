@@ -1,0 +1,123 @@
+<p-toast position="top-right"></p-toast>
+
+<!-- ===== LOADING ===== -->
+<div *ngIf="loading" class="card ui-card">
+  <div class="bar">Chargement...</div>
+  <div class="block">
+    <p class="loading-msg">
+      <i class="pi pi-spin pi-spinner"></i>
+      Chargement des données...
+    </p>
+  </div>
+</div>
+
+<!-- ===== FORM ===== -->
+<form *ngIf="!loading"
+      #formRef="ngForm"
+      (ngSubmit)="save(formRef)"
+      class="card ui-card">
+
+  <div class="bar">Modifier le Département</div>
+
+  <div class="block">
+    <div class="block-title">Informations du département</div>
+
+    <div class="formgrid3">
+
+      <!-- NOM -->
+      <div class="field">
+        <label>Nom *</label>
+        <input pInputText
+               name="name"
+               [(ngModel)]="form.name"
+               required
+               maxlength="255"
+               placeholder="Nom du département"
+               #name="ngModel" />
+        <small class="error" *ngIf="name.invalid && name.touched">
+          Le nom est requis
+        </small>
+      </div>
+
+      <!-- EMAIL -->
+      <div class="field">
+        <label>Email *</label>
+        <input pInputText
+               type="email"
+               name="email"
+               [(ngModel)]="form.email"
+               required
+               email
+               placeholder="département@entreprise.com"
+               #email="ngModel" />
+        <small class="error" *ngIf="email.invalid && email.touched">
+          Email invalide
+        </small>
+      </div>
+
+      <!-- TYPE — read-only -->
+      <div class="field">
+        <label>Type</label>
+        <div class="readonly-field">
+          <span class="type-badge" [ngClass]="typeClass">{{ typeLabel }}</span>
+          <span class="readonly-hint">
+            <i class="pi pi-lock"></i> Non modifiable
+          </span>
+        </div>
+      </div>
+
+      <!-- TÉLÉPHONE -->
+      <div class="field">
+        <label>Téléphone</label>
+        <input pInputText
+               name="phoneNumber"
+               [(ngModel)]="form.phoneNumber"
+               placeholder="Ex: +216 XX XXX XXX" />
+      </div>
+
+      <!-- LOCALISATION -->
+      <div class="field">
+        <label>Localisation</label>
+        <input pInputText
+               name="location"
+               [(ngModel)]="form.location"
+               placeholder="Ex: Tunis, Bâtiment A" />
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div class="field field-full">
+        <label>Description</label>
+        <textarea class="p-inputtext textarea-field"
+                  name="description"
+                  rows="3"
+                  [(ngModel)]="form.description"
+                  placeholder="Décrivez le rôle et les responsabilités de ce département...">
+        </textarea>
+      </div>
+
+    </div>
+
+    <!-- INFO BOX -->
+    <div class="info-box">
+      <i class="pi pi-info-circle"></i>
+      <div>
+        <strong>Remarque</strong>
+        <ul>
+          <li>Le <code>type</code> du département ne peut pas être modifié après la création</li>
+          <li>Pour changer le statut actif/inactif, utilisez les boutons depuis la liste</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-sticky">
+    <p-button type="submit"
+              icon="pi pi-save"
+              label="Sauvegarder"
+              severity="info"
+              [loading]="saving">
+    </p-button>
+  </div>
+
+</form>

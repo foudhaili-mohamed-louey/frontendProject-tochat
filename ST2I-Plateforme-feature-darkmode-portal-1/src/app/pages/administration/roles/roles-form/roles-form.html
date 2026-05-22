@@ -1,0 +1,99 @@
+<form #formRef="ngForm"
+      (ngSubmit)="save(formRef)"
+      class="card ui-card">
+
+  <!-- bar -->
+  <div class="bar">Ajouter un Rôle</div>
+
+  <div class="block">
+    <div class="block-title">Informations du rôle</div>
+
+    <div class="formgrid">
+
+      <!-- NAME -->
+      <div class="field">
+        <label>Nom du rôle *</label>
+        <input pInputText
+               name="name"
+               [(ngModel)]="form.name"
+               required
+               maxlength="100"
+               placeholder="Ex: MANAGER"
+               #name="ngModel" />
+        <small class="error" *ngIf="name.invalid && name.touched">
+          Le nom est requis (max 100 caractères)
+        </small>
+      </div>
+
+      <!-- LEVEL -->
+      <div class="field">
+        <label>Niveau (0 - 100) *</label>
+        <input pInputText
+               type="number"
+               name="level"
+               [(ngModel)]="form.level"
+               required
+               min="0"
+               max="100"
+               placeholder="Ex: 50"
+               #level="ngModel" />
+        <small class="error" *ngIf="level.invalid && level.touched">
+          Le niveau est requis (entre 0 et 100)
+        </small>
+        <!-- level hint -->
+        <small class="hint">
+          <i class="pi pi-info-circle"></i>
+          Doit être strictement inférieur à votre propre niveau.
+        </small>
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div class="field full-width">
+        <label>Description</label>
+        <textarea name="description"
+                  [(ngModel)]="form.description"
+                  maxlength="500"
+                  rows="3"
+                  placeholder="Description du rôle (optionnel)"
+                  class="p-inputtext w-full textarea">
+        </textarea>
+        <small class="char-count">
+          {{ form.description?.length || 0 }} / 500
+        </small>
+      </div>
+
+    </div>
+
+    <!-- info box -->
+    <div class="info-box">
+      <i class="pi pi-shield"></i>
+      <div>
+        <strong>Règles de création</strong>
+        <ul>
+          <li>Le nom ne peut pas être <code>SUPER_ADMIN</code> ou <code>ADMIN</code></li>
+          <li>Le niveau doit être strictement inférieur à votre niveau actuel</li>
+          <li>Le nom doit être unique dans le système</li>
+          <li>Le mot de passe sera généré automatiquement et envoyé par email</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- footer -->
+  <div class="footer-sticky">
+    <p-button type="submit"
+              icon="pi pi-save"
+              label="Sauvegarder"
+              severity="info"
+              [loading]="saving">
+    </p-button>
+    <p-button icon="pi pi-arrow-left"
+              label="Retour"
+              severity="danger"
+              [outlined]="true"
+              (onClick)="back()">
+    </p-button>
+  </div>
+
+</form>

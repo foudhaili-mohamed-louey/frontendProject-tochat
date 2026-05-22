@@ -1,0 +1,128 @@
+<!-- loading -->
+<div *ngIf="loading" class="card ui-card">
+  <div class="bar">Chargement...</div>
+  <div class="loading-msg">
+    <i class="pi pi-spin pi-spinner"></i>
+    Chargement des données...
+  </div>
+</div>
+
+<!-- user not found -->
+<div *ngIf="!loading && !user" class="card ui-card">
+  <div class="bar">Utilisateur introuvable</div>
+  <div class="loading-msg">
+    <i class="pi pi-exclamation-triangle" style="color:#dc2626"></i>
+    Aucun utilisateur trouvé.
+  </div>
+</div>
+
+<!-- user details -->
+<div *ngIf="!loading && user">
+
+  <!-- ===== PERSONAL INFO ===== -->
+  <div class="card ui-card">
+    <div class="bar">Informations Personnelles</div>
+
+    <div class="photo-container">
+      <img class="user-photo"
+           [src]="photo"
+           alt="user photo"
+           (error)="onPhotoError()" />
+    </div>
+
+    <div class="row">
+      <b>Nom</b>
+      <span>{{ user.lastName }}</span>
+    </div>
+    <div class="row">
+      <b>Prénom</b>
+      <span>{{ user.firstName }}</span>
+    </div>
+    <div class="row">
+      <b>Username</b>
+      <span>{{ user.username }}</span>
+    </div>
+    <div class="row">
+      <b>Sexe</b>
+      <span>{{ user.sex || '—' }}</span>
+    </div>
+    <div class="row">
+      <b>CIN</b>
+      <span>{{ user.cin || '—' }}</span>
+    </div>
+    <div class="row">
+      <b>Date d'embauche</b>
+      <span>{{ user.hireDate ? (user.hireDate | date:'dd/MM/yyyy') : '—' }}</span>
+    </div>
+  </div>
+
+  <!-- ===== WORK INFO ===== -->
+  <div class="card ui-card">
+    <div class="bar">Informations Professionnelles</div>
+
+    <div class="row">
+      <b>Profession</b>
+      <span>{{ user.profession || '—' }}</span>
+    </div>
+
+    <div class="row">
+      <b>Rôle</b>
+      <span class="role-badge">{{ user.roleName || '—' }}</span>
+    </div>
+
+    <div class="row">
+      <b>Niveau</b>
+      <span class="level-badge" [ngClass]="getLevelClass(user.roleLevel)">
+        {{ user.roleLevel ?? '—' }}
+      </span>
+    </div>
+
+    <div class="row">
+      <b>Statut</b>
+      <span class="status-badge"
+            [class.active]="user.isActive"
+            [class.inactive]="!user.isActive">
+        {{ user.isActive ? 'Actif' : 'Inactif' }}
+      </span>
+    </div>
+
+    <div class="row">
+      <b>Email vérifié</b>
+      <span class="verified-badge" *ngIf="user.emailVerified">
+        <i class="pi pi-check-circle"></i> Vérifié
+      </span>
+      <span class="unverified-badge" *ngIf="!user.emailVerified">
+        <i class="pi pi-clock"></i> En attente
+      </span>
+    </div>
+
+    <div class="row" *ngIf="user.departmentId">
+      <b>Département</b>
+      <span class="dept-badge">
+        {{ user.departmentName || '—' }}
+        <span class="dept-code" *ngIf="user.departmentCode">({{ user.departmentCode }})</span>
+        <span class="dept-type" *ngIf="user.departmentType">· {{ user.departmentType }}</span>
+      </span>
+    </div>
+
+    <div class="row" *ngIf="!user.departmentId">
+      <b>Département</b>
+      <span class="no-dept">Non affecté</span>
+    </div>
+  </div>
+
+  <!-- ===== CONTACT INFO ===== -->
+  <div class="card ui-card">
+    <div class="bar">Informations de Contact</div>
+
+    <div class="row">
+      <b>Adresse Email</b>
+      <span>{{ user.email || '—' }}</span>
+    </div>
+    <div class="row">
+      <b>Numéro de Téléphone</b>
+      <span>{{ user.phone || '—' }}</span>
+    </div>
+  </div>
+
+</div>

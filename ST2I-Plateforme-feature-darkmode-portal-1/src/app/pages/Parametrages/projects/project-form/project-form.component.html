@@ -1,0 +1,202 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="card ui-card">
+  <div class="bar">Ajouter un projet</div>
+
+  <div class="block">
+    <div class="block-title">Informations du projet</div>
+
+    <div class="formgrid3">
+      <div class="field">
+        <label>Nom *</label>
+        <input
+          pInputText
+          placeholder="Nom du projet"
+          [(ngModel)]="form.name" />
+      </div>
+
+      <div class="field">
+        <label>Client</label>
+        <input
+          pInputText
+          placeholder="Nom du client"
+          [(ngModel)]="form.clientName" />
+      </div>
+
+      <div class="field">
+        <label>Budget</label>
+        <input
+          class="p-inputtext"
+          type="number"
+          min="1"
+          placeholder="Budget"
+          [(ngModel)]="form.budget" />
+      </div>
+
+      <div class="field">
+        <label>Date début</label>
+        <input
+          class="p-inputtext"
+          type="date"
+          [(ngModel)]="form.startDate"
+          [max]="form.endDate || null" />
+      </div>
+
+      <div class="field">
+        <label>Date fin</label>
+        <input
+          class="p-inputtext"
+          type="date"
+          [(ngModel)]="form.endDate"
+          [min]="form.startDate || null" />
+      </div>
+
+      <div class="field">
+        <label>Équipe libre optionnelle</label>
+
+        <p-select
+          class="w-full"
+          styleClass="team-search-dropdown"
+          panelStyleClass="team-search-panel"
+          appendTo="body"
+          [(ngModel)]="selectedTeamId"
+          [options]="teamOptions"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          [showClear]="false"
+          [loading]="loadingTeams"
+          [virtualScroll]="true"
+          [virtualScrollItemSize]="52"
+          [scrollHeight]="'260px'"
+          placeholder="Aucune équipe / affecter plus tard"
+          emptyMessage="Aucune équipe libre trouvée"
+          emptyFilterMessage="Aucune équipe libre trouvée"
+          (onFilter)="onTeamFilter($event)">
+
+          <ng-template let-team pTemplate="item">
+            <div
+              class="team-option"
+              [class.no-team-option]="team.noTeam">
+
+              <span class="team-name">
+                <i
+                  class="pi"
+                  [ngClass]="team.noTeam ? 'pi-times-circle' : 'pi-users'">
+                </i>
+
+                {{ team.name || 'Équipe sans nom' }}
+              </span>
+
+              <span class="team-sub">
+                {{ team.noTeam ? 'Créer le projet sans équipe' : ((team.members?.length || 0) + ' membre(s)') }}
+              </span>
+            </div>
+          </ng-template>
+
+          <ng-template let-team pTemplate="selectedItem">
+            <div
+              class="team-option selected"
+              *ngIf="team"
+              [class.no-team-option]="team.noTeam">
+
+              <span class="team-name">
+                <i
+                  class="pi"
+                  [ngClass]="team.noTeam ? 'pi-times-circle' : 'pi-users'">
+                </i>
+
+                {{ team.name || 'Aucune équipe / affecter plus tard' }}
+              </span>
+
+              <span class="team-sub">
+                {{ team.noTeam ? 'Projet sans équipe' : ((team.members?.length || 0) + ' membre(s)') }}
+              </span>
+            </div>
+          </ng-template>
+
+        </p-select>
+      </div>
+
+      <div class="field full">
+        <label>Départements opérationnels</label>
+
+        <p-multiSelect
+          class="w-full"
+          styleClass="departments-multiselect"
+          panelStyleClass="departments-panel"
+          appendTo="body"
+          [(ngModel)]="selectedDepartmentIds"
+          [options]="departments"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name,code"
+          [showClear]="true"
+          [loading]="loadingDepartments"
+          placeholder="Sélectionner les départements concernés"
+          emptyMessage="Aucun département opérationnel trouvé"
+          emptyFilterMessage="Aucun département opérationnel trouvé"
+          selectedItemsLabel="{0} départements sélectionnés">
+
+          <ng-template let-department pTemplate="item">
+            <div class="department-option">
+              <span class="department-name">
+                {{ department.code }} - {{ department.name }}
+              </span>
+
+              <span class="department-sub">
+                {{ department.type }}
+              </span>
+            </div>
+          </ng-template>
+
+        </p-multiSelect>
+      </div>
+
+      <div class="field full">
+        <label>Description</label>
+        <textarea
+          class="p-inputtext w-full"
+          rows="5"
+          placeholder="Description du projet..."
+          [(ngModel)]="form.description">
+        </textarea>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <i class="pi pi-info-circle"></i>
+      <div>
+        <strong>Règles de création</strong>
+        <ul>
+          <li>Le projet est créé en statut <code>DRAFT</code> automatiquement</li>
+          <li>Seules les équipes libres peuvent être affectées</li>
+          <li>Vous pouvez choisir <code>Aucune équipe</code> pour affecter l’équipe plus tard</li>
+          <li>Seuls les départements opérationnels actifs sont proposés</li>
+          <li>Le projet devient <code>READY</code> seulement avec une équipe et au moins un département</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-sticky">
+    <p-button
+      icon="pi pi-times"
+      label="Annuler"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="saving"
+      (onClick)="cancel()">
+    </p-button>
+
+    <p-button
+      icon="pi pi-save"
+      label="Sauvegarder"
+      severity="info"
+      [loading]="saving"
+      (onClick)="save()">
+    </p-button>
+  </div>
+</div>

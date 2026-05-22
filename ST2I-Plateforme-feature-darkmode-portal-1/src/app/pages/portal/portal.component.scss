@@ -1,0 +1,135 @@
+:host {
+  display: block;
+}
+
+.portal-page {
+  min-height: 100vh;
+  background: #fff; 
+  display: flex;
+  justify-content: center;
+}
+
+.portal-container {
+  width: min(1100px, 92vw);
+  padding: 2.5rem 0 2rem;
+}
+
+.title {
+  text-align: center;
+  color: #1f3b6d;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.title-underline {
+  width: 220px;
+  height: 4px;
+  background: #eb3b0a; /* orange underline like your inspiration */
+  margin: 0.7rem auto 1.8rem;
+  border-radius: 999px;
+}
+
+.section {
+  margin-top: 1.2rem;
+}
+
+.section-title {
+  text-align: center;
+  color: #1f3b6d;
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.section-line {
+  height: 2px;
+  background: rgba(31, 59, 109, 0.35);
+  border-radius: 999px;
+  margin-bottom: 1.3rem;
+}
+
+.cards {
+  display: grid;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.cards.one {
+  grid-template-columns: minmax(260px, 420px);
+}
+
+.cards.three {
+  grid-template-columns: repeat(3, minmax(260px, 1fr));
+}
+
+@media (max-width: 900px) {
+  .cards.three {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: #f7f9ff;
+  border: 2px solid rgba(31, 59, 109, 0.6);
+  border-radius: 18px;
+  padding: 2.3rem 1.6rem 1.8rem;
+  text-decoration: none;
+  text-align: center;
+  position: relative;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
+}
+
+.icon-circle {
+  width: 74px;
+  height: 74px;
+  border-radius: 999px;
+  background: #1f3b6d;
+  display: grid;
+  place-items: center;
+  margin: -3.2rem auto 1.1rem;
+  border: 8px solid rgba(31, 59, 109, 0.15);
+}
+
+.icon-circle i {
+  color: #f7f7f7; 
+  font-size: 1.9rem;
+}
+
+.card-title {
+  color: #1f3b6d;
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-top: 0.2rem;
+}
+
+.card-sub {
+  color: rgba(31, 59, 109, 0.75);
+  margin-top: 0.7rem;
+  font-size: 0.95rem;
+}
+
+.logout-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.2rem;
+}
+
+.logout-btn {
+  background: #1f3b6d;
+  color: #fff;
+  border: none;
+  padding: 0.85rem 2.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  filter: brightness(1.05);
+}

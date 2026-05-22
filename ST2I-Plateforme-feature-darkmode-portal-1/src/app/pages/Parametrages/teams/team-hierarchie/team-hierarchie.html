@@ -1,0 +1,328 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="card ui-card">
+
+  <div class="bar bar-row">
+    <span>Hiérarchie des équipes</span>
+
+    <div class="bar-actions">
+      <p-button
+        icon="pi pi-refresh"
+        label="Recharger"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="loadingTeams || loadingTeam || saving"
+        (onClick)="reload()">
+      </p-button>
+
+      <p-button
+        icon="pi pi-save"
+        label="Sauvegarder"
+        severity="info"
+        [loading]="saving"
+        [disabled]="!selectedTeamId || loadingTeam || loadingMembers || members.length === 0"
+        (onClick)="save()">
+      </p-button>
+    </div>
+  </div>
+
+  <div class="block">
+
+    <div class="selector-card">
+      <div class="selector-title">
+        <i class="pi pi-search"></i>
+        Sélectionner une équipe
+      </div>
+
+      <div class="selector-grid">
+        <div class="field">
+          <label>Équipe *</label>
+
+          <p-select
+            class="w-full"
+            styleClass="team-dropdown"
+            panelStyleClass="team-dropdown-panel"
+            appendTo="body"
+            [(ngModel)]="selectedTeamId"
+            [options]="teamOptions"
+            optionLabel="label"
+            optionValue="id"
+            [filter]="true"
+            filterBy="label,projectName,statusLabel"
+            [showClear]="true"
+            [loading]="loadingTeams"
+            placeholder="Choisir une équipe"
+            emptyMessage="Aucune équipe trouvée"
+            emptyFilterMessage="Aucune équipe trouvée"
+            (onChange)="onTeamSelected($event.value)">
+
+            <ng-template let-team pTemplate="item">
+              <div class="team-option">
+                <span class="team-option-title">
+                  <i class="pi pi-users"></i>
+                  {{ team.label }}
+                </span>
+
+                <span class="team-option-sub">
+                  {{ team.projectName || 'Aucun projet' }} · {{ team.statusLabel }}
+                </span>
+              </div>
+            </ng-template>
+
+            <ng-template let-team pTemplate="selectedItem">
+              <div class="team-option selected" *ngIf="team">
+                <span class="team-option-title">
+                  <i class="pi pi-users"></i>
+                  {{ team.label }}
+                </span>
+              </div>
+            </ng-template>
+          </p-select>
+        </div>
+
+        <div class="selector-help">
+          <span class="help-badge">
+            {{ allTeams.length }} équipe(s)
+          </span>
+
+          <span class="help-text">
+            Sélectionnez une équipe pour configurer sa hiérarchie.
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="loadingTeam" class="loading-box">
+      <i class="pi pi-spin pi-spinner"></i>
+      Chargement de l'équipe...
+    </div>
+
+    <ng-container *ngIf="!loadingTeam && team">
+
+      <div class="hero">
+        <div class="hero-icon">
+          <i class="pi pi-sitemap"></i>
+        </div>
+
+        <div>
+          <h2>{{ team.name || 'Équipe sans nom' }}</h2>
+
+          <p>
+            Projet :
+            <strong>{{ team.projectName || 'Aucun projet' }}</strong>
+          </p>
+
+          <div class="hero-badges">
+            <span class="status-badge">
+              {{ members.length }} membre(s)
+            </span>
+
+            <span class="status-badge info">
+              1 leader requis
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <i class="pi pi-info-circle"></i>
+
+        <div>
+          <strong>Règles appliquées automatiquement</strong>
+
+          <ul>
+            <li>Le superviseur doit être un membre réel de la même équipe</li>
+            <li>Le superviseur doit avoir un niveau hiérarchique plus fort</li>
+            <li>Deux rôles du même niveau ne peuvent pas se superviser</li>
+            <li>Les cycles hiérarchiques sont bloqués par le backend</li>
+          </ul>
+        </div>
+      </div>
+
+      <div *ngIf="loadingMembers" class="loading-box">
+        <i class="pi pi-spin pi-spinner"></i>
+        Chargement des membres...
+      </div>
+
+      <div class="hierarchy-section" *ngIf="!loadingMembers && members.length > 0">
+        <div class="section-title">
+          <i class="pi pi-users"></i>
+          Configuration hiérarchique
+          <span class="section-count">{{ members.length }} membre(s)</span>
+        </div>
+
+        <div class="table-wrap">
+          <table class="hierarchy-table">
+            <thead>
+              <tr>
+                <th>Membre</th>
+                <th>Rôle projet</th>
+                <th>Niveau</th>
+                <th>Catégorie</th>
+                <th>Superviseur direct</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let member of members" class="data-row">
+                <td>
+                  <div class="user-cell">
+                    <img
+                      class="avatar"
+                      [src]="member.photoUrl"
+                      [alt]="member.fullName"
+                      (error)="onAvatarError($event)" />
+
+                    <div>
+                      <span class="main-name">{{ member.fullName }}</span>
+                      <span class="sub-text">{{ member.email || member.userId }}</span>
+                    </div>
+                  </div>
+                </td>
+
+                <td>
+                  <span class="role-badge">
+                    {{ member.projectRoleName || '—' }}
+                  </span>
+                </td>
+
+                <td>
+                  <span class="level-badge">
+                    {{ getHierarchyLabel(member.hierarchyLevel) }}
+                  </span>
+                </td>
+
+                <td>
+                  <span class="category-badge" *ngIf="member.roleCategoryName">
+                    <span
+                      class="color-dot"
+                      [style.background]="member.roleCategoryColor || '#1f3b6d'">
+                    </span>
+                    {{ member.roleCategoryName }}
+                  </span>
+
+                  <span class="text-faint" *ngIf="!member.roleCategoryName">—</span>
+                </td>
+
+                <td>
+                  <select
+                    class="p-inputtext supervisor-select"
+                    [ngModel]="hierarchyMap.get(member.id) ?? null"
+                    [disabled]="isSupervisorLoading(member.id)"
+                    (ngModelChange)="onSupervisorChange(member.id, $event)">
+
+                    <option [ngValue]="null">
+                      Leader / Aucun superviseur
+                    </option>
+
+                    <option
+                      *ngFor="let supervisor of getValidSupervisorsFor(member.id)"
+                      [ngValue]="supervisor.id">
+
+                      {{ supervisor.fullName }}
+                      — {{ supervisor.projectRoleName || 'Rôle non défini' }}
+                      — {{ getHierarchyLabel(supervisor.hierarchyLevel) }}
+                    </option>
+                  </select>
+
+                  <div class="supervisor-help">
+                    <ng-container *ngIf="isSupervisorLoading(member.id)">
+                      Chargement...
+                    </ng-container>
+
+                    <ng-container *ngIf="!isSupervisorLoading(member.id)">
+                      {{ getValidSupervisorsFor(member.id).length }} superviseur(s) valide(s)
+                    </ng-container>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="summary-box">
+          <div class="summary-item">
+            <span class="summary-label">Leader actuel</span>
+            <span class="summary-value">{{ getLeaderName() }}</span>
+          </div>
+
+          <div class="summary-item">
+            <span class="summary-label">Nombre de leaders</span>
+            <span class="summary-value" [class.invalid]="getLeaderCount() !== 1">
+              {{ getLeaderCount() }}
+            </span>
+          </div>
+
+          <div class="summary-item">
+            <span class="summary-label">Validation locale</span>
+            <span class="summary-value" [class.invalid]="!isHierarchyLocallyValid()">
+              {{ isHierarchyLocallyValid() ? 'Prêt à sauvegarder' : 'Un seul leader requis' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-section" *ngIf="!loadingMembers && members.length > 0">
+        <div class="section-title">
+          <i class="pi pi-sitemap"></i>
+          Organigramme
+        </div>
+
+        <div class="chart-wrap" *ngIf="chartNodes.length > 0">
+          <p-organizationChart
+            [value]="chartNodes"
+            [collapsible]="true"
+            selectionMode="single">
+
+            <ng-template let-node pTemplate="default">
+              <div class="org-node">
+                <div
+                  class="node-top"
+                  [style.background]="node.data.roleCategoryColor || '#1f3b6d'">
+                </div>
+
+                <div class="node-avatar-wrap">
+                  <img
+                    class="node-avatar"
+                    [src]="node.data.photoUrl"
+                    [alt]="node.data.fullName"
+                    (error)="onAvatarError($event)" />
+                </div>
+
+                <div class="node-name">
+                  {{ node.data.fullName }}
+                </div>
+
+                <div class="node-role">
+                  {{ node.data.projectRoleName || 'Rôle non défini' }}
+                </div>
+
+                <div class="node-level">
+                  {{ getHierarchyLabel(node.data.hierarchyLevel) }}
+                </div>
+              </div>
+            </ng-template>
+
+          </p-organizationChart>
+        </div>
+
+        <div class="empty-box" *ngIf="chartNodes.length === 0">
+          <i class="pi pi-info-circle"></i>
+          Impossible de générer l’organigramme.
+        </div>
+      </div>
+
+    </ng-container>
+
+    <div *ngIf="!loadingTeam && selectedTeamId && !team" class="empty-box">
+      <i class="pi pi-info-circle"></i>
+      Aucune équipe trouvée.
+    </div>
+
+    <div *ngIf="!selectedTeamId && !loadingTeams" class="empty-box soft">
+      <i class="pi pi-info-circle"></i>
+      Sélectionnez une équipe pour afficher la configuration hiérarchique.
+    </div>
+
+  </div>
+</div>

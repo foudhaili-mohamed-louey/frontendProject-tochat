@@ -1,0 +1,164 @@
+:host {
+  --blue: #1f3b6d;
+  display: block;
+}
+
+.ui-card {
+  border-radius: 14px;
+  overflow: hidden;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.bar {
+  background: var(--blue);
+  color: #fff;
+  padding: 0.9rem 1rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.block {
+  padding: 1.3rem 1.1rem;
+}
+
+.block-title {
+  font-weight: 700;
+  color: var(--blue);
+  padding-bottom: 0.55rem;
+  margin-bottom: 1.1rem;
+  border-bottom: 2px solid var(--blue);
+}
+
+// ===== FORM GRID =====
+.formgrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+}
+
+@media (max-width: 640px) {
+  .formgrid { grid-template-columns: 1fr; }
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+// ===== FIELDS =====
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+label {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.95rem;
+}
+
+.textarea {
+  resize: vertical;
+  border-radius: 10px;
+  border: 1px solid #dbe4f3;
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: var(--blue);
+  }
+}
+
+// ===== MESSAGES =====
+.error {
+  color: #dc2626;
+  font-size: 0.78rem;
+}
+
+.hint {
+  color: #6b7280;
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  .pi {
+    color: #3b82f6;
+    font-size: 0.78rem;
+  }
+}
+
+.char-count {
+  color: #9ca3af;
+  font-size: 0.78rem;
+  text-align: right;
+}
+
+// ===== WARNING BOX =====
+.warning-box {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  margin-top: 1.5rem;
+  color: #92400e;
+
+  .pi-exclamation-triangle {
+    font-size: 1.3rem;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+    color: #f59e0b;
+  }
+
+  strong {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    font-size: 0.85rem;
+    line-height: 1.7;
+  }
+
+  code {
+    background: #fef3c7;
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+}
+
+// ===== LOADING =====
+.loading-msg {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+
+  .pi {
+    margin-right: 0.5rem;
+    color: var(--blue);
+  }
+}
+
+// ===== FOOTER =====
+.footer-sticky {
+  position: sticky;
+  bottom: 0;
+  border-top: 1px solid #e6eaf2;
+  padding: 1rem 1.1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.9rem;
+  background: #fff;
+}

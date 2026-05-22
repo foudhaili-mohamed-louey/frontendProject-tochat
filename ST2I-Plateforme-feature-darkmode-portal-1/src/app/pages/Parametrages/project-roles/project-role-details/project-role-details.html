@@ -1,0 +1,129 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="card ui-card">
+  <div class="bar bar-row">
+    <span>Détails du rôle projet</span>
+
+    <div class="bar-actions">
+      <p-button
+        icon="pi pi-arrow-left"
+        label="Retour"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="back()">
+      </p-button>
+
+      <p-button
+        icon="pi pi-pencil"
+        label="Modifier"
+        severity="info"
+        [disabled]="!role"
+        (onClick)="edit()">
+      </p-button>
+    </div>
+  </div>
+
+  <div class="block">
+
+    <div *ngIf="loading" class="loading-box">
+      <i class="pi pi-spin pi-spinner"></i>
+      Chargement du rôle projet...
+    </div>
+
+    <ng-container *ngIf="!loading && role">
+
+      <div class="hero">
+        <div class="hero-icon">
+          <i class="pi pi-briefcase"></i>
+        </div>
+
+        <div>
+          <h2>{{ role.name }}</h2>
+          <p>{{ role.description || 'Aucune description disponible.' }}</p>
+        </div>
+      </div>
+
+      <div class="details-grid">
+
+        <div class="info-card">
+          <span class="label">Identifiant</span>
+          <span class="value">#{{ role.id }}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Type de rôle</span>
+          <span class="badge badge-green" *ngIf="role.uniqueRole">
+            <i class="pi pi-check-circle"></i>
+            Rôle unique
+          </span>
+
+          <span class="badge badge-amber" *ngIf="!role.uniqueRole">
+            Rôle multiple
+          </span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Niveau hiérarchique</span>
+          <span class="level-badge">
+            {{ getHierarchyLabel(role.hierarchyLevel) }}
+          </span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Catégorie</span>
+          <span class="category-badge" *ngIf="role.roleCategoryName">
+            <span
+              class="color-dot"
+              [style.background]="role.roleCategoryColor || '#1f3b6d'">
+            </span>
+            {{ role.roleCategoryName }}
+          </span>
+          <span class="text-faint" *ngIf="!role.roleCategoryName">—</span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Statut</span>
+          <span class="status-badge" [class.inactive]="role.active === false">
+            {{ role.active === false ? 'Inactive' : 'Active' }}
+          </span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">ID Catégorie</span>
+          <span class="value" *ngIf="role.roleCategoryId">#{{ role.roleCategoryId }}</span>
+          <span class="text-faint" *ngIf="!role.roleCategoryId">—</span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Créé le</span>
+          <span class="value">{{ role.createdAt ? (role.createdAt | date:'dd/MM/yyyy HH:mm') : '—' }}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Dernière modification</span>
+          <span class="value">{{ role.updatedAt ? (role.updatedAt | date:'dd/MM/yyyy HH:mm') : '—' }}</span>
+        </div>
+
+      </div>
+
+      <div class="info-box">
+        <i class="pi pi-info-circle"></i>
+        <div>
+          <strong>Règle hiérarchique</strong>
+          <ul>
+            <li>Plus le niveau est petit, plus l’autorité hiérarchique est élevée</li>
+            <li>Un superviseur doit avoir un niveau strictement supérieur en autorité</li>
+            <li>Deux rôles du même niveau ne peuvent pas se superviser entre eux</li>
+          </ul>
+        </div>
+      </div>
+
+    </ng-container>
+
+    <div *ngIf="!loading && !role" class="empty-box">
+      <i class="pi pi-info-circle"></i>
+      Aucun rôle projet trouvé.
+    </div>
+
+  </div>
+</div>

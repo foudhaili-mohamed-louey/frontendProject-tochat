@@ -1,0 +1,218 @@
+:host {
+  --blue: #1f3b6d;
+  display: block;
+}
+
+.ui-card {
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.bar {
+  background: var(--blue);
+  color: #fff;
+  padding: 0.9rem 1rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.bar-title {
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.total-badge {
+  background: rgba(255,255,255,0.2);
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.body { padding: 1rem; }
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(180px, 1fr));
+  gap: 1rem;
+  align-items: center;
+}
+
+@media (max-width: 1400px) { .filter-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 900px)  { .filter-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 650px)  { .filter-grid { grid-template-columns: 1fr; } }
+
+.field { margin: 0; }
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.bar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.icon-btn { width: 2.6rem; height: 2.6rem; }
+.export   { border: 1px solid rgba(255,255,255,0.35); }
+
+// ===== TABLE =====
+.table-wrap { overflow-x: auto; }
+
+.dept-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead tr {
+    background: #f1f5f9;
+  }
+
+  th {
+    padding: 0.85rem 1rem;
+    text-align: left;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.9rem;
+    color: #1e293b;
+  }
+
+  tbody tr:hover {
+    background: #f8fafc;
+  }
+}
+
+// ===== BADGES =====
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  &.active   { background: #dcfce7; color: #16a34a; }
+  &.inactive { background: #fee2e2; color: #dc2626; }
+}
+
+.code-badge {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: #dbeafe;
+  color: #1d4ed8;
+  letter-spacing: 0.04em;
+}
+
+.type-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  &.operational { background: #ede9fe; color: #6d28d9; }
+  &.support     { background: #fef9c3; color: #a16207; }
+}
+
+// ===== ACTIONS =====
+.actions-col { white-space: nowrap; }
+
+:host ::ng-deep .action-btn {
+  width: 2.2rem; height: 2.2rem;
+  border-radius: 999px;
+  padding: 0 !important;
+  margin-left: 0.25rem;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  &:hover { background: rgba(31,59,109,0.08) !important; }
+}
+:host ::ng-deep .action-btn .pi { font-size: 1.1rem; }
+:host ::ng-deep .info .pi       { color: #2563eb; }
+:host ::ng-deep .edit .pi       { color: #1f3b6d; }
+:host ::ng-deep .activate .pi   { color: #16a34a; }
+:host ::ng-deep .deactivate .pi { color: #d97706; }
+
+// ===== EMPTY =====
+.empty-msg {
+  text-align: center;
+  padding: 2rem;
+  color: #94a3b8;
+  font-style: italic;
+  .pi { margin-right: 0.5rem; }
+}
+
+// ===== PAGINATION =====
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 1rem;
+  border-top: 1px solid #f1f5f9;
+  flex-wrap: wrap;
+}
+
+.pg-btn {
+  min-width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #1f3b6d;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.5rem;
+
+  &:hover:not(:disabled) {
+    background: #1f3b6d;
+    color: #fff;
+    border-color: #1f3b6d;
+  }
+
+  &.active {
+    background: #1f3b6d;
+    color: #fff;
+    border-color: #1f3b6d;
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.pg-info {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin-left: 0.5rem;
+}

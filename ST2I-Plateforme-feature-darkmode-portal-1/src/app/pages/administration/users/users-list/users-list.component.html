@@ -1,0 +1,296 @@
+<p-toast position="top-right"></p-toast>
+
+<!-- ===== DELETE CONFIRM DIALOG ===== -->
+<div class="confirm-overlay" *ngIf="showDeleteConfirm" (click)="cancelDelete()">
+  <div class="confirm-dialog" (click)="$event.stopPropagation()">
+    <div class="confirm-header">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>Confirmer la suppression</span>
+    </div>
+
+    <div class="confirm-user-info" *ngIf="userToDelete">
+      <span class="confirm-user-name">{{ userToDelete.firstName }} {{ userToDelete.lastName }}</span>
+      <span class="confirm-user-email">{{ userToDelete.email }}</span>
+    </div>
+
+    <div class="confirm-warning-box">
+      <strong>Attention — cette action est irréversible</strong>
+      <ul>
+        <li>Le compte utilisateur sera définitivement supprimé</li>
+        <li>Toutes les sessions actives seront terminées</li>
+        <li>Cette action ne peut pas être annulée</li>
+      </ul>
+    </div>
+
+    <div class="confirm-actions">
+      <p-button
+        icon="pi pi-trash"
+        label="Supprimer"
+        severity="danger"
+        [loading]="deleting"
+        (onClick)="confirmDelete()">
+      </p-button>
+
+      <p-button
+        icon="pi pi-times"
+        label="Annuler"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="deleting"
+        (onClick)="cancelDelete()">
+      </p-button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FILTER CARD ===== -->
+<div class="card ui-card">
+  <div class="bar">Filtres de recherche</div>
+
+  <div class="body">
+    <div class="filter-grid">
+      <div class="field">
+        <input
+          pInputText
+          placeholder="Prénom"
+          [(ngModel)]="filters.firstName" />
+      </div>
+
+      <div class="field">
+        <input
+          pInputText
+          placeholder="Nom"
+          [(ngModel)]="filters.lastName" />
+      </div>
+
+      <div class="field">
+        <select class="p-inputtext" [(ngModel)]="filters.emailVerified">
+          <option [ngValue]="undefined">Email vérifié</option>
+          <option [ngValue]="true">Vérifié</option>
+          <option [ngValue]="false">Non vérifié</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <select class="p-inputtext" [(ngModel)]="filters.isActive">
+          <option [ngValue]="undefined">Statut</option>
+          <option [ngValue]="true">Actif</option>
+          <option [ngValue]="false">Inactif</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <select class="p-inputtext" [(ngModel)]="filters.profession">
+          <option [ngValue]="undefined">Profession</option>
+          <option *ngFor="let profession of professions" [ngValue]="profession">
+            {{ profession }}
+          </option>
+        </select>
+      </div>
+
+      <div class="field">
+        <select class="p-inputtext" [(ngModel)]="filters.departmentId">
+          <option [ngValue]="undefined">Département</option>
+          <option *ngFor="let dept of departments" [ngValue]="dept.id">
+            {{ dept.code }} - {{ dept.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="field">
+        <select class="p-inputtext" [(ngModel)]="filters.roleMetadataId">
+          <option [ngValue]="undefined">Rôle</option>
+          <option *ngFor="let role of roles" [ngValue]="role.id">
+            {{ role.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="actions">
+      <p-button
+        icon="pi pi-search"
+        label="Rechercher"
+        severity="info"
+        (onClick)="search()">
+      </p-button>
+
+      <p-button
+        icon="pi pi-refresh"
+        label="Réinitialiser"
+        severity="danger"
+        [outlined]="true"
+        (onClick)="reset()">
+      </p-button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TABLE CARD ===== -->
+<div class="card ui-card">
+  <div class="bar bar-row">
+    <div class="bar-title">
+      Liste des utilisateurs
+      <span class="total-badge" *ngIf="totalElements > 0">{{ totalElements }}</span>
+    </div>
+
+    <div class="bar-right">
+      <p-button
+        icon="pi pi-plus"
+        [rounded]="true"
+        (onClick)="add()"
+        styleClass="icon-btn"
+        pTooltip="Ajouter un utilisateur">
+      </p-button>
+
+      <p-button
+        icon="pi pi-upload"
+        [rounded]="true"
+        (onClick)="export()"
+        styleClass="icon-btn export"
+        pTooltip="Exporter CSV">
+      </p-button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Utilisateur</th>
+          <th>Email</th>
+          <th>Vérification</th>
+          <th>Statut</th>
+          <th>Profession</th>
+          <th>Département</th>
+          <th>Rôle</th>
+          <th style="width: 170px;">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <!-- loading skeleton -->
+        <ng-container *ngIf="loading">
+          <tr *ngFor="let i of [1,2,3,4,5,6,7]" class="skeleton-row">
+            <td><div class="skel skel-user"></div></td>
+            <td><div class="skel skel-md"></div></td>
+            <td><div class="skel skel-sm"></div></td>
+            <td><div class="skel skel-sm"></div></td>
+            <td><div class="skel skel-sm"></div></td>
+            <td><div class="skel skel-sm"></div></td>
+            <td><div class="skel skel-sm"></div></td>
+            <td><div class="skel skel-actions"></div></td>
+          </tr>
+        </ng-container>
+
+        <!-- data rows -->
+        <ng-container *ngIf="!loading">
+          <tr *ngFor="let u of rows" class="data-row">
+            <td>
+              <div class="user-cell">
+                <img
+                  class="user-avatar"
+                  [src]="getAvatar(u)"
+                  [alt]="u.firstName + ' ' + u.lastName"
+                  (error)="onAvatarError($event, u)" />
+
+                <span class="user-fullname">{{ u.firstName }} {{ u.lastName }}</span>
+              </div>
+            </td>
+
+            <td class="text-muted">{{ u.email }}</td>
+
+            <td>
+              <span class="badge badge-green" *ngIf="u.emailVerified">
+                <i class="pi pi-check-circle"></i> Vérifié
+              </span>
+              <span class="badge badge-amber" *ngIf="!u.emailVerified">
+                <i class="pi pi-clock"></i> En attente
+              </span>
+            </td>
+
+            <td>
+              <span class="badge badge-green" *ngIf="u.isActive">Actif</span>
+              <span class="badge badge-red" *ngIf="!u.isActive">Inactif</span>
+            </td>
+
+            <td>
+              <span class="profession-badge" *ngIf="u.profession">{{ u.profession }}</span>
+              <span class="text-faint" *ngIf="!u.profession">—</span>
+            </td>
+
+            <td>
+              <span class="dept-badge" *ngIf="u.departmentCode">{{ u.departmentCode }}</span>
+              <span class="text-faint" *ngIf="!u.departmentCode">—</span>
+            </td>
+
+            <td>
+              <span class="role-badge" *ngIf="u.roleName">{{ u.roleName }}</span>
+              <span class="text-faint" *ngIf="!u.roleName">—</span>
+            </td>
+
+            <td class="actions-col">
+              <button class="action-btn info" pTooltip="Détails" (click)="details(u)">
+                <i class="pi pi-info-circle"></i>
+              </button>
+
+              <button class="action-btn edit" pTooltip="Modifier" (click)="edit(u)">
+                <i class="pi pi-pencil"></i>
+              </button>
+
+              <button class="action-btn del" pTooltip="Supprimer" (click)="delete(u)">
+                <i class="pi pi-trash"></i>
+              </button>
+
+              <button class="action-btn reset-pw" pTooltip="Réinitialiser mot de passe" (click)="resetPassword(u)">
+                <i class="pi pi-key"></i>
+              </button>
+            </td>
+          </tr>
+
+          <!-- empty -->
+          <tr *ngIf="rows.length === 0">
+            <td colspan="8" class="empty-msg">
+              <i class="pi pi-users" style="font-size:2rem;opacity:.3"></i>
+              <br />Aucun utilisateur trouvé.
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== CUSTOM PAGINATION ===== -->
+  <div class="pagination-bar" *ngIf="totalPages > 1">
+    <span class="page-info">
+      Page {{ currentPage + 1 }} / {{ totalPages }}
+      &nbsp;·&nbsp; {{ totalElements }} utilisateurs
+    </span>
+
+    <div class="page-controls">
+      <button class="page-btn" [disabled]="currentPage === 0" (click)="onPageChange(0)">
+        <i class="pi pi-angle-double-left"></i>
+      </button>
+
+      <button class="page-btn" [disabled]="currentPage === 0" (click)="onPageChange(currentPage - 1)">
+        <i class="pi pi-angle-left"></i>
+      </button>
+
+      <button
+        *ngFor="let p of pages"
+        class="page-btn"
+        [class.active]="p === currentPage"
+        (click)="onPageChange(p)">
+        {{ p + 1 }}
+      </button>
+
+      <button class="page-btn" [disabled]="currentPage === totalPages - 1" (click)="onPageChange(currentPage + 1)">
+        <i class="pi pi-angle-right"></i>
+      </button>
+
+      <button class="page-btn" [disabled]="currentPage === totalPages - 1" (click)="onPageChange(totalPages - 1)">
+        <i class="pi pi-angle-double-right"></i>
+      </button>
+    </div>
+  </div>
+</div>

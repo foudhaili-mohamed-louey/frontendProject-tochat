@@ -1,0 +1,412 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="confirm-overlay" *ngIf="showConfirm" (click)="cancelConfirm()">
+  <div class="confirm-dialog" (click)="$event.stopPropagation()">
+    <div class="confirm-header">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>{{ getConfirmTitle() }}</span>
+    </div>
+
+    <div class="confirm-user-info" *ngIf="projectToConfirm">
+      <span class="confirm-user-name">
+        {{ projectToConfirm.name || 'Projet sans nom' }}
+      </span>
+
+      <span class="confirm-user-email">
+        {{ projectToConfirm.clientName || 'Aucun client' }}
+      </span>
+    </div>
+
+    <div class="confirm-warning-box" *ngIf="confirmActionType === 'DELETE'">
+      <strong>Attention — cette action est importante</strong>
+      <ul>
+        <li>Le projet sera archivé avec soft delete</li>
+        <li>L’historique du projet et des affectations sera conservé</li>
+        <li>Une équipe déjà affectée restera liée au projet archivé</li>
+        <li>Les projets RUNNING ou ON_HOLD ne peuvent pas être supprimés</li>
+      </ul>
+    </div>
+
+    <div class="confirm-warning-box" *ngIf="confirmActionType === 'CANCEL'">
+      <strong>Attention — cette action est définitive</strong>
+      <ul>
+        <li>Le projet passera au statut CANCELLED</li>
+        <li>Un projet annulé ne pourra plus être modifié</li>
+        <li>Les affectations existantes seront conservées pour l’historique</li>
+      </ul>
+    </div>
+
+    <div class="confirm-warning-box" *ngIf="confirmActionType === 'END'">
+      <strong>Attention — cette action est définitive</strong>
+      <ul>
+        <li>Le projet passera au statut ENDED</li>
+        <li>Un projet terminé ne pourra plus être modifié</li>
+        <li>Les affectations existantes seront conservées pour l’historique</li>
+      </ul>
+    </div>
+
+    <div class="confirm-actions">
+      <p-button
+        [icon]="getConfirmButtonIcon()"
+        [label]="getConfirmButtonLabel()"
+        severity="danger"
+        [loading]="confirming"
+        (onClick)="confirmAction()">
+      </p-button>
+
+      <p-button
+        icon="pi pi-times"
+        label="Retour"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="confirming"
+        (onClick)="cancelConfirm()">
+      </p-button>
+    </div>
+  </div>
+</div>
+
+<div class="card ui-card">
+  <div class="bar">Filtres de recherche</div>
+
+  <div class="body">
+    <div class="filter-grid">
+      <div class="field">
+        <label>Mot-clé</label>
+        <input
+          pInputText
+          placeholder="Nom, description, client..."
+          [(ngModel)]="filters.keyword" />
+      </div>
+
+      <div class="field">
+        <label>Client</label>
+        <input
+          pInputText
+          placeholder="Nom du client"
+          [(ngModel)]="filters.clientName" />
+      </div>
+
+      <div class="field">
+        <label>Équipe affectée</label>
+
+        <p-select
+          class="w-full"
+          styleClass="team-filter-dropdown"
+          panelStyleClass="team-filter-panel"
+          appendTo="body"
+          [(ngModel)]="filters.teamId"
+          [options]="teamOptions"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name,projectName"
+          [showClear]="false"
+          [loading]="loadingAssignedTeams"
+          [virtualScroll]="true"
+          [virtualScrollItemSize]="52"
+          [scrollHeight]="'260px'"
+          placeholder="Toutes les équipes"
+          emptyMessage="Aucune équipe affectée trouvée"
+          emptyFilterMessage="Aucune équipe affectée trouvée"
+          (onFilter)="onTeamFilter($event)">
+
+          <ng-template let-team pTemplate="item">
+            <div
+              class="team-filter-option"
+              [class.all-teams-option]="team.allTeams">
+
+              <span class="team-filter-name">
+                <i
+                  class="pi"
+                  [ngClass]="team.allTeams ? 'pi-list' : 'pi-users'">
+                </i>
+
+                {{ team.name }}
+              </span>
+
+              <span class="team-filter-sub">
+                {{ team.allTeams ? 'Afficher tous les projets' : ((team.membersCount || 0) + ' membre(s)' + (team.projectName ? ' · ' + team.projectName : '')) }}
+              </span>
+            </div>
+          </ng-template>
+
+          <ng-template let-team pTemplate="selectedItem">
+            <div
+              class="team-filter-option selected"
+              *ngIf="team"
+              [class.all-teams-option]="team.allTeams">
+
+              <span class="team-filter-name">
+                <i
+                  class="pi"
+                  [ngClass]="team.allTeams ? 'pi-list' : 'pi-users'">
+                </i>
+
+                {{ team.name }}
+              </span>
+            </div>
+          </ng-template>
+        </p-select>
+      </div>
+
+      <div class="field">
+        <label>Statut</label>
+        <select class="p-inputtext" [(ngModel)]="filters.status">
+          <option [ngValue]="undefined">Tous les statuts</option>
+          <option *ngFor="let status of statuses" [ngValue]="status">
+            {{ formatStatus(status) }}
+          </option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Date début min</label>
+        <input
+          class="p-inputtext"
+          type="date"
+          [(ngModel)]="filters.startDateFrom"
+          [max]="filters.endDateTo || null" />
+      </div>
+
+      <div class="field">
+        <label>Date fin max</label>
+        <input
+          class="p-inputtext"
+          type="date"
+          [(ngModel)]="filters.endDateTo"
+          [min]="filters.startDateFrom || null" />
+      </div>
+    </div>
+
+    <div class="actions">
+      <p-button
+        icon="pi pi-search"
+        label="Rechercher"
+        severity="info"
+        (onClick)="search()">
+      </p-button>
+
+      <p-button
+        icon="pi pi-refresh"
+        label="Réinitialiser"
+        severity="danger"
+        [outlined]="true"
+        (onClick)="reset()">
+      </p-button>
+    </div>
+  </div>
+</div>
+
+<div class="card ui-card">
+  <div class="bar bar-row">
+    <div class="bar-title">
+      Liste des projets
+      <span class="total-badge" *ngIf="totalElements > 0">
+        {{ totalElements }}
+      </span>
+    </div>
+
+    <div class="bar-right">
+      <p-button
+        icon="pi pi-plus"
+        [rounded]="true"
+        (onClick)="add()"
+        styleClass="icon-btn"
+        pTooltip="Ajouter un projet">
+      </p-button>
+
+      <p-button
+        icon="pi pi-upload"
+        [rounded]="true"
+        (onClick)="export()"
+        styleClass="icon-btn export"
+        pTooltip="Exporter CSV">
+      </p-button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Client</th>
+          <th>Statut</th>
+          <th>Équipe</th>
+          <th style="width: 230px;">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <ng-container *ngIf="loading">
+          <tr *ngFor="let i of [1,2,3,4,5,6,7]" class="skeleton-row">
+            <td><div class="skel skel-md"></div></td>
+            <td><div class="skel skel-md"></div></td>
+            <td><div class="skel skel-sm"></div></td>
+            <td><div class="skel skel-md"></div></td>
+            <td><div class="skel skel-actions"></div></td>
+          </tr>
+        </ng-container>
+
+        <ng-container *ngIf="!loading">
+          <tr *ngFor="let p of rows" class="data-row">
+            <td>
+              <div class="project-cell">
+                <span class="project-icon">
+                  <i class="pi pi-folder"></i>
+                </span>
+
+                <div>
+                  <span class="main-name">
+                    {{ p.name || 'Projet sans nom' }}
+                  </span>
+
+                  <span class="sub-text">
+                    #{{ p.id }}
+                  </span>
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <span class="client-badge" *ngIf="p.clientName">
+                <i class="pi pi-user"></i>
+                {{ p.clientName }}
+              </span>
+
+              <span class="text-faint" *ngIf="!p.clientName">
+                Aucun client
+              </span>
+            </td>
+
+            <td>
+              <span class="badge" [ngClass]="statusClass(p.status)">
+                {{ formatStatus(p.status) }}
+              </span>
+            </td>
+
+            <td>
+              <span class="team-badge" *ngIf="hasTeam(p)">
+                <i class="pi pi-users"></i>
+                {{ p.teamName || ('Équipe #' + p.teamId) }}
+              </span>
+
+              <span class="text-faint" *ngIf="!hasTeam(p)">
+                Non affectée
+              </span>
+            </td>
+
+            <td class="actions-col">
+              <button class="action-btn info" pTooltip="Détails" (click)="details(p)">
+                <i class="pi pi-info-circle"></i>
+              </button>
+
+              <button
+                class="action-btn edit"
+                pTooltip="Modifier"
+                [disabled]="!canEdit(p)"
+                (click)="edit(p)">
+                <i class="pi pi-pencil"></i>
+              </button>
+
+              <button
+                *ngIf="canStart(p)"
+                class="action-btn start"
+                pTooltip="Démarrer"
+                [disabled]="isChanging(p)"
+                (click)="changeStatusDirect(p, ProjectStatus.RUNNING)">
+                <i class="pi pi-play"></i>
+              </button>
+
+              <button
+                *ngIf="canPause(p)"
+                class="action-btn pause"
+                pTooltip="Mettre en pause"
+                [disabled]="isChanging(p)"
+                (click)="changeStatusDirect(p, ProjectStatus.ON_HOLD)">
+                <i class="pi pi-pause"></i>
+              </button>
+
+              <button
+                *ngIf="canResume(p)"
+                class="action-btn resume"
+                pTooltip="Reprendre"
+                [disabled]="isChanging(p)"
+                (click)="changeStatusDirect(p, ProjectStatus.RUNNING)">
+                <i class="pi pi-refresh"></i>
+              </button>
+
+              <button
+                *ngIf="canEnd(p)"
+                class="action-btn end"
+                pTooltip="Terminer"
+                [disabled]="isChanging(p)"
+                (click)="openEndConfirm(p)">
+                <i class="pi pi-check-circle"></i>
+              </button>
+
+              <button
+                *ngIf="canCancel(p)"
+                class="action-btn cancel"
+                pTooltip="Annuler le projet"
+                [disabled]="isChanging(p)"
+                (click)="openCancelConfirm(p)">
+                <i class="pi pi-ban"></i>
+              </button>
+
+              <button
+                class="action-btn del"
+                pTooltip="Supprimer"
+                [disabled]="!canDelete(p)"
+                (click)="openDeleteConfirm(p)">
+                <i class="pi pi-trash"></i>
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="rows.length === 0">
+            <td colspan="5" class="empty-msg">
+              <i class="pi pi-folder" style="font-size:2rem;opacity:.3"></i>
+              <br />
+              Aucun projet trouvé.
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination-bar" *ngIf="totalPages > 1">
+    <span class="page-info">
+      Page {{ currentPage + 1 }} / {{ totalPages }}
+      &nbsp;·&nbsp; {{ totalElements }} projets
+    </span>
+
+    <div class="page-controls">
+      <button class="page-btn" [disabled]="currentPage === 0" (click)="onPageChange(0)">
+        <i class="pi pi-angle-double-left"></i>
+      </button>
+
+      <button class="page-btn" [disabled]="currentPage === 0" (click)="onPageChange(currentPage - 1)">
+        <i class="pi pi-angle-left"></i>
+      </button>
+
+      <button
+        *ngFor="let p of pages"
+        class="page-btn"
+        [class.active]="p === currentPage"
+        (click)="onPageChange(p)">
+        {{ p + 1 }}
+      </button>
+
+      <button class="page-btn" [disabled]="currentPage === totalPages - 1" (click)="onPageChange(currentPage + 1)">
+        <i class="pi pi-angle-right"></i>
+      </button>
+
+      <button class="page-btn" [disabled]="currentPage === totalPages - 1" (click)="onPageChange(totalPages - 1)">
+        <i class="pi pi-angle-double-right"></i>
+      </button>
+    </div>
+  </div>
+</div>

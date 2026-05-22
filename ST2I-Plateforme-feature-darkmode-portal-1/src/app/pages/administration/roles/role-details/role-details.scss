@@ -1,0 +1,78 @@
+:host {
+  --blue:#1f3b6d;
+  display:block;
+}
+
+.role-details-container{
+  padding:1rem;
+}
+
+.ui-card{
+  border-radius:14px;
+  overflow:hidden;
+  margin-bottom:1rem;
+  background:#fff;
+  border:1px solid #e6eaf2;
+}
+
+.bar{
+  background:var(--blue);
+  color:#fff;
+  padding:0.9rem 1rem;
+  font-weight:600;
+  font-size:1.05rem;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  gap:2rem;
+  padding:0.95rem 1rem;
+  border-bottom:1px solid #e6eaf2;
+}
+
+.module-card{
+  border-bottom:1px solid #e6eaf2;
+}
+
+.module-header{
+  display:flex;
+  justify-content:space-between;
+  padding:0.9rem 1rem;
+  cursor:pointer;
+  font-weight:500;
+  background:#f8f9fb;
+}
+
+.module-header:hover{
+  background:#eef2f8;
+}
+
+.arrow{
+  font-size:0.8rem;
+}
+
+.permissions-table{
+  padding:1rem;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th, td{
+  text-align:center;
+  padding:0.6rem;
+  border:1px solid #e6eaf2;
+}
+
+th{
+  background:#f5f7fb;
+  font-weight:600;
+}
+
+.loading{
+  padding:1rem;
+  text-align:center;
+}

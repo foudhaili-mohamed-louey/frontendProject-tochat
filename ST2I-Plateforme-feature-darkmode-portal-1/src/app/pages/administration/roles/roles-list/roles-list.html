@@ -1,0 +1,206 @@
+<p-toast position="top-right"></p-toast>
+
+<!-- ===== CUSTOM CONFIRM DIALOG ===== -->
+<div class="confirm-overlay" *ngIf="showConfirm" (click)="cancelDelete()">
+  <div class="confirm-dialog" (click)="$event.stopPropagation()">
+
+    <div class="confirm-header">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>Confirmer la suppression</span>
+    </div>
+
+    <div class="confirm-role-info" *ngIf="roleToDelete">
+      <span class="confirm-role-name">{{ roleToDelete.name }}</span>
+      <span class="confirm-role-level">Niveau {{ roleToDelete.level }}</span>
+    </div>
+
+    <div class="confirm-warning-box">
+      <strong>Attention — cette action est irréversible</strong>
+      <ul>
+        <li>Toutes les permissions assignées à ce rôle seront supprimées</li>
+        <li>Les utilisateurs avec ce rôle devront être réassignés</li>
+        <li>Cette action ne peut pas être annulée</li>
+      </ul>
+    </div>
+
+    <div class="confirm-info-box">
+      <i class="pi pi-shield"></i>
+      <div>
+        <strong>Conditions de suppression</strong>
+        <ul>
+          <li>Les rôles système ne peuvent pas être supprimés</li>
+          <li>Vous ne pouvez pas supprimer un rôle de niveau ≥ au vôtre</li>
+          <li>Vous ne pouvez pas supprimer votre propre rôle</li>
+          <li>Un rôle assigné à des utilisateurs ne peut pas être supprimé</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="confirm-actions">
+      <p-button icon="pi pi-trash"
+                label="Supprimer"
+                severity="danger"
+                [loading]="deleting"
+                (onClick)="confirmDelete()">
+      </p-button>
+      <p-button icon="pi pi-times"
+                label="Annuler"
+                severity="secondary"
+                [outlined]="true"
+                [disabled]="deleting"
+                (onClick)="cancelDelete()">
+      </p-button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== MAIN CARD ===== -->
+<div class="card ui-card">
+
+  <div class="bar">
+    <span>Liste des rôles</span>
+    <p-button icon="pi pi-plus"
+              label="Ajouter"
+              severity="info"
+              (onClick)="goToCreate()"
+              class="add-btn">
+    </p-button>
+  </div>
+
+  <div class="block">
+
+    <!-- ===== FILTERS ROW ===== -->
+    <div class="filters-row">
+
+      <div class="search-box">
+        <i class="pi pi-search search-icon"></i>
+        <input type="text"
+               placeholder="Rechercher par nom..."
+               [(ngModel)]="searchCriteria.name"
+               (input)="onSearchChange()" />
+      </div>
+
+      <div class="type-filter">
+        <label>Type</label>
+        <!-- fix: use (ngModelChange) instead of (change)+"$event.target" to avoid null error -->
+        <select [(ngModel)]="typeFilter"
+                (ngModelChange)="onTypeChange(typeFilter)">
+          <option value="">Tous</option>
+          <option value="true">Système</option>
+          <option value="false">Personnalisé</option>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- ===== TABLE ===== -->
+    <table class="roles-table">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Type</th>
+          <th>Niveau</th>
+          <th class="text-center">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr *ngIf="loading">
+          <td colspan="4" class="empty-msg">
+            <i class="pi pi-spin pi-spinner"></i>
+            Chargement...
+          </td>
+        </tr>
+
+        <tr *ngFor="let role of roles" [class.system-row]="role.isSystemRole">
+
+          <td><span class="role-name">{{ role.name }}</span></td>
+
+          <td>
+            <span class="type-badge"
+                  [class.system]="role.isSystemRole"
+                  [class.custom]="!role.isSystemRole">
+              {{ role.isSystemRole ? 'Système' : 'Personnalisé' }}
+            </span>
+          </td>
+
+          <td><span class="level-badge">{{ role.level }}</span></td>
+
+          <td class="text-center actions-col">
+            <i class="pi pi-info-circle action info"
+               title="Détails"
+               (click)="goToDetails(role.name)">
+            </i>
+            <i class="pi pi-pencil action edit"
+               title="Modifier"
+               [class.disabled]="role.isSystemRole"
+               (click)="!role.isSystemRole && goToEdit(role.name)">
+            </i>
+            <i class="pi pi-trash action delete"
+               title="Supprimer"
+               [class.disabled]="role.isSystemRole"
+               (click)="deleteRole(role)">
+            </i>
+            <i class="pi pi-key action permissions"
+               title="Gérer les permissions"
+               [class.disabled]="role.isSystemRole"
+               (click)="!role.isSystemRole && goToPermissions(role.id)">
+            </i>
+          </td>
+        </tr>
+
+        <tr *ngIf="!loading && roles.length === 0">
+          <td colspan="4" class="empty-msg">
+            {{ (searchCriteria.name || searchCriteria.isSystemRole !== null)
+               ? 'Aucun rôle trouvé'
+               : 'Aucun rôle disponible' }}
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+
+    <!-- ===== PAGINATION ===== -->
+    <div class="pagination-row" *ngIf="!loading && totalPages > 1">
+
+      <div class="pagination-info">
+        {{ (currentPage * pageSize) + 1 }} -
+        {{ Math.min((currentPage + 1) * pageSize, totalElements) }}
+        sur {{ totalElements }} rôle(s)
+      </div>
+
+      <div class="pagination-controls">
+        <p-button icon="pi pi-chevron-left"
+                  label="Précédent"
+                  severity="secondary"
+                  [outlined]="true"
+                  [disabled]="currentPage === 0"
+                  (onClick)="previousPage()">
+        </p-button>
+
+        <span class="page-numbers">
+          <p-button *ngFor="let page of pageNumbers"
+                    [label]="(page + 1).toString()"
+                    severity="secondary"
+                    [outlined]="true"
+                    size="small"
+                    [class.active]="page === currentPage"
+                    (onClick)="goToPage(page)">
+          </p-button>
+        </span>
+
+        <p-button icon="pi pi-chevron-right"
+                  label="Suivant"
+                  severity="secondary"
+                  [outlined]="true"
+                  [disabled]="isLastPage"
+                  (onClick)="nextPage()">
+        </p-button>
+      </div>
+
+    </div>
+
+  </div>
+</div>

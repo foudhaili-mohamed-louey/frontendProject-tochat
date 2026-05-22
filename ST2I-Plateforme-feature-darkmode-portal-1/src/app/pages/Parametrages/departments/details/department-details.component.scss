@@ -1,0 +1,191 @@
+:host {
+  --blue: #1f3b6d;
+  display: block;
+}
+
+.ui-card {
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.bar {
+  background: var(--blue);
+  color: #fff;
+  padding: 0.9rem 1rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.count-badge {
+  background: rgba(255,255,255,0.2);
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+// ===== ROWS =====
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  padding: 0.95rem 1rem;
+  border-bottom: 1px solid #e6eaf2;
+
+  b {
+    color: #374151;
+    font-weight: 600;
+    min-width: 180px;
+  }
+
+  span {
+    color: #1f2937;
+    text-align: right;
+  }
+}
+
+// ===== BADGES =====
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  &.active   { background: #dcfce7; color: #16a34a; }
+  &.inactive { background: #fee2e2; color: #dc2626; }
+}
+
+.code-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: #dbeafe;
+  color: #1d4ed8;
+  letter-spacing: 0.05em;
+}
+
+.type-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  &.operational { background: #ede9fe; color: #6d28d9; }
+  &.support     { background: #fef9c3; color: #a16207; }
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+// ===== USERS =====
+.empty-users {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  color: #94a3b8;
+  font-style: italic;
+
+  .pi { font-size: 1.3rem; }
+}
+
+.user-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+
+  &:last-child { border-bottom: none; }
+  &:hover      { background: #f8fafc; }
+}
+
+.user-avatar {
+  flex-shrink: 0;
+}
+
+.avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 2px solid #e2e8f0;
+}
+
+.avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: #1f3b6d;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.9rem;
+}
+
+.user-meta {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.user-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+// ===== LOADING =====
+.loading-msg {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+
+  .pi {
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+  }
+}
+
+// ===== FOOTER =====
+.details-footer {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}

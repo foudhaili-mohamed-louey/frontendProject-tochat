@@ -1,0 +1,82 @@
+:host {
+  --blue: #1f3b6d;
+  display: block;
+}
+
+.ui-card {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.bar {
+  background: var(--blue);
+  color: #fff;
+  padding: 0.9rem 1rem;
+  font-weight: 600;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.block {
+  padding: 1.2rem;
+}
+
+.search-box {
+  margin-bottom: 1rem;
+}
+
+.search-box input {
+  width: 250px;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid #cfd6e4;
+  border-radius: 6px;
+}
+
+.modules-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modules-table th {
+  text-align: left;
+  padding: 0.7rem;
+  border-bottom: 2px solid #e6eaf2;
+}
+
+.modules-table td {
+  padding: 0.7rem;
+  border-bottom: 1px solid #e6eaf2;
+}
+
+.actions {
+  text-align: center;
+}
+
+.action {
+  font-size: 1.1rem;
+  margin: 0 8px;
+  cursor: pointer;
+}
+
+.action.info {
+  color: #1976d2;
+}
+
+.action.edit {
+  color: #4caf50;
+}
+
+.action.delete {
+  color: #e53935;
+}
+
+.loading {
+  text-align: center;
+  padding: 1rem;
+}
+
+.add-btn {
+  margin-left: auto;
+}

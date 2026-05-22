@@ -1,0 +1,50 @@
+:host {
+  --blue: #1f3b6d;
+  display: block;
+}
+
+.ui-card {
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.bar {
+  background: var(--blue);
+  color: #fff;
+  padding: 0.9rem 1rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  padding: 0.95rem 1rem;
+  border-bottom: 1px solid #e6eaf2;
+
+  b {
+    color: #374151;
+    font-weight: 600;
+    min-width: 160px;
+  }
+
+  span {
+    color: #1f2937;
+    text-align: right;
+  }
+}
+
+// ===== LOADING =====
+.loading-msg {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+
+  .pi {
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+  }
+}

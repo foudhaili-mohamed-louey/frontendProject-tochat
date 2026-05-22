@@ -1,0 +1,170 @@
+:host {
+  --blue: #1f3b6d;
+  display: block;
+}
+
+// ===== CARD =====
+.ui-card {
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+// ===== BAR =====
+.bar {
+  background: var(--blue);
+  color: #fff;
+  padding: 0.9rem 1rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+// ===== PHOTO =====
+.photo-container {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 0;
+}
+
+.user-photo {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #e6eaf2;
+  // subtle shadow to lift the avatar off the white card
+  box-shadow: 0 4px 16px rgba(31, 59, 109, 0.1);
+}
+
+// ===== ROWS =====
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  padding: 0.95rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+
+  &:last-child { border-bottom: none; }
+
+  b {
+    color: #374151;
+    font-weight: 600;
+    min-width: 160px;
+    flex-shrink: 0;
+  }
+
+  span {
+    color: #1f2937;
+    text-align: right;
+  }
+}
+
+// ===== STATUS =====
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  &.active   { background: #dcfce7; color: #16a34a; }
+  &.inactive { background: #fee2e2; color: #dc2626; }
+}
+
+// ===== ROLE =====
+.role-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+// ===== LEVEL =====
+.level-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+
+  &.level-high    { background: #fee2e2; color: #dc2626; }
+  &.level-mid     { background: #fef3c7; color: #92400e; }
+  &.level-low     { background: #dcfce7; color: #16a34a; }
+  &.level-default { background: #f1f5f9; color: #475569; }
+}
+
+// ===== EMAIL VERIFIED =====
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #dcfce7;
+  color: #16a34a;
+
+  .pi { font-size: 0.78rem; }
+}
+
+.unverified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #fef3c7;
+  color: #92400e;
+
+  .pi { font-size: 0.78rem; }
+}
+
+// ===== DEPARTMENT =====
+.dept-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.dept-code {
+  font-weight: 400;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.dept-type {
+  font-size: 0.75rem;
+  font-weight: 400;
+  opacity: 0.75;
+}
+
+.no-dept {
+  font-size: 0.82rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+// ===== LOADING =====
+.loading-msg {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+
+  .pi {
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+  }
+}

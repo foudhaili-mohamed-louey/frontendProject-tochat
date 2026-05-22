@@ -1,0 +1,92 @@
+<div class="role-details-container">
+
+  <div class="ui-card">
+
+    <div class="bar">
+      Role Details
+    </div>
+
+    <div class="row">
+      <strong>Role Name :</strong>
+      <span>{{ roleName }}</span>
+    </div>
+
+  </div>
+
+
+  <div class="ui-card">
+
+    <div class="bar">
+      Modules and Permissions
+    </div>
+
+    <div *ngIf="loading" class="loading">
+      Chargement...
+    </div>
+
+    <div *ngIf="!loading">
+
+      <div *ngFor="let module of modules" class="module-card">
+
+        <div
+          class="module-header"
+          (click)="toggleModule(module.id)"
+        >
+          {{ module.name }}
+
+          <span class="arrow">
+            {{ expandedModuleId === module.id ? '▲' : '▼' }}
+          </span>
+
+        </div>
+
+
+        <div
+          *ngIf="expandedModuleId === module.id"
+          class="permissions-table"
+        >
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Create</th>
+                <th>Read</th>
+                <th>Update</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              <tr>
+
+                <td *ngFor="let action of actions">
+
+                  <ng-container *ngIf="getPermission(module.id, action) as permission">
+
+                    <input
+                      type="checkbox"
+                      [checked]="hasRolePermission(permission.id)"
+                      disabled
+                    />
+
+                  </ng-container>
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

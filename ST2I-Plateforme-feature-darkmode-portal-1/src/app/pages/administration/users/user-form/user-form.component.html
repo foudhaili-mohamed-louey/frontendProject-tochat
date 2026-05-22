@@ -1,0 +1,171 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="card ui-card">
+  <div class="bar">Ajouter Utilisateur</div>
+
+  <div class="block">
+
+    <!-- ── AVATAR ROW (centered, full width) ── -->
+    <div class="avatar-row">
+      <div class="field avatar-field">
+        <label>Photo de profil</label>
+        <div class="photo-field">
+          <img class="photo-preview"
+               [src]="photoPreview"
+               [alt]="form.firstName || 'preview'"
+               (error)="onPreviewError()" />
+
+          <div class="photo-actions">
+            <button type="button" class="upload-btn" (click)="triggerFilePicker()" [disabled]="uploading">
+              <i class="pi" [ngClass]="uploading ? 'pi-spin pi-spinner' : 'pi-upload'"></i>
+              {{ uploading ? 'Envoi...' : 'Choisir une image' }}
+            </button>
+            <button type="button" class="remove-btn" *ngIf="form.photoUrl" (click)="removePhoto()">
+              <i class="pi pi-times"></i>
+            </button>
+          </div>
+
+          <input #fileInput
+                 type="file"
+                 accept="image/png,image/jpeg,image/webp"
+                 style="display:none"
+                 (change)="onFileSelected($event)" />
+        </div>
+        <small class="upload-hint">PNG, JPG ou WEBP · max 2 Mo</small>
+      </div>
+    </div>
+
+    <!-- ── SECTION TITLE ── -->
+    <div class="block-title">Informations utilisateur</div>
+
+    <!-- ── MAIN FORM GRID ── -->
+    <div class="formgrid3">
+
+      <!-- Username -->
+      <div class="field">
+        <label>Username *</label>
+        <input pInputText placeholder="Username" [(ngModel)]="form.username" />
+      </div>
+
+      <!-- Nom -->
+      <div class="field">
+        <label>Nom *</label>
+        <input pInputText placeholder="Nom" [(ngModel)]="form.lastName" />
+      </div>
+
+      <!-- Prénom -->
+      <div class="field">
+        <label>Prénom *</label>
+        <input pInputText placeholder="Prénom" [(ngModel)]="form.firstName" />
+      </div>
+
+      <!-- Email -->
+      <div class="field">
+        <label>Email *</label>
+        <input pInputText type="email" placeholder="Email" [(ngModel)]="form.email" />
+      </div>
+
+      <!-- CIN -->
+      <div class="field">
+        <label>CIN *</label>
+        <input pInputText placeholder="8 chiffres" maxlength="8" [(ngModel)]="form.cin" />
+      </div>
+
+      <!-- Téléphone -->
+      <div class="field">
+        <label>Téléphone *</label>
+        <input pInputText placeholder="8 chiffres" maxlength="8" [(ngModel)]="form.phone" />
+      </div>
+
+      <!-- Sexe -->
+      <div class="field">
+        <label>Sexe *</label>
+        <select class="p-inputtext w-full" [(ngModel)]="form.sex" (ngModelChange)="onSexChange()">
+          <option *ngFor="let s of sexOptions" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <!-- Date d'embauche -->
+      <div class="field">
+        <label>Date d'embauche *</label>
+        <input class="p-inputtext w-full" type="date" [(ngModel)]="form.hireDate" />
+      </div>
+
+      <!-- Profession -->
+      <div class="field">
+        <label>Profession *</label>
+        <input pInputText placeholder="Profession" [(ngModel)]="form.profession" />
+      </div>
+
+      <!-- Statut -->
+      <div class="field">
+        <label>Statut *</label>
+        <select class="p-inputtext w-full" [(ngModel)]="form.isActive">
+          <option [ngValue]="true">Actif</option>
+          <option [ngValue]="false">Inactif</option>
+        </select>
+      </div>
+
+      <!-- Rôle -->
+      <div class="field">
+        <label>Rôle *</label>
+        <select class="p-inputtext w-full"
+                [(ngModel)]="form.roleMetadataId"
+                (ngModelChange)="onRoleChange($event)"
+                [disabled]="rolesLoading">
+          <option [ngValue]="0" disabled>
+            {{ rolesLoading ? 'Chargement...' : 'Sélectionner un rôle' }}
+          </option>
+          <option *ngFor="let role of manageableRoles" [ngValue]="role.id">
+            {{ role.name }} (Niveau {{ role.level }})
+          </option>
+        </select>
+      </div>
+
+      <!-- Département -->
+      <div class="field" *ngIf="showDepartment">
+        <label>Département *</label>
+        <select class="p-inputtext w-full"
+                [(ngModel)]="form.departmentId"
+                [disabled]="departmentsLoading">
+          <option [ngValue]="undefined" disabled>
+            {{ departmentsLoading ? 'Chargement...' : 'Sélectionner un département' }}
+          </option>
+          <option *ngFor="let dept of departments" [ngValue]="dept.id">
+            {{ dept.name }} ({{ dept.code }})
+          </option>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- info box -->
+    <div class="info-box">
+      <i class="pi pi-shield"></i>
+      <div>
+        <strong>Règles de création</strong>
+        <ul>
+          <li>Le nom d'utilisateur doit être unique dans le système</li>
+          <li>Le CIN et le téléphone doivent contenir exactement <code>8 chiffres</code></li>
+          <li>Le rôle assigné doit être strictement inférieur à votre niveau actuel</li>
+          <li>Le département est obligatoire sauf pour les rôles <code>ADMIN</code> et <code>SUPER_ADMIN</code></li>
+          <li>
+            <i class="pi pi-key key-icon"></i>
+            Un email de vérification sera envoyé automatiquement après la création
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-sticky">
+    <p-button icon="pi pi-save"
+              label="Sauvegarder"
+              (onClick)="save()"
+              severity="info"
+              [loading]="saving">
+    </p-button>
+  </div>
+
+</div>

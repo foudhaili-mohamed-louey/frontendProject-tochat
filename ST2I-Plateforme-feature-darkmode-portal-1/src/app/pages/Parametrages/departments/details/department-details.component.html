@@ -1,0 +1,134 @@
+<p-toast position="top-right"></p-toast>
+
+<!-- ===== LOADING ===== -->
+<div *ngIf="loading" class="card ui-card">
+  <div class="bar">Chargement...</div>
+  <div class="loading-msg">
+    <i class="pi pi-spin pi-spinner"></i>
+    Chargement des données...
+  </div>
+</div>
+
+<!-- ===== NOT FOUND ===== -->
+<div *ngIf="!loading && !dept" class="card ui-card">
+  <div class="bar">Département introuvable</div>
+  <div class="loading-msg">
+    <i class="pi pi-exclamation-triangle" style="color:#dc2626"></i>
+    Aucun département trouvé.
+  </div>
+</div>
+
+<!-- ===== CONTENT ===== -->
+<div *ngIf="!loading && dept">
+
+  <!-- ===== GENERAL INFO ===== -->
+  <div class="card ui-card">
+    <div class="bar">Informations Générales</div>
+
+    <div class="row">
+      <b>Nom</b>
+      <span>{{ dept.name }}</span>
+    </div>
+    <div class="row">
+      <b>Code</b>
+      <span class="code-badge">{{ dept.code }}</span>
+    </div>
+    <div class="row">
+      <b>Type</b>
+      <span class="type-badge"
+            [class.operational]="dept.type === 'OPERATIONAL'"
+            [class.support]="dept.type === 'SUPPORT'">
+        {{ dept.type === 'OPERATIONAL' ? 'Opérationnel' : 'Support' }}
+      </span>
+    </div>
+    <div class="row">
+      <b>Description</b>
+      <span>{{ dept.description || '—' }}</span>
+    </div>
+    <div class="row">
+      <b>Statut</b>
+      <span class="status-badge"
+            [class.active]="dept.active"
+            [class.inactive]="!dept.active">
+        {{ dept.active ? 'Actif' : 'Inactif' }}
+      </span>
+    </div>
+    <div class="row">
+      <b>Date de création</b>
+      <span>{{ dept.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+    </div>
+    <div class="row">
+      <b>Dernière modification</b>
+      <span>{{ dept.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+    </div>
+  </div>
+
+  <!-- ===== LOCATION & CONTACT ===== -->
+  <div class="card ui-card">
+    <div class="bar">Localisation & Contact</div>
+
+    <div class="row">
+      <b>Localisation</b>
+      <span>{{ dept.location || '—' }}</span>
+    </div>
+    <div class="row">
+      <b>Adresse Email</b>
+      <span>{{ dept.email || '—' }}</span>
+    </div>
+    <div class="row">
+      <b>Numéro de Téléphone</b>
+      <span>{{ dept.phoneNumber || '—' }}</span>
+    </div>
+  </div>
+
+  <!-- ===== USERS ===== -->
+  <div class="card ui-card">
+    <div class="bar bar-row">
+      <span>Membres du département</span>
+      <span class="count-badge">{{ dept.users.length || 0 }}</span>
+    </div>
+
+    <!-- empty -->
+    <div *ngIf="!dept.users || dept.users.length === 0" class="empty-users">
+      <i class="pi pi-users"></i>
+      <span>Aucun membre affecté à ce département</span>
+    </div>
+
+    <!-- user rows -->
+    <div *ngFor="let u of dept.users" class="user-row">
+      <div class="user-avatar">
+        <img *ngIf="u.photoUrl"
+             [src]="u.photoUrl"
+             [alt]="u.firstName"
+             class="avatar-img"
+             (error)="onAvatarError($event, u.sex)" />
+        <div *ngIf="!u.photoUrl" class="avatar-placeholder">
+          {{ u.firstName.charAt(0) }}{{ u.lastName.charAt(0) }}
+        </div>
+      </div>
+      <div class="user-info">
+        <span class="user-name">{{ u.firstName }} {{ u.lastName }}</span>
+        <span class="user-meta">{{ u.profession || '—' }}</span>
+      </div>
+      <div class="user-right">
+        <span class="role-badge">{{ u.roleName || '—' }}</span>
+        <span class="status-badge"
+              [class.active]="u.isActive"
+              [class.inactive]="!u.isActive">
+          {{ u.isActive ? 'Actif' : 'Inactif' }}
+        </span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <div class="details-footer">
+    <p-button icon="pi pi-pencil"
+              label="Modifier"
+              severity="info"
+              (onClick)="edit()">
+    </p-button>
+  </div>
+
+</div>

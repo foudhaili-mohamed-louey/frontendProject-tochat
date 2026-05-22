@@ -1,0 +1,209 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="card ui-card">
+  <div class="bar bar-row">
+    <span>Détails de l'équipe</span>
+
+    <div class="bar-actions">
+      <p-button
+        icon="pi pi-arrow-left"
+        label="Retour"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="back()">
+      </p-button>
+
+      <p-button
+        icon="pi pi-pencil"
+        label="Modifier"
+        severity="info"
+        [disabled]="!team"
+        (onClick)="edit()">
+      </p-button>
+    </div>
+  </div>
+
+  <div class="block">
+
+    <div *ngIf="loading" class="loading-box">
+      <i class="pi pi-spin pi-spinner"></i>
+      Chargement de l'équipe...
+    </div>
+
+    <ng-container *ngIf="!loading && team">
+
+      <div class="hero">
+        <div class="hero-icon">
+          <i class="pi pi-users"></i>
+        </div>
+
+        <div>
+          <h2>{{ team.name || 'Équipe sans nom' }}</h2>
+          <p>{{ team.description || 'Aucune description disponible.' }}</p>
+
+          <span class="badge" [ngClass]="statusClass(team.status)">
+            {{ formatStatus(team.status) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="details-grid">
+        <div class="info-card">
+          <span class="label">Identifiant</span>
+          <span class="value">#{{ team.id }}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Projet</span>
+
+          <span class="project-badge" *ngIf="team.projectName">
+            <i class="pi pi-folder"></i>
+            {{ team.projectName }}
+          </span>
+
+          <span class="text-faint" *ngIf="!team.projectName">
+            Aucun projet
+          </span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Nombre de membres</span>
+          <span class="value">{{ members.length }} membre(s)</span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Créée le</span>
+          <span class="value">
+            {{ team.createdAt ? (team.createdAt | date:'dd/MM/yyyy HH:mm') : '—' }}
+          </span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Dernière modification</span>
+          <span class="value">
+            {{ team.updatedAt ? (team.updatedAt | date:'dd/MM/yyyy HH:mm') : '—' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="members-section">
+        <div class="section-title">
+          <i class="pi pi-users"></i>
+          Membres de l'équipe
+        </div>
+
+        <div *ngIf="loadingMembers" class="loading-box">
+          <i class="pi pi-spin pi-spinner"></i>
+          Chargement des membres...
+        </div>
+
+        <div class="table-wrap" *ngIf="!loadingMembers && pagedMembers.length > 0">
+          <table class="members-table">
+            <thead>
+              <tr>
+                <th>Utilisateur</th>
+                <th>Email</th>
+                <th>Rôle projet</th>
+                <th>Niveau</th>
+                <th>Catégorie</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let member of pagedMembers">
+                <td>
+                  <div class="user-cell">
+                    <img
+                      class="avatar"
+                      [src]="member.photoUrl"
+                      [alt]="member.fullName"
+                      (error)="onAvatarError($event)" />
+
+                    <div>
+                      <span class="main-name">{{ member.fullName }}</span>
+                      <span class="sub-text">#{{ member.id }}</span>
+                    </div>
+                  </div>
+                </td>
+
+                <td>
+                  <span class="email-text" *ngIf="member.email">{{ member.email }}</span>
+                  <span class="text-faint" *ngIf="!member.email">—</span>
+                </td>
+
+                <td>
+                  <span class="role-badge">
+                    {{ member.projectRoleName || '—' }}
+                  </span>
+                </td>
+
+                <td>
+                  <span class="level-badge">
+                    {{ getHierarchyLabel(member.hierarchyLevel) }}
+                  </span>
+                </td>
+
+                <td>
+                  <span class="category-badge" *ngIf="member.roleCategoryName">
+                    <span
+                      class="color-dot"
+                      [style.background]="member.roleCategoryColor || '#1f3b6d'">
+                    </span>
+                    {{ member.roleCategoryName }}
+                  </span>
+
+                  <span class="text-faint" *ngIf="!member.roleCategoryName">—</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div *ngIf="!loadingMembers && members.length === 0" class="empty-box">
+          <i class="pi pi-info-circle"></i>
+          Aucun membre dans cette équipe.
+        </div>
+
+        <div class="pagination-bar" *ngIf="memberTotalPages > 1">
+          <span class="page-info">
+            Page {{ memberPage + 1 }} / {{ memberTotalPages }}
+            &nbsp;·&nbsp; {{ members.length }} membres
+          </span>
+
+          <div class="page-controls">
+            <button class="page-btn" [disabled]="memberPage === 0" (click)="onMemberPageChange(0)">
+              <i class="pi pi-angle-double-left"></i>
+            </button>
+
+            <button class="page-btn" [disabled]="memberPage === 0" (click)="onMemberPageChange(memberPage - 1)">
+              <i class="pi pi-angle-left"></i>
+            </button>
+
+            <button
+              *ngFor="let p of memberPages"
+              class="page-btn"
+              [class.active]="p === memberPage"
+              (click)="onMemberPageChange(p)">
+              {{ p + 1 }}
+            </button>
+
+            <button class="page-btn" [disabled]="memberPage === memberTotalPages - 1" (click)="onMemberPageChange(memberPage + 1)">
+              <i class="pi pi-angle-right"></i>
+            </button>
+
+            <button class="page-btn" [disabled]="memberPage === memberTotalPages - 1" (click)="onMemberPageChange(memberTotalPages - 1)">
+              <i class="pi pi-angle-double-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
+
+    <div *ngIf="!loading && !team" class="empty-box">
+      <i class="pi pi-info-circle"></i>
+      Aucune équipe trouvée.
+    </div>
+
+  </div>
+</div>

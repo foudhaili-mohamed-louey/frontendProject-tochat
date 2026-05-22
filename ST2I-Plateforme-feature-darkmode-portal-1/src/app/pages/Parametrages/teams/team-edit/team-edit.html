@@ -1,0 +1,426 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="card ui-card">
+  <div class="bar">Modifier une équipe</div>
+
+  <div class="block">
+    <div class="block-title">Informations de l'équipe</div>
+
+    <div class="formgrid3">
+      <div class="field">
+        <label>Nom *</label>
+        <input
+          pInputText
+          placeholder="Nom de l'équipe"
+          [(ngModel)]="form.name" />
+      </div>
+
+      <div class="field">
+        <label>Projet optionnel</label>
+
+        <select
+          class="p-inputtext w-full"
+          [(ngModel)]="selectedProjectId"
+          [disabled]="loadingProjects">
+
+          <option [ngValue]="undefined">
+            {{ loadingProjects ? 'Chargement...' : 'Aucun projet / affecter plus tard' }}
+          </option>
+
+          <option
+            *ngFor="let project of projects"
+            [ngValue]="project.id">
+
+            {{ project.name || 'Projet sans nom' }}
+          </option>
+        </select>
+      </div>
+
+      <div class="field full">
+        <label>Description</label>
+
+        <textarea
+          class="p-inputtext w-full"
+          rows="4"
+          placeholder="Description de l'équipe..."
+          [(ngModel)]="form.description">
+        </textarea>
+      </div>
+    </div>
+
+    <div class="members-header">
+      <div>
+        <div class="block-title small">Gestion des membres</div>
+
+        <span class="selected-count">
+          {{ getSelectedCount() }} membre(s) sélectionné(s)
+        </span>
+      </div>
+    </div>
+
+    <div class="user-filter-card">
+      <div class="user-filter-grid">
+
+        <div class="field">
+          <input
+            pInputText
+            placeholder="Prénom"
+            [(ngModel)]="userFilters.firstName" />
+        </div>
+
+        <div class="field">
+          <input
+            pInputText
+            placeholder="Nom"
+            [(ngModel)]="userFilters.lastName" />
+        </div>
+
+        <div class="field">
+          <select
+            class="p-inputtext w-full"
+            [(ngModel)]="userFilters.departmentId"
+            [disabled]="loadingDepartments">
+
+            <option [ngValue]="undefined">
+              {{ loadingDepartments ? 'Chargement...' : 'Tous les départements opérationnels' }}
+            </option>
+
+            <option
+              *ngFor="let department of departments"
+              [ngValue]="department.id">
+
+              {{ department.code }} - {{ department.name }}
+            </option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="filter-actions">
+        <p-button
+          icon="pi pi-search"
+          label="Rechercher"
+          severity="info"
+          [disabled]="loadingUsers"
+          (onClick)="searchUsers()">
+        </p-button>
+
+        <p-button
+          icon="pi pi-refresh"
+          label="Réinitialiser"
+          severity="danger"
+          [outlined]="true"
+          [disabled]="loadingUsers"
+          (onClick)="resetUserFilters()">
+        </p-button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="users-table">
+
+        <thead>
+          <tr>
+            <th style="width: 70px;">Sélect.</th>
+            <th>Utilisateur</th>
+            <th>Profession</th>
+            <th>Département</th>
+            <th>Statut</th>
+            <th>Rôle projet</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <ng-container *ngIf="loadingUsers">
+            <tr *ngFor="let i of [1,2,3,4,5,6,7]">
+
+              <td>
+                <div class="skel skel-check"></div>
+              </td>
+
+              <td>
+                <div class="skel skel-lg"></div>
+              </td>
+
+              <td>
+                <div class="skel skel-md"></div>
+              </td>
+
+              <td>
+                <div class="skel skel-md"></div>
+              </td>
+
+              <td>
+                <div class="skel skel-sm"></div>
+              </td>
+
+              <td>
+                <div class="skel skel-role"></div>
+              </td>
+
+            </tr>
+          </ng-container>
+
+          <ng-container *ngIf="!loadingUsers">
+
+            <tr
+              *ngFor="let user of users"
+              class="data-row">
+
+              <td>
+                <input
+                  type="checkbox"
+                  [checked]="isSelected(user)"
+                  (change)="toggleUser(user, $any($event.target).checked)" />
+              </td>
+
+              <td>
+                <div class="user-cell">
+
+                  <img
+                    class="avatar"
+                    [src]="getAvatar(user)"
+                    [alt]="fullName(user)"
+                    (error)="onAvatarError($event)" />
+
+                  <div>
+                    <span class="main-name">
+                      {{ fullName(user) }}
+                    </span>
+
+                    <span class="sub-text">
+                      {{ user.email }}
+                    </span>
+                  </div>
+
+                </div>
+              </td>
+
+              <td>
+                <span
+                  class="profession-badge"
+                  *ngIf="user.profession">
+
+                  {{ user.profession }}
+                </span>
+
+                <span
+                  class="text-faint"
+                  *ngIf="!user.profession">
+
+                  —
+                </span>
+              </td>
+
+              <td>
+                <span
+                  class="department-badge"
+                  *ngIf="user.departmentName">
+
+                  {{ user.departmentCode }} - {{ user.departmentName }}
+                </span>
+
+                <span
+                  class="text-faint"
+                  *ngIf="!user.departmentName">
+
+                  —
+                </span>
+              </td>
+
+              <td>
+                <span class="status-badge active">
+                  Actif
+                </span>
+              </td>
+
+              <td>
+
+                <select
+                  class="p-inputtext role-select"
+                  [ngModel]="selectedRoles.get(user.keycloakId) || 0"
+                  [disabled]="!isSelected(user) || loadingRoles"
+                  (ngModelChange)="onRoleChange(user, $event)">
+
+                  <option [ngValue]="0">
+                    {{
+                      isSelected(user)
+                        ? 'Sélectionner un rôle'
+                        : 'Sélectionnez d’abord le membre'
+                    }}
+                  </option>
+
+                  <option
+                    *ngFor="let role of roles"
+                    [ngValue]="role.id"
+                    [disabled]="isRoleDisabledForUser(role, user)">
+
+                    {{ role.name }}
+                    ·
+                    {{ getHierarchyLabel(role.hierarchyLevel) }}
+                    {{ role.uniqueRole ? '(unique)' : '' }}
+                  </option>
+
+                </select>
+
+                <div
+                  class="role-preview"
+                  *ngIf="isSelected(user) && selectedRoles.get(user.keycloakId)">
+
+                  <span class="level-chip">
+                    {{
+                      getHierarchyLabel(
+                        getSelectedRole(user)?.hierarchyLevel
+                      )
+                    }}
+                  </span>
+
+                  <span
+                    class="category-chip"
+                    *ngIf="getSelectedRole(user)?.roleCategoryName">
+
+                    <span
+                      class="color-dot"
+                      [style.background]="
+                        getSelectedRole(user)?.roleCategoryColor || '#1f3b6d'
+                      ">
+                    </span>
+
+                    {{ getSelectedRole(user)?.roleCategoryName }}
+                  </span>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+            <tr *ngIf="users.length === 0">
+              <td colspan="6" class="empty-msg">
+
+                <i
+                  class="pi pi-users"
+                  style="font-size:2rem;opacity:.3">
+                </i>
+
+                <br />
+
+                Aucun utilisateur opérationnel actif trouvé.
+              </td>
+            </tr>
+
+          </ng-container>
+
+        </tbody>
+      </table>
+    </div>
+
+    <div
+      class="pagination-bar"
+      *ngIf="userTotalPages > 1">
+
+      <span class="page-info">
+        Page {{ userPage + 1 }} / {{ userTotalPages }}
+        &nbsp;·&nbsp;
+        {{ userTotalElements }} utilisateurs
+      </span>
+
+      <div class="page-controls">
+
+        <button
+          class="page-btn"
+          [disabled]="userPage === 0"
+          (click)="onUserPageChange(0)">
+
+          <i class="pi pi-angle-double-left"></i>
+        </button>
+
+        <button
+          class="page-btn"
+          [disabled]="userPage === 0"
+          (click)="onUserPageChange(userPage - 1)">
+
+          <i class="pi pi-angle-left"></i>
+        </button>
+
+        <button
+          *ngFor="let p of userPages"
+          class="page-btn"
+          [class.active]="p === userPage"
+          (click)="onUserPageChange(p)">
+
+          {{ p + 1 }}
+        </button>
+
+        <button
+          class="page-btn"
+          [disabled]="userPage === userTotalPages - 1"
+          (click)="onUserPageChange(userPage + 1)">
+
+          <i class="pi pi-angle-right"></i>
+        </button>
+
+        <button
+          class="page-btn"
+          [disabled]="userPage === userTotalPages - 1"
+          (click)="onUserPageChange(userTotalPages - 1)">
+
+          <i class="pi pi-angle-double-right"></i>
+        </button>
+
+      </div>
+    </div>
+
+    <div class="info-box">
+      <i class="pi pi-info-circle"></i>
+
+      <div>
+
+        <strong>Règles de modification</strong>
+
+        <ul>
+          <li>
+            Chaque membre sélectionné doit avoir un rôle projet
+          </li>
+
+          <li>
+            Les rôles uniques ne peuvent être attribués qu’une seule fois
+          </li>
+
+          <li>
+            Le niveau hiérarchique du rôle sera utilisé dans l’organigramme
+          </li>
+
+          <li>
+            Les superviseurs seront validés automatiquement selon le niveau du rôle
+          </li>
+
+        </ul>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-sticky">
+
+    <p-button
+      icon="pi pi-times"
+      label="Annuler"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="saving"
+      (onClick)="cancel()">
+    </p-button>
+
+    <p-button
+      icon="pi pi-save"
+      label="Sauvegarder"
+      severity="info"
+      [loading]="saving"
+      (onClick)="save()">
+    </p-button>
+
+  </div>
+</div>

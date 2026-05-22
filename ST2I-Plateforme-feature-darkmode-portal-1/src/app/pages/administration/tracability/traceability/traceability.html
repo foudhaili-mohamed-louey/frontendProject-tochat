@@ -1,0 +1,150 @@
+<p-toast position="top-right"></p-toast>
+
+<!-- ===== FILTER CARD ===== -->
+<div class="card ui-card">
+  <div class="bar">Filtre de recherche</div>
+
+  <div class="body">
+    <div class="filter-grid">
+
+      <div class="field">
+        <input pInputText placeholder="Utilisateur" [(ngModel)]="filters.username" />
+      </div>
+
+      <div class="field">
+        <input pInputText placeholder="Service" [(ngModel)]="filters.serviceName" />
+      </div>
+
+      <div class="field">
+        <select class="p-inputtext" [(ngModel)]="filters.method">
+          <option value="">Méthode</option>
+          <option value="GET">GET</option>
+          <option value="POST">POST</option>
+          <option value="PUT">PUT</option>
+          <option value="PATCH">PATCH</option>
+          <option value="DELETE">DELETE</option>
+          <option value="OPTIONS">OPTIONS</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <input pInputText placeholder="Chemin" [(ngModel)]="filters.endpoint" />
+      </div>
+
+      <div class="field">
+        <input pInputText placeholder="Adresse IP" [(ngModel)]="filters.ipAddress" />
+      </div>
+
+      <div class="field">
+        <input pInputText placeholder="Statut" type="number" [(ngModel)]="filters.statusCode" />
+      </div>
+
+      <div class="field date-field">
+        <input pInputText type="datetime-local" placeholder="Horodatage (début)" [(ngModel)]="filters.from" />
+      </div>
+
+      <div class="field date-field">
+        <input pInputText type="datetime-local" placeholder="Horodatage (fin)" [(ngModel)]="filters.to" />
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <p-button icon="pi pi-search"
+                label="Rechercher"
+                (onClick)="search()"
+                severity="info">
+      </p-button>
+      <p-button icon="pi pi-refresh"
+                label="Réinitialiser"
+                severity="danger"
+                [outlined]="true"
+                (onClick)="reset()">
+      </p-button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TABLE CARD ===== -->
+<div class="card ui-card">
+  <div class="bar bar-row">
+    <div class="bar-title">Liste traces</div>
+
+    <div class="bar-right">
+      <p-button icon="pi pi-download"
+                [rounded]="true"
+                (onClick)="exportCsv()"
+                styleClass="icon-btn export"
+                pTooltip="Exporter CSV">
+      </p-button>
+
+      <div class="searchwrap">
+        <i class="pi pi-search"></i>
+        <input pInputText
+               type="text"
+               #globalFilter
+               (input)="dt.filterGlobal(globalFilter.value, 'contains')"
+               placeholder="Filtrer parmi ces éléments..." />
+      </div>
+    </div>
+  </div>
+
+  <p-table
+    #dt
+    [value]="rows"
+    [paginator]="true"
+    [rows]="pageSize"
+    [loading]="loading"
+    [lazy]="true"
+    [totalRecords]="totalElements"
+    (onPage)="onPageChange($event)"
+    [globalFilterFields]="['username','serviceName','method','endpoint','ipAddress','result']">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Utilisateur</th>
+        <th>Service</th>
+        <th>Méthode</th>
+        <th>Chemin</th>
+        <th>Adresse IP</th>
+        <th>Statut</th>
+        <th>Résultat</th>
+        <th>Latence (ms)</th>
+        <th>Horodatage</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-t>
+      <tr>
+        <td class="user-cell">{{ t.username || 'anonymous' }}</td>
+        <td>{{ t.serviceName }}</td>
+        <td>
+          <span class="method-badge" [ngClass]="t.method?.toLowerCase()">
+            {{ t.method }}
+          </span>
+        </td>
+        <td class="endpoint-cell" [title]="t.endpoint">{{ t.endpoint }}</td>
+        <td>{{ t.ipAddress }}</td>
+        <td>
+          <span class="status-badge" [ngClass]="getStatusClass(t.statusCode)">
+            {{ t.statusCode }}
+          </span>
+        </td>
+        <td>
+          <span class="result-badge" [ngClass]="t.result?.toLowerCase()">
+            {{ t.result }}
+          </span>
+        </td>
+        <td>{{ t.latency }}</td>
+        <td>{{ t.timestamp | date:'dd/MM/yyyy HH:mm' }}</td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="9" class="empty-msg">Aucune trace trouvée.</td>
+      </tr>
+    </ng-template>
+
+  </p-table>
+</div>

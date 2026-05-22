@@ -1,0 +1,153 @@
+<p-toast position="top-right"></p-toast>
+
+<!-- loading -->
+<div *ngIf="loading" class="card ui-card">
+  <div class="bar">
+    <span>Gestion des Permissions</span>
+  </div>
+  <div class="loading-msg">
+    <i class="pi pi-spin pi-spinner"></i>
+    Chargement des données...
+  </div>
+</div>
+
+<!-- main -->
+<div *ngIf="!loading" class="card ui-card">
+
+  <!-- bar -->
+  <div class="bar">
+    <div class="bar-left">
+      <span>Permissions du rôle</span>
+      <span class="role-badge" *ngIf="role">
+        {{ role.name }}
+        <span class="level-pill">Niv. {{ role.level }}</span>
+      </span>
+    </div>
+    <div class="search-wrap">
+      <i class="pi pi-search"></i>
+      <input type="text"
+             placeholder="Rechercher un module..."
+             [(ngModel)]="searchTerm"
+             (input)="filterModules()" />
+    </div>
+  </div>
+
+  <!-- modules list -->
+  <div class="block">
+
+    <!-- summary bar -->
+    <div class="summary-bar">
+      <span class="summary-text">
+        <i class="pi pi-check-circle"></i>
+        {{ selectedPermissions.size }} permission(s) sélectionnée(s)
+        sur {{ permissions.length }} disponible(s)
+      </span>
+      <div class="summary-actions">
+        <p-button icon="pi pi-save"
+                  label="Sauvegarder"
+                  severity="info"
+                  [loading]="saving"
+                  (onClick)="savePermissions()">
+        </p-button>
+        <p-button icon="pi pi-trash"
+                  label="Tout supprimer"
+                  severity="danger"
+                  [outlined]="true"
+                  (onClick)="cleanAllPermissions()">
+        </p-button>
+        <p-button icon="pi pi-arrow-left"
+                  label="Retour"
+                  severity="secondary"
+                  [outlined]="true"
+                  (onClick)="back()">
+        </p-button>
+      </div>
+    </div>
+
+    <!-- empty modules -->
+    <div *ngIf="filteredModules.length === 0" class="empty-msg">
+      Aucun module trouvé
+    </div>
+
+    <!-- module cards -->
+    <div class="modules-list">
+      <div class="module-card"
+           *ngFor="let module of filteredModules"
+           [class.expanded]="expandedModuleId === module.id">
+
+        <!-- module header -->
+        <div class="module-header" (click)="toggleModule(module.id)">
+
+          <div class="module-header-left">
+            <i class="pi"
+               [class.pi-chevron-down]="expandedModuleId === module.id"
+               [class.pi-chevron-right]="expandedModuleId !== module.id">
+            </i>
+            <span class="module-name">{{ module.name }}</span>
+          </div>
+
+          <div class="module-header-right">
+            <!-- progress bar -->
+            <div class="progress-wrap">
+              <div class="progress-bar">
+                <div class="progress-fill"
+                     [style.width.%]="(getCheckedCount(module.id) / actions.length) * 100">
+                </div>
+              </div>
+              <span class="progress-label">
+                {{ getCheckedCount(module.id) }} / {{ actions.length }}
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- permissions table -->
+        <div class="permissions-body"
+             *ngIf="expandedModuleId === module.id">
+
+          <!-- quick actions -->
+          <div class="quick-actions">
+            <p-button icon="pi pi-check-square"
+                      label="Tout sélectionner"
+                      severity="info"
+                      [text]="true"
+                      (onClick)="selectAllModule(module.id)">
+            </p-button>
+            <p-button icon="pi pi-times-circle"
+                      label="Tout désélectionner"
+                      severity="danger"
+                      [text]="true"
+                      (onClick)="clearAllModule(module.id)">
+            </p-button>
+          </div>
+
+          <!-- checkboxes grid -->
+          <div class="perms-grid">
+            <div class="perm-cell"
+                 *ngFor="let action of actions"
+                 [class.checked]="isChecked(getPermission(module.id, action)?.id)"
+                 [class.unavailable]="!getPermission(module.id, action)"
+                 (click)="togglePermission(getPermission(module.id, action))">
+
+              <div class="perm-checkbox">
+                <i class="pi"
+                   [class.pi-check-square]="isChecked(getPermission(module.id, action)?.id)"
+                   [class.pi-stop]="!isChecked(getPermission(module.id, action)?.id)">
+                </i>
+              </div>
+
+              <span class="perm-action">{{ action }}</span>
+
+              <span *ngIf="!getPermission(module.id, action)"
+                    class="perm-na">N/A</span>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

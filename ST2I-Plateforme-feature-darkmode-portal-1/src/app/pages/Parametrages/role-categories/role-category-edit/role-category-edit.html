@@ -1,0 +1,96 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="card ui-card">
+  <div class="bar">Modifier une catégorie de rôle</div>
+
+  <div class="block">
+
+    <div *ngIf="loading" class="loading-box">
+      <i class="pi pi-spin pi-spinner"></i>
+      Chargement de la catégorie...
+    </div>
+
+    <ng-container *ngIf="!loading">
+      <div class="block-title">Informations de la catégorie</div>
+
+      <div class="formgrid3">
+
+        <div class="field">
+          <label>Nom *</label>
+          <input
+            pInputText
+            placeholder="Ex: Management"
+            [(ngModel)]="form.name" />
+        </div>
+
+        <div class="field">
+          <label>Couleur</label>
+
+          <div class="color-row">
+            <input
+              class="color-input"
+              type="color"
+              [(ngModel)]="form.color" />
+
+            <input
+              pInputText
+              placeholder="#1f3b6d"
+              [(ngModel)]="form.color" />
+          </div>
+        </div>
+
+        <div class="field preview-field">
+          <label>Aperçu</label>
+
+          <span class="preview-badge">
+            <span class="color-dot" [style.background]="form.color || '#1f3b6d'"></span>
+            {{ form.name || 'Nom catégorie' }}
+          </span>
+        </div>
+
+        <div class="field full">
+          <label>Description</label>
+          <textarea
+            class="p-inputtext w-full"
+            rows="5"
+            placeholder="Description de la catégorie..."
+            [(ngModel)]="form.description">
+          </textarea>
+        </div>
+
+      </div>
+
+      <div class="info-box">
+        <i class="pi pi-info-circle"></i>
+        <div>
+          <strong>Modification de la catégorie</strong>
+          <ul>
+            <li>Le nom de la catégorie est obligatoire</li>
+            <li>La couleur sera utilisée pour identifier visuellement les rôles</li>
+            <li>La suppression peut être bloquée si des rôles projet utilisent cette catégorie</li>
+          </ul>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="footer-sticky">
+    <p-button
+      icon="pi pi-times"
+      label="Annuler"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="saving"
+      (onClick)="cancel()">
+    </p-button>
+
+    <p-button
+      icon="pi pi-save"
+      label="Sauvegarder"
+      severity="info"
+      [loading]="saving"
+      [disabled]="loading"
+      (onClick)="save()">
+    </p-button>
+  </div>
+</div>

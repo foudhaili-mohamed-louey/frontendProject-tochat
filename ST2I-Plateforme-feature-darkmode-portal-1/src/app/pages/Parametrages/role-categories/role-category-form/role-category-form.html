@@ -1,0 +1,87 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="card ui-card">
+  <div class="bar">Ajouter une catégorie de rôle</div>
+
+  <div class="block">
+    <div class="block-title">Informations de la catégorie</div>
+
+    <div class="formgrid3">
+
+      <div class="field">
+        <label>Nom *</label>
+        <input
+          pInputText
+          placeholder="Ex: Management"
+          [(ngModel)]="form.name" />
+      </div>
+
+      <div class="field">
+        <label>Couleur</label>
+
+        <div class="color-row">
+          <input
+            class="color-input"
+            type="color"
+            [(ngModel)]="form.color" />
+
+          <input
+            pInputText
+            placeholder="#1f3b6d"
+            [(ngModel)]="form.color" />
+        </div>
+      </div>
+
+      <div class="field preview-field">
+        <label>Aperçu</label>
+
+        <span class="preview-badge">
+          <span class="color-dot" [style.background]="form.color || '#1f3b6d'"></span>
+          {{ form.name || 'Nom catégorie' }}
+        </span>
+      </div>
+
+      <div class="field full">
+        <label>Description</label>
+        <textarea
+          class="p-inputtext w-full"
+          rows="5"
+          placeholder="Description de la catégorie..."
+          [(ngModel)]="form.description">
+        </textarea>
+      </div>
+
+    </div>
+
+    <div class="info-box">
+      <i class="pi pi-info-circle"></i>
+      <div>
+        <strong>Règles de création</strong>
+        <ul>
+          <li>Le nom de la catégorie est obligatoire</li>
+          <li>La couleur permet d’identifier rapidement la famille de rôles</li>
+          <li>La description reste utile pour expliquer l’objectif de la catégorie</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-sticky">
+    <p-button
+      icon="pi pi-times"
+      label="Annuler"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="saving"
+      (onClick)="cancel()">
+    </p-button>
+
+    <p-button
+      icon="pi pi-save"
+      label="Sauvegarder"
+      severity="info"
+      [loading]="saving"
+      (onClick)="save()">
+    </p-button>
+  </div>
+</div>

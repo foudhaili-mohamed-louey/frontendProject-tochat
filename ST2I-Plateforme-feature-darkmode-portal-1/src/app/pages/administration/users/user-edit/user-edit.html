@@ -1,0 +1,233 @@
+<p-toast position="top-right"></p-toast>
+
+<!-- loading state -->
+<div *ngIf="loading" class="card ui-card">
+  <div class="bar">Chargement...</div>
+  <div class="block">
+    <p class="loading-msg">
+      <i class="pi pi-spin pi-spinner"></i>
+      Chargement des données...
+    </p>
+  </div>
+</div>
+
+<!-- form -->
+<form *ngIf="!loading"
+      #formRef="ngForm"
+      (ngSubmit)="save(formRef)"
+      class="card ui-card">
+
+  <div class="bar">Modifier Utilisateur</div>
+
+  <div class="block">
+
+    <!-- ── PHOTO ROW CENTERED ── -->
+    <div class="avatar-row">
+      <div class="field avatar-field">
+        <label>Photo de profil</label>
+
+        <div class="photo-field">
+
+          <!-- preview -->
+          <img class="photo-preview"
+               [src]="photoPreview"
+               [alt]="form.firstName || 'preview'"
+               (error)="onPreviewError()" />
+
+          <!-- actions -->
+          <div class="photo-actions">
+            <button type="button"
+                    class="upload-btn"
+                    (click)="triggerFilePicker()"
+                    [disabled]="uploading">
+              <i class="pi" [ngClass]="uploading ? 'pi-spin pi-spinner' : 'pi-upload'"></i>
+              {{ uploading ? 'Envoi...' : 'Choisir une image' }}
+            </button>
+
+            <button type="button"
+                    class="remove-btn"
+                    *ngIf="form.photoUrl"
+                    (click)="removePhoto()">
+              <i class="pi pi-times"></i>
+            </button>
+          </div>
+
+          <!-- hidden file input -->
+          <input #fileInput
+                 type="file"
+                 accept="image/png,image/jpeg,image/webp"
+                 style="display:none"
+                 (change)="onFileSelected($event)" />
+        </div>
+
+        <small class="upload-hint">PNG, JPG ou WEBP · max 2 Mo</small>
+      </div>
+    </div>
+
+    <div class="block-title">Informations utilisateur</div>
+
+    <div class="formgrid3">
+
+      <!-- LAST NAME -->
+      <div class="field">
+        <label>Nom *</label>
+        <input pInputText
+               name="lastName"
+               [(ngModel)]="form.lastName"
+               required
+               maxlength="255"
+               #lastName="ngModel" />
+        <small class="error" *ngIf="lastName.invalid && lastName.touched">
+          Nom requis
+        </small>
+      </div>
+
+      <!-- FIRST NAME -->
+      <div class="field">
+        <label>Prénom *</label>
+        <input pInputText
+               name="firstName"
+               [(ngModel)]="form.firstName"
+               required
+               maxlength="255"
+               #firstName="ngModel" />
+        <small class="error" *ngIf="firstName.invalid && firstName.touched">
+          Prénom requis
+        </small>
+      </div>
+
+      <!-- EMAIL -->
+      <div class="field">
+        <label>Email *</label>
+        <input pInputText
+               type="email"
+               name="email"
+               [(ngModel)]="form.email"
+               required
+               email
+               #email="ngModel" />
+        <small class="error" *ngIf="email.invalid && email.touched">
+          Email invalide
+        </small>
+      </div>
+
+      <!-- PHONE -->
+      <div class="field">
+        <label>Téléphone *</label>
+        <input pInputText
+               name="phone"
+               [(ngModel)]="form.phone"
+               required
+               pattern="^[0-9]{8}$"
+               maxlength="8"
+               #phone="ngModel" />
+        <small class="error" *ngIf="phone.invalid && phone.touched">
+          Le téléphone doit contenir 8 chiffres
+        </small>
+      </div>
+
+      <!-- SEX -->
+      <div class="field">
+        <label>Sexe *</label>
+        <select class="p-inputtext w-full"
+                name="sex"
+                [(ngModel)]="form.sex"
+                (ngModelChange)="onSexChange()"
+                required
+                #sex="ngModel">
+          <option *ngFor="let s of sexOptions" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <!-- HIRE DATE -->
+      <div class="field">
+        <label>Date d'embauche *</label>
+        <input type="date"
+               class="p-inputtext w-full"
+               name="hireDate"
+               [(ngModel)]="form.hireDate"
+               required
+               [max]="today"
+               #hireDate="ngModel" />
+        <small class="error" *ngIf="hireDate.invalid && hireDate.touched">
+          Date invalide
+        </small>
+      </div>
+
+      <!-- PROFESSION -->
+      <div class="field">
+        <label>Profession *</label>
+        <input pInputText
+               name="profession"
+               [(ngModel)]="form.profession"
+               required
+               minlength="2"
+               maxlength="30"
+               #profession="ngModel" />
+        <small class="error" *ngIf="profession.invalid && profession.touched">
+          Profession entre 2 et 30 caractères
+        </small>
+      </div>
+
+      <!-- STATUS -->
+      <div class="field">
+        <label>Statut *</label>
+        <select class="p-inputtext w-full"
+                name="isActive"
+                [(ngModel)]="form.isActive">
+          <option [ngValue]="true">Actif</option>
+          <option [ngValue]="false">Inactif</option>
+        </select>
+      </div>
+
+      <!-- ROLE -->
+      <div class="field">
+        <label>Rôle *</label>
+        <select class="p-inputtext w-full"
+                name="roleMetadataId"
+                [(ngModel)]="form.roleMetadataId"
+                required
+                [disabled]="rolesLoading"
+                (ngModelChange)="onRoleChange($event)"
+                #roleField="ngModel">
+          <option [ngValue]="0" disabled>
+            {{ rolesLoading ? 'Chargement...' : 'Sélectionner un rôle' }}
+          </option>
+          <option *ngFor="let role of manageableRoles" [ngValue]="role.id">
+            {{ role.name }} (Niveau {{ role.level }})
+          </option>
+        </select>
+        <small class="error" *ngIf="roleField.invalid && roleField.touched">
+          Le rôle est requis
+        </small>
+      </div>
+
+      <!-- DÉPARTEMENT -->
+      <div class="field" *ngIf="showDepartment">
+        <label>Département *</label>
+        <select class="p-inputtext w-full"
+                name="departmentId"
+                [(ngModel)]="form.departmentId"
+                [disabled]="departmentsLoading">
+          <option [ngValue]="undefined" disabled>
+            {{ departmentsLoading ? 'Chargement...' : 'Sélectionner un département' }}
+          </option>
+          <option *ngFor="let dept of departments" [ngValue]="dept.id">
+            {{ dept.name }} ({{ dept.code }})
+          </option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer-sticky">
+    <p-button type="submit"
+              icon="pi pi-save"
+              label="Sauvegarder"
+              severity="info"
+              [loading]="saving">
+    </p-button>
+  </div>
+
+</form>

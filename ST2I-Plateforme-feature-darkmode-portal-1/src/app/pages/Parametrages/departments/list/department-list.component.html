@@ -1,0 +1,187 @@
+<p-toast position="top-right"></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<!-- ===== FILTER CARD ===== -->
+<div class="card ui-card">
+  <div class="bar">Filtres de recherche</div>
+  <div class="body">
+    <div class="filter-grid">
+
+      <div class="field">
+        <input pInputText
+               placeholder="Nom du département"
+               [(ngModel)]="filters.name" />
+      </div>
+
+      <div class="field">
+        <input pInputText
+               placeholder="Code"
+               [(ngModel)]="filters.code" />
+      </div>
+
+      <div class="field">
+        <input pInputText
+               placeholder="Localisation"
+               [(ngModel)]="filters.localisation" />
+      </div>
+
+      <div class="field">
+        <select class="p-inputtext" [(ngModel)]="filters.isActive">
+          <option [ngValue]="null">Statut</option>
+          <option [ngValue]="true">Actif</option>
+          <option [ngValue]="false">Non Actif</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <select class="p-inputtext" [(ngModel)]="filters.type">
+          <option [ngValue]="null">Type</option>
+          <option value="OPERATIONAL">Opérationnel</option>
+          <option value="SUPPORT">Support</option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <p-button icon="pi pi-search"
+                label="Rechercher"
+                (onClick)="search(0)"
+                severity="info">
+      </p-button>
+      <p-button icon="pi pi-refresh"
+                label="Réinitialiser"
+                severity="danger"
+                [outlined]="true"
+                (onClick)="reset()">
+      </p-button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TABLE CARD ===== -->
+<div class="card ui-card">
+  <div class="bar bar-row">
+    <div class="bar-title">
+      Liste des départements
+      <span class="total-badge">{{ totalElements }}</span>
+    </div>
+    <div class="bar-right">
+      <p-button icon="pi pi-plus"
+                [rounded]="true"
+                (onClick)="add()"
+                styleClass="icon-btn"
+                pTooltip="Ajouter un département">
+      </p-button>
+      <p-button icon="pi pi-upload"
+                [rounded]="true"
+                (onClick)="export()"
+                styleClass="icon-btn export"
+                pTooltip="Exporter CSV">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <table class="dept-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Nom</th>
+          <th>Type</th>
+          <th>Statut</th>
+          <th style="width:130px">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- loading skeleton -->
+        <tr *ngIf="loading">
+          <td colspan="5" class="empty-msg">
+            <i class="pi pi-spin pi-spinner"></i>
+            Chargement...
+          </td>
+        </tr>
+
+        <!-- empty -->
+        <tr *ngIf="!loading && rows.length === 0">
+          <td colspan="5" class="empty-msg">
+            Aucun département trouvé.
+          </td>
+        </tr>
+
+        <!-- rows -->
+        <tr *ngFor="let d of rows">
+          <td>
+            <span class="code-badge">{{ d.code }}</span>
+          </td>
+          <td>{{ d.name }}</td>
+          <td>
+            <span class="type-badge"
+                  [class.operational]="d.type === 'OPERATIONAL'"
+                  [class.support]="d.type === 'SUPPORT'">
+              {{ d.type === 'OPERATIONAL' ? 'Opérationnel' : 'Support' }}
+            </span>
+          </td>
+          <td>
+            <span class="status-badge"
+                  [class.active]="d.active"
+                  [class.inactive]="!d.active">
+              {{ d.active ? 'Actif' : 'Inactif' }}
+            </span>
+          </td>
+          <td class="actions-col">
+            <p-button icon="pi pi-info-circle"
+                      [text]="true"
+                      (onClick)="details(d)"
+                      styleClass="action-btn info"
+                      pTooltip="Détails">
+            </p-button>
+            <p-button icon="pi pi-pencil"
+                      [text]="true"
+                      (onClick)="edit(d)"
+                      styleClass="action-btn edit"
+                      pTooltip="Modifier">
+            </p-button>
+            <p-button [icon]="d.active ? 'pi pi-ban' : 'pi pi-check-circle'"
+                      [text]="true"
+                      (onClick)="toggleActive(d)"
+                      [styleClass]="d.active ? 'action-btn deactivate' : 'action-btn activate'"
+                      [pTooltip]="d.active ? 'Désactiver' : 'Activer'">
+            </p-button>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== PAGINATION ===== -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button class="pg-btn"
+            [disabled]="currentPage === 0"
+            (click)="goToPage(currentPage - 1)">
+      <i class="pi pi-chevron-left"></i>
+    </button>
+
+    <button *ngFor="let p of pages"
+            class="pg-btn"
+            [class.active]="p === currentPage"
+            (click)="goToPage(p)">
+      {{ p + 1 }}
+    </button>
+
+    <button class="pg-btn"
+            [disabled]="currentPage === totalPages - 1"
+            (click)="goToPage(currentPage + 1)">
+      <i class="pi pi-chevron-right"></i>
+    </button>
+
+    <span class="pg-info">
+      Page {{ currentPage + 1 }} / {{ totalPages }}
+      &nbsp;·&nbsp; {{ totalElements }} résultat(s)
+    </span>
+  </div>
+
+</div>

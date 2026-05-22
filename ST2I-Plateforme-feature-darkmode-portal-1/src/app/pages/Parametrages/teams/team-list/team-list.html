@@ -1,0 +1,327 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="confirm-overlay" *ngIf="showDeleteConfirm" (click)="cancelDelete()">
+  <div class="confirm-dialog" (click)="$event.stopPropagation()">
+    <div class="confirm-header">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>Confirmer la suppression</span>
+    </div>
+
+    <div class="confirm-user-info" *ngIf="teamToDelete">
+      <span class="confirm-user-name">
+        {{ teamToDelete.name || 'Équipe sans nom' }}
+      </span>
+
+      <span class="confirm-user-email">
+        {{ teamToDelete.projectName || 'Aucun projet affecté' }}
+      </span>
+    </div>
+
+    <div class="confirm-warning-box">
+      <strong>Attention — cette action est irréversible</strong>
+      <ul>
+        <li>L’équipe sera supprimée définitivement</li>
+        <li>Les membres de cette équipe seront supprimés</li>
+        <li>Si un projet est lié, il retournera automatiquement à DRAFT</li>
+      </ul>
+    </div>
+
+    <div class="confirm-actions">
+      <p-button
+        icon="pi pi-trash"
+        label="Supprimer"
+        severity="danger"
+        [loading]="deleting"
+        (onClick)="confirmDelete()">
+      </p-button>
+
+      <p-button
+        icon="pi pi-times"
+        label="Annuler"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="deleting"
+        (onClick)="cancelDelete()">
+      </p-button>
+    </div>
+  </div>
+</div>
+
+<div class="card ui-card">
+  <div class="bar">Filtres de recherche</div>
+
+  <div class="body">
+    <div class="filter-grid">
+      <div class="field">
+        <input
+          pInputText
+          placeholder="Mot-clé"
+          [(ngModel)]="filters.keyword" />
+      </div>
+
+      <div class="field">
+        <select class="p-inputtext" [(ngModel)]="filters.status">
+          <option [ngValue]="undefined">Statut</option>
+          <option *ngFor="let status of statuses" [ngValue]="status">
+            {{ formatStatus(status) }}
+          </option>
+        </select>
+      </div>
+
+      <div class="field">
+        <p-select
+          class="w-full"
+          styleClass="project-filter-dropdown"
+          panelStyleClass="project-filter-panel"
+          appendTo="body"
+          [(ngModel)]="filters.projectId"
+          [options]="projectOptions"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          [showClear]="false"
+          [loading]="loadingProjects"
+          [virtualScroll]="true"
+          [virtualScrollItemSize]="52"
+          [scrollHeight]="'260px'"
+          placeholder="Tous les projets"
+          emptyMessage="Aucun projet trouvé"
+          emptyFilterMessage="Aucun projet trouvé"
+          (onFilter)="onProjectFilter($event)">
+
+          <ng-template let-project pTemplate="item">
+            <div
+              class="project-filter-option"
+              [class.all-projects-option]="project.allProjects">
+
+              <span class="project-filter-name">
+                <i
+                  class="pi"
+                  [ngClass]="project.allProjects ? 'pi-list' : 'pi-folder'">
+                </i>
+
+                {{ project.name }}
+              </span>
+
+              <span class="project-filter-sub">
+                {{ project.allProjects ? 'Afficher toutes les équipes' : formatProjectStatus(project.status) }}
+              </span>
+            </div>
+          </ng-template>
+
+          <ng-template let-project pTemplate="selectedItem">
+            <div
+              class="project-filter-option selected"
+              *ngIf="project"
+              [class.all-projects-option]="project.allProjects">
+
+              <span class="project-filter-name">
+                <i
+                  class="pi"
+                  [ngClass]="project.allProjects ? 'pi-list' : 'pi-folder'">
+                </i>
+
+                {{ project.name }}
+              </span>
+            </div>
+          </ng-template>
+
+        </p-select>
+      </div>
+    </div>
+
+    <div class="actions">
+      <p-button
+        icon="pi pi-search"
+        label="Rechercher"
+        severity="info"
+        (onClick)="search()">
+      </p-button>
+
+      <p-button
+        icon="pi pi-refresh"
+        label="Réinitialiser"
+        severity="danger"
+        [outlined]="true"
+        (onClick)="reset()">
+      </p-button>
+    </div>
+  </div>
+</div>
+
+<div class="card ui-card">
+  <div class="bar bar-row">
+    <div class="bar-title">
+      Liste des équipes
+      <span class="total-badge" *ngIf="totalElements > 0">
+        {{ totalElements }}
+      </span>
+    </div>
+
+    <div class="bar-right">
+      <p-button
+        icon="pi pi-plus"
+        [rounded]="true"
+        (onClick)="add()"
+        styleClass="icon-btn"
+        pTooltip="Ajouter une équipe">
+      </p-button>
+
+      <p-button
+        icon="pi pi-upload"
+        [rounded]="true"
+        (onClick)="export()"
+        styleClass="icon-btn export"
+        pTooltip="Exporter CSV">
+      </p-button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Équipe</th>
+          <th>Statut</th>
+          <th>Projet</th>
+          <th>Membres</th>
+          <th style="width: 140px;">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <ng-container *ngIf="loading">
+          <tr *ngFor="let i of [1,2,3,4,5,6,7]" class="skeleton-row">
+            <td><div class="skel skel-md"></div></td>
+            <td><div class="skel skel-sm"></div></td>
+            <td><div class="skel skel-md"></div></td>
+            <td><div class="skel skel-sm"></div></td>
+            <td><div class="skel skel-actions"></div></td>
+          </tr>
+        </ng-container>
+
+        <ng-container *ngIf="!loading">
+          <tr *ngFor="let t of rows" class="data-row">
+            <td>
+              <div class="team-cell">
+                <span class="team-icon">
+                  <i class="pi pi-users"></i>
+                </span>
+
+                <div>
+                  <span class="main-name">
+                    {{ t.name || 'Équipe sans nom' }}
+                  </span>
+
+                  <span class="sub-text">
+                    #{{ t.id }}
+                  </span>
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <span class="badge" [ngClass]="statusClass(t.status)">
+                {{ formatStatus(t.status) }}
+              </span>
+            </td>
+
+            <td>
+              <span class="project-badge" *ngIf="t.projectName">
+                <i class="pi pi-folder"></i>
+                {{ t.projectName }}
+              </span>
+
+              <span class="text-faint" *ngIf="!t.projectName">
+                Aucun projet
+              </span>
+            </td>
+
+            <td>
+              <span class="member-badge">
+                {{ t.members.length || 0 }} membre(s)
+              </span>
+            </td>
+
+            <td class="actions-col">
+              <button
+                class="action-btn info"
+                pTooltip="Détails"
+                (click)="details(t)">
+                <i class="pi pi-info-circle"></i>
+              </button>
+
+              <button
+                class="action-btn edit"
+                pTooltip="Modifier"
+                (click)="edit(t)">
+                <i class="pi pi-pencil"></i>
+              </button>
+
+              <button
+                class="action-btn del"
+                pTooltip="Supprimer"
+                (click)="delete(t)">
+                <i class="pi pi-trash"></i>
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="rows.length === 0">
+            <td colspan="5" class="empty-msg">
+              <i class="pi pi-users" style="font-size:2rem;opacity:.3"></i>
+              <br />
+              Aucune équipe trouvée.
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination-bar" *ngIf="totalPages > 1">
+    <span class="page-info">
+      Page {{ currentPage + 1 }} / {{ totalPages }}
+      &nbsp;·&nbsp; {{ totalElements }} équipes
+    </span>
+
+    <div class="page-controls">
+      <button
+        class="page-btn"
+        [disabled]="currentPage === 0"
+        (click)="onPageChange(0)">
+        <i class="pi pi-angle-double-left"></i>
+      </button>
+
+      <button
+        class="page-btn"
+        [disabled]="currentPage === 0"
+        (click)="onPageChange(currentPage - 1)">
+        <i class="pi pi-angle-left"></i>
+      </button>
+
+      <button
+        *ngFor="let p of pages"
+        class="page-btn"
+        [class.active]="p === currentPage"
+        (click)="onPageChange(p)">
+        {{ p + 1 }}
+      </button>
+
+      <button
+        class="page-btn"
+        [disabled]="currentPage === totalPages - 1"
+        (click)="onPageChange(currentPage + 1)">
+        <i class="pi pi-angle-right"></i>
+      </button>
+
+      <button
+        class="page-btn"
+        [disabled]="currentPage === totalPages - 1"
+        (click)="onPageChange(totalPages - 1)">
+        <i class="pi pi-angle-double-right"></i>
+      </button>
+    </div>
+  </div>
+</div>

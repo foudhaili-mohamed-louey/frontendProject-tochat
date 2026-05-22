@@ -1,0 +1,44 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="card ui-card">
+  <div class="bar">Ajouter Module</div>
+
+  <div class="block">
+    <div class="block-title">Informations du module</div>
+
+    <div class="formgrid1">
+
+      <!-- Module Name -->
+      <div class="field">
+        <label>Nom du module *</label>
+        <input pInputText
+               placeholder="Nom du module"
+               [(ngModel)]="module.name" />
+      </div>
+
+    </div>
+
+    <!-- info box -->
+    <div class="info-box">
+      <i class="pi pi-info-circle"></i>
+      <div>
+        <strong>Règles de création</strong>
+        <ul>
+          <li>Le nom du module doit être unique dans le système</li>
+          <li>Le nom ne peut pas être vide</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-sticky">
+    <p-button icon="pi pi-save"
+              label="Sauvegarder"
+              (onClick)="createModule()"
+              severity="info"
+              [loading]="loading">
+    </p-button>
+  </div>
+
+</div>

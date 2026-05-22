@@ -1,0 +1,111 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="card ui-card">
+  <div class="bar">Ajouter un Département</div>
+
+  <div class="block">
+    <div class="block-title">Informations du département</div>
+
+    <div class="formgrid3">
+
+      <!-- NOM -->
+      <div class="field">
+        <label>Nom *</label>
+        <input pInputText
+               name="name"
+               [(ngModel)]="form.name"
+               placeholder="Nom du département" />
+      </div>
+
+      <!-- CODE -->
+      <div class="field">
+        <label>Code *</label>
+        <input pInputText
+               name="code"
+               [(ngModel)]="form.code"
+               placeholder="Ex: RH, IT, FIN"
+               maxlength="10" />
+      </div>
+
+      <!-- TYPE -->
+      <div class="field">
+        <label>Type *</label>
+        <select class="p-inputtext select-field"
+                name="type"
+                [(ngModel)]="form.type">
+          <option value="" disabled>Sélectionner un type</option>
+          <option *ngFor="let t of departmentTypes" [value]="t.value">
+            {{ t.label }}
+          </option>
+        </select>
+      </div>
+
+      <!-- EMAIL -->
+      <div class="field">
+        <label>Email *</label>
+        <input pInputText
+               type="email"
+               name="email"
+               [(ngModel)]="form.email"
+               placeholder="département@entreprise.com" />
+      </div>
+
+      <!-- TÉLÉPHONE -->
+      <div class="field">
+        <label>Téléphone</label>
+        <input pInputText
+               name="phoneNumber"
+               [(ngModel)]="form.phoneNumber"
+               placeholder="Ex: +216 XX XXX XXX" />
+      </div>
+
+      <!-- LOCALISATION -->
+      <div class="field">
+        <label>Localisation</label>
+        <input pInputText
+               name="location"
+               [(ngModel)]="form.location"
+               placeholder="Ex: Tunis, Bâtiment A" />
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div class="field field-full">
+        <label>Description</label>
+        <textarea class="p-inputtext textarea-field"
+                  name="description"
+                  rows="3"
+                  [(ngModel)]="form.description"
+                  placeholder="Décrivez le rôle et les responsabilités de ce département...">
+        </textarea>
+      </div>
+
+    </div>
+
+    <!-- INFO BOX -->
+    <div class="info-box">
+      <i class="pi pi-info-circle"></i>
+      <div>
+        <strong>Règles de création</strong>
+        <ul>
+          <li>Le <code>nom</code>, le <code>code</code> et le <code>type</code> sont obligatoires</li>
+          <li>Le <code>code</code> doit être unique dans le système (ex: RH, IT, FIN)</li>
+          <li>L'email doit être une adresse valide</li>
+          <li>Le type <code>Opérationnel</code> permet d'associer le département à des projets</li>
+          <li>Le type <code>Support</code> est transversal et ne peut pas être lié à des projets</li>
+          <li>Le département sera <code>actif</code> par défaut après sa création</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-sticky">
+    <p-button icon="pi pi-save"
+              label="Sauvegarder"
+              (onClick)="save()"
+              severity="info"
+              [loading]="saving">
+    </p-button>
+  </div>
+
+</div>

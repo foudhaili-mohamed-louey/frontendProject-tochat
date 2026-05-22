@@ -1,0 +1,77 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="card ui-card">
+
+  <div class="bar">
+    Liste des modules
+
+    <p-button
+      icon="pi pi-plus"
+      label="Ajouter"
+      severity="info"
+      (onClick)="goToCreate()"
+      class="add-btn">
+    </p-button>
+  </div>
+
+  <div class="block">
+
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Rechercher par nom..."
+        [(ngModel)]="searchTerm"
+        (input)="searchByName()"
+      />
+    </div>
+
+    <table class="modules-table">
+
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nom</th>
+          <th class="actions">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr *ngIf="loading">
+          <td colspan="3" class="loading">Chargement...</td>
+        </tr>
+
+        <tr *ngFor="let module of filteredModules">
+
+          <td>{{ module.id }}</td>
+          <td>{{ module.name }}</td>
+
+          <td class="actions">
+
+            <i
+              class="pi pi-info-circle action info"
+              (click)="goToDetails(module.id)">
+            </i>
+
+            <i
+              class="pi pi-pencil action edit"
+              (click)="goToEdit(module.id)">
+            </i>
+
+            <i
+              class="pi pi-trash action delete"
+              (click)="deleteModule(module.id)">
+            </i>
+
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
