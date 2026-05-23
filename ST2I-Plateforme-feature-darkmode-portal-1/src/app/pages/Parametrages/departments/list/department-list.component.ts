@@ -14,6 +14,7 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { RbacService } from '@/app/core/services/rbac.service';
 
 @Component({
   selector: 'app-department-list',
@@ -50,17 +51,31 @@ export class DepartmentListComponent implements OnInit {
     type: null
   };
 
-  constructor(
-    private departmentService: DepartmentService,
-    private router: Router,
-    private cd: ChangeDetectorRef,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService
-  ) {}
+ constructor(
+  private departmentService: DepartmentService,
+  private router: Router,
+  private cd: ChangeDetectorRef,
+  private messageService: MessageService,
+  private confirmationService: ConfirmationService,
+  public rbacService: RbacService
+) {}
 
   ngOnInit(): void {
     this.search();
   }
+  private readonly MODULE_NAME = 'gestion des départments';
+
+canCreate(): boolean {
+  return this.rbacService.canCreate(this.MODULE_NAME);
+}
+
+canUpdate(): boolean {
+  return this.rbacService.canUpdate(this.MODULE_NAME);
+}
+
+canDelete(): boolean {
+  return this.rbacService.canDelete(this.MODULE_NAME);
+}
 
   search(page: number = 0): void {
     this.loading = true;

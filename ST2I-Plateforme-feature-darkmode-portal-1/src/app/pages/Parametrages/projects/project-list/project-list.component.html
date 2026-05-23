@@ -209,6 +209,7 @@
 
     <div class="bar-right">
       <p-button
+        *ngIf="canCreateProject()"
         icon="pi pi-plus"
         [rounded]="true"
         (onClick)="add()"
@@ -356,6 +357,7 @@
               </button>
 
               <button
+                *ngIf="canDeleteProject()"
                 class="action-btn del"
                 pTooltip="Supprimer"
                 [disabled]="!canDelete(p)"

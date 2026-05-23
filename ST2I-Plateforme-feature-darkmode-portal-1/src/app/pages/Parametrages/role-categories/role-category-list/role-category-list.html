@@ -83,6 +83,7 @@
 
     <div class="bar-right">
       <p-button
+        *ngIf="canCreate()"
         icon="pi pi-plus"
         [rounded]="true"
         (onClick)="add()"
@@ -147,11 +148,19 @@
                 <i class="pi pi-info-circle"></i>
               </button>
 
-              <button class="action-btn edit" pTooltip="Modifier" (click)="edit(c)">
+              <button
+                *ngIf="canUpdate()"
+                class="action-btn edit"
+                pTooltip="Modifier"
+                (click)="edit(c)">
                 <i class="pi pi-pencil"></i>
               </button>
 
-              <button class="action-btn del" pTooltip="Désactiver" (click)="delete(c)">
+              <button
+                *ngIf="canDelete()"
+                class="action-btn del"
+                pTooltip="Désactiver"
+                (click)="delete(c)">
                 <i class="pi pi-ban"></i>
               </button>
             </td>

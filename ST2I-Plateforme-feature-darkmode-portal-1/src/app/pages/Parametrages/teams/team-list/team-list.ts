@@ -19,6 +19,7 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { SelectModule } from 'primeng/select';
 import { MessageService } from 'primeng/api';
+import { RbacService } from '@/app/core/services/rbac.service';
 
 type ProjectFilterOption = {
   id: number | null;
@@ -74,14 +75,15 @@ export class TeamListComponent implements OnInit, OnDestroy {
   private projectSearchTimeout: any;
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private teamService: TeamService,
-    private projectService: ProjectService,
-    private router: Router,
-    private cd: ChangeDetectorRef,
-    private zone: NgZone,
-    private messageService: MessageService
-  ) {}
+ constructor(
+  private teamService: TeamService,
+  private projectService: ProjectService,
+  private router: Router,
+  private cd: ChangeDetectorRef,
+  private zone: NgZone,
+  private messageService: MessageService,
+  public rbacService: RbacService
+) {}
 
   ngOnInit(): void {
     this.loadProjects();
@@ -93,6 +95,19 @@ export class TeamListComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
     clearTimeout(this.projectSearchTimeout);
   }
+  private readonly MODULE_NAME = 'gestion des équipes';
+
+canCreate(): boolean {
+  return this.rbacService.canCreate(this.MODULE_NAME);
+}
+
+canUpdate(): boolean {
+  return this.rbacService.canUpdate(this.MODULE_NAME);
+}
+
+canDelete(): boolean {
+  return this.rbacService.canDelete(this.MODULE_NAME);
+}
 
   private applyView(): void {
     setTimeout(() => {

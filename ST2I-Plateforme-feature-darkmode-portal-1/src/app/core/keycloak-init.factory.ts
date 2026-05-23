@@ -1,4 +1,8 @@
+import { firstValueFrom } from 'rxjs';
 import Keycloak from 'keycloak-js';
+import { Router } from '@angular/router';
+
+import { RbacService } from './services/rbac.service';
 
 export const keycloak = new Keycloak({
   url: 'http://localhost:8080',
@@ -6,20 +10,41 @@ export const keycloak = new Keycloak({
   clientId: 'angular-portal',
 });
 
-export function initializeKeycloak(): () => Promise<boolean> {
-  return () =>
-    keycloak
-      .init({
+export function initializeKeycloak(
+  rbacService: RbacService,
+  router: Router
+): () => Promise<boolean> {
+  return async () => {
+    try {
+      const currentPath = window.location.pathname;
+
+      if (currentPath !== '/' && currentPath !== '/portal') {
+        sessionStorage.setItem('redirectAfterLogin', currentPath);
+      }
+
+      const authenticated = await keycloak.init({
         onLoad: 'login-required',
-        redirectUri: 'http://localhost:4200/portal',
-        checkLoginIframe: false, 
-      })
-      .then((authenticated) => {
-        console.log('Keycloak authenticated:', authenticated);
-        return authenticated;
-      })
-      .catch((err) => {
-        console.error('Keycloak init failed:', err);
-        return false;
+        redirectUri: window.location.origin + '/',
+        checkLoginIframe: false,
       });
+
+      if (authenticated) {
+        await firstValueFrom(rbacService.loadCurrentUserPermissions());
+
+        const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
+
+        if (redirectAfterLogin) {
+          sessionStorage.removeItem('redirectAfterLogin');
+          setTimeout(() => {
+            router.navigateByUrl(redirectAfterLogin);
+          }, 0);
+        }
+      }
+
+      return authenticated;
+    } catch (error) {
+      console.error('Keycloak init failed:', error);
+      return false;
+    }
+  };
 }

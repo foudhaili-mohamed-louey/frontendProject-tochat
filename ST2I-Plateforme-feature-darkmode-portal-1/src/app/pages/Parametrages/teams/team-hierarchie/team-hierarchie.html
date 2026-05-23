@@ -16,6 +16,7 @@
       </p-button>
 
       <p-button
+        *ngIf="canManageHierarchy()"
         icon="pi pi-save"
         label="Sauvegarder"
         severity="info"
@@ -208,7 +209,7 @@
                   <select
                     class="p-inputtext supervisor-select"
                     [ngModel]="hierarchyMap.get(member.id) ?? null"
-                    [disabled]="isSupervisorLoading(member.id)"
+                    [disabled]="!canManageHierarchy() || isSupervisorLoading(member.id)"
                     (ngModelChange)="onSupervisorChange(member.id, $event)">
 
                     <option [ngValue]="null">

@@ -18,6 +18,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
+import { RbacService } from '@/app/core/services/rbac.service';
 
 @Component({
   selector: 'app-users-list',
@@ -77,14 +78,15 @@ export class UsersListComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private usersService: UsersService,
-    private rolesService: RolesService,
-    private departmentService: DepartmentService,
-    private router: Router,
-    private cd: ChangeDetectorRef,
-    private messageService: MessageService
-  ) {}
+ constructor(
+  private usersService: UsersService,
+  private rolesService: RolesService,
+  private departmentService: DepartmentService,
+  private router: Router,
+  private cd: ChangeDetectorRef,
+  private messageService: MessageService,
+  public rbacService: RbacService
+) {}
 
   ngOnInit(): void {
     this.loadDropdowns();
@@ -95,6 +97,19 @@ export class UsersListComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+  private readonly MODULE_NAME = 'gestion des utilisateurs';
+
+canCreate(): boolean {
+  return this.rbacService.canCreate(this.MODULE_NAME);
+}
+
+canUpdate(): boolean {
+  return this.rbacService.canUpdate(this.MODULE_NAME);
+}
+
+canDelete(): boolean {
+  return this.rbacService.canDelete(this.MODULE_NAME);
+}
 
   // ── load dropdown data ──────────────────────────────────────────────
   private loadDropdowns(): void {

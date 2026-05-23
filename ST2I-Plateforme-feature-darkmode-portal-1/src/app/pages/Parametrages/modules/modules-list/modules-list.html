@@ -7,6 +7,7 @@
     Liste des modules
 
     <p-button
+      *ngIf="canCreate()"
       icon="pi pi-plus"
       label="Ajouter"
       severity="info"
@@ -55,11 +56,13 @@
             </i>
 
             <i
+              *ngIf="canUpdate()"
               class="pi pi-pencil action edit"
               (click)="goToEdit(module.id)">
             </i>
 
             <i
+              *ngIf="canDelete()"
               class="pi pi-trash action delete"
               (click)="deleteModule(module.id)">
             </i>

@@ -50,17 +50,11 @@
   <div class="body">
     <div class="filter-grid">
       <div class="field">
-        <input
-          pInputText
-          placeholder="Prénom"
-          [(ngModel)]="filters.firstName" />
+        <input pInputText placeholder="Prénom" [(ngModel)]="filters.firstName" />
       </div>
 
       <div class="field">
-        <input
-          pInputText
-          placeholder="Nom"
-          [(ngModel)]="filters.lastName" />
+        <input pInputText placeholder="Nom" [(ngModel)]="filters.lastName" />
       </div>
 
       <div class="field">
@@ -136,6 +130,7 @@
 
     <div class="bar-right">
       <p-button
+        *ngIf="canCreate()"
         icon="pi pi-plus"
         [rounded]="true"
         (onClick)="add()"
@@ -169,7 +164,6 @@
       </thead>
 
       <tbody>
-        <!-- loading skeleton -->
         <ng-container *ngIf="loading">
           <tr *ngFor="let i of [1,2,3,4,5,6,7]" class="skeleton-row">
             <td><div class="skel skel-user"></div></td>
@@ -183,7 +177,6 @@
           </tr>
         </ng-container>
 
-        <!-- data rows -->
         <ng-container *ngIf="!loading">
           <tr *ngFor="let u of rows" class="data-row">
             <td>
@@ -234,21 +227,32 @@
                 <i class="pi pi-info-circle"></i>
               </button>
 
-              <button class="action-btn edit" pTooltip="Modifier" (click)="edit(u)">
+              <button
+                *ngIf="canUpdate()"
+                class="action-btn edit"
+                pTooltip="Modifier"
+                (click)="edit(u)">
                 <i class="pi pi-pencil"></i>
               </button>
 
-              <button class="action-btn del" pTooltip="Supprimer" (click)="delete(u)">
+              <button
+                *ngIf="canDelete()"
+                class="action-btn del"
+                pTooltip="Supprimer"
+                (click)="delete(u)">
                 <i class="pi pi-trash"></i>
               </button>
 
-              <button class="action-btn reset-pw" pTooltip="Réinitialiser mot de passe" (click)="resetPassword(u)">
+              <button
+                *ngIf="canUpdate()"
+                class="action-btn reset-pw"
+                pTooltip="Réinitialiser mot de passe"
+                (click)="resetPassword(u)">
                 <i class="pi pi-key"></i>
               </button>
             </td>
           </tr>
 
-          <!-- empty -->
           <tr *ngIf="rows.length === 0">
             <td colspan="8" class="empty-msg">
               <i class="pi pi-users" style="font-size:2rem;opacity:.3"></i>
@@ -260,7 +264,6 @@
     </table>
   </div>
 
-  <!-- ===== CUSTOM PAGINATION ===== -->
   <div class="pagination-bar" *ngIf="totalPages > 1">
     <span class="page-info">
       Page {{ currentPage + 1 }} / {{ totalPages }}

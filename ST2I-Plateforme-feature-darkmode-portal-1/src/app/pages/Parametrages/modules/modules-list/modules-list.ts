@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 
 import { ModulesService } from '../services/modules.service';
 import { ModuleResponseDTO } from '../models/ModuleResponseDTO';
+import { RbacService } from '@/app/core/services/rbac.service';
 
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -27,6 +28,8 @@ import { ButtonModule } from 'primeng/button';
 })
 export class ModulesListComponent implements OnInit {
 
+  private readonly MODULE_NAME = 'gestion des des modules';
+
   modules: ModuleResponseDTO[] = [];
   filteredModules: ModuleResponseDTO[] = [];
 
@@ -38,11 +41,24 @@ export class ModulesListComponent implements OnInit {
     private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    public rbacService: RbacService
   ) {}
 
   ngOnInit(): void {
     this.loadModules();
+  }
+
+  canCreate(): boolean {
+    return this.rbacService.canCreate(this.MODULE_NAME);
+  }
+
+  canUpdate(): boolean {
+    return this.rbacService.canUpdate(this.MODULE_NAME);
+  }
+
+  canDelete(): boolean {
+    return this.rbacService.canDelete(this.MODULE_NAME);
   }
 
   loadModules(): void {

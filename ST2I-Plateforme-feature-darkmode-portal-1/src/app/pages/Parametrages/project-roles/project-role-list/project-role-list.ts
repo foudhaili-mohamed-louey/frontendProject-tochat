@@ -17,6 +17,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
+import { RbacService } from '@/app/core/services/rbac.service';
 
 @Component({
   selector: 'app-project-role-list',
@@ -63,13 +64,14 @@ export class ProjectRoleListComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
-    private projectRoleService: ProjectRoleService,
-    private roleCategoryService: RoleCategoryService,
-    private router: Router,
-    private cd: ChangeDetectorRef,
-    private zone: NgZone,
-    private messageService: MessageService
-  ) {}
+  private projectRoleService: ProjectRoleService,
+  private roleCategoryService: RoleCategoryService,
+  private router: Router,
+  private cd: ChangeDetectorRef,
+  private zone: NgZone,
+  private messageService: MessageService,
+  public rbacService: RbacService
+) {}
 
   ngOnInit(): void {
     this.loadCategories();
@@ -80,6 +82,19 @@ export class ProjectRoleListComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+  private readonly MODULE_NAME = 'gestion les roles des projets';
+
+canCreate(): boolean {
+  return this.rbacService.canCreate(this.MODULE_NAME);
+}
+
+canUpdate(): boolean {
+  return this.rbacService.canUpdate(this.MODULE_NAME);
+}
+
+canDelete(): boolean {
+  return this.rbacService.canDelete(this.MODULE_NAME);
+}
 
   private refresh(): void {
     this.cd.detectChanges();

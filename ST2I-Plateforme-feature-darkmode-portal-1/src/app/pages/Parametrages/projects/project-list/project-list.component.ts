@@ -14,6 +14,8 @@ import { TeamService } from '../../teams/service/team.service';
 import { TeamResponseDTO } from '../../teams/dtos/team-response.dto';
 import { TeamStatus } from '../../teams/dtos/team-status.enum';
 
+import { RbacService } from '@/app/core/services/rbac.service';
+
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
@@ -49,6 +51,8 @@ type TeamFilterOption = {
   providers: [MessageService]
 })
 export class ProjectListComponent implements OnInit, OnDestroy {
+
+  private readonly MODULE_NAME = 'gestion des projets';
 
   readonly ProjectStatus = ProjectStatus;
 
@@ -98,7 +102,8 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     private teamService: TeamService,
     private router: Router,
     private cd: ChangeDetectorRef,
-    private messageService: MessageService
+    private messageService: MessageService,
+    public rbacService: RbacService
   ) {}
 
   ngOnInit(): void {
@@ -110,6 +115,18 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
     clearTimeout(this.teamSearchTimeout);
+  }
+
+  canCreateProject(): boolean {
+    return this.rbacService.canCreate(this.MODULE_NAME);
+  }
+
+  canUpdateProject(): boolean {
+    return this.rbacService.canUpdate(this.MODULE_NAME);
+  }
+
+  canDeleteProject(): boolean {
+    return this.rbacService.canDelete(this.MODULE_NAME);
   }
 
   private buildTeamOptions(): void {
@@ -517,37 +534,41 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   canEdit(project: ProjectResponseDTO): boolean {
-    return project.status !== ProjectStatus.ENDED &&
+    return this.canUpdateProject() &&
+      project.status !== ProjectStatus.ENDED &&
       project.status !== ProjectStatus.CANCELLED;
   }
 
   canDelete(project: ProjectResponseDTO): boolean {
-    return project.status !== ProjectStatus.RUNNING &&
+    return this.canDeleteProject() &&
+      project.status !== ProjectStatus.RUNNING &&
       project.status !== ProjectStatus.ON_HOLD;
   }
 
   canStart(project: ProjectResponseDTO): boolean {
-    return project.status === ProjectStatus.READY;
+    return this.canUpdateProject() && project.status === ProjectStatus.READY;
   }
 
   canPause(project: ProjectResponseDTO): boolean {
-    return project.status === ProjectStatus.RUNNING;
+    return this.canUpdateProject() && project.status === ProjectStatus.RUNNING;
   }
 
   canResume(project: ProjectResponseDTO): boolean {
-    return project.status === ProjectStatus.ON_HOLD;
+    return this.canUpdateProject() && project.status === ProjectStatus.ON_HOLD;
   }
 
   canEnd(project: ProjectResponseDTO): boolean {
-    return project.status === ProjectStatus.RUNNING ||
-      project.status === ProjectStatus.ON_HOLD;
+    return this.canUpdateProject() &&
+      (project.status === ProjectStatus.RUNNING ||
+        project.status === ProjectStatus.ON_HOLD);
   }
 
   canCancel(project: ProjectResponseDTO): boolean {
-    return project.status === ProjectStatus.DRAFT ||
-      project.status === ProjectStatus.READY ||
-      project.status === ProjectStatus.RUNNING ||
-      project.status === ProjectStatus.ON_HOLD;
+    return this.canUpdateProject() &&
+      (project.status === ProjectStatus.DRAFT ||
+        project.status === ProjectStatus.READY ||
+        project.status === ProjectStatus.RUNNING ||
+        project.status === ProjectStatus.ON_HOLD);
   }
 
   isChanging(project: ProjectResponseDTO): boolean {

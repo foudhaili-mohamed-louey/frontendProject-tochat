@@ -17,7 +17,7 @@ import { ToastModule } from 'primeng/toast';
 import { SelectModule } from 'primeng/select';
 import { OrganizationChartModule } from 'primeng/organizationchart';
 import { MessageService, TreeNode } from 'primeng/api';
-
+import { RbacService } from '@/app/core/services/rbac.service';
 type TeamOption = {
   id: number;
   label: string;
@@ -82,16 +82,21 @@ export class TeamHierarchyComponent implements OnInit {
   readonly defaultFemale = 'assets/images/default-user-female.png';
 
   constructor(
-    private teamService: TeamService,
-    private usersService: UsersService,
-    private cd: ChangeDetectorRef,
-    private zone: NgZone,
-    private messageService: MessageService
-  ) {}
+  private teamService: TeamService,
+  private usersService: UsersService,
+  private cd: ChangeDetectorRef,
+  private zone: NgZone,
+  private messageService: MessageService,
+  public rbacService: RbacService
+) {}
 
   ngOnInit(): void {
     this.loadAllTeams();
   }
+  private readonly MODULE_NAME = 'gestion des équipes';
+  canManageHierarchy(): boolean {
+  return this.rbacService.canUpdate(this.MODULE_NAME);
+}
 
   private applyView(): void {
     setTimeout(() => {

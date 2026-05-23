@@ -10,6 +10,7 @@ import { RoleSearchCriteriaDTO } from '../models/role-models/role-search-criteri
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { RbacService } from '@/app/core/services/rbac.service';
 
 @Component({
   selector: 'app-roles-list',
@@ -48,16 +49,30 @@ export class RolesListComponent implements OnInit {
   showConfirm = false;
   roleToDelete: RoleResponseDTO | null = null;
 
-  constructor(
-    private rolesService: RolesService,
-    private router: Router,
-    private cd: ChangeDetectorRef,
-    private messageService: MessageService
-  ) {}
+ constructor(
+  private rolesService: RolesService,
+  private router: Router,
+  private cd: ChangeDetectorRef,
+  private messageService: MessageService,
+  public rbacService: RbacService
+) {}
 
   ngOnInit(): void {
     this.loadRoles();
   }
+  private readonly MODULE_NAME = 'gestion des roles';
+
+canCreate(): boolean {
+  return this.rbacService.canCreate(this.MODULE_NAME);
+}
+
+canUpdate(): boolean {
+  return this.rbacService.canUpdate(this.MODULE_NAME);
+}
+
+canDelete(): boolean {
+  return this.rbacService.canDelete(this.MODULE_NAME);
+}
 
   loadRoles(): void {
     this.loading = true;

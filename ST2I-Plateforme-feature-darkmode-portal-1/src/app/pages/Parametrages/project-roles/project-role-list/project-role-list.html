@@ -165,6 +165,7 @@
 
     <div class="bar-right">
       <p-button
+        *ngIf="canCreate()"
         icon="pi pi-plus"
         [rounded]="true"
         (onClick)="add()"
@@ -190,7 +191,6 @@
           <th>Type</th>
           <th>Niveau</th>
           <th>Catégorie</th>
-      
           <th style="width: 140px;">Actions</th>
         </tr>
       </thead>
@@ -199,7 +199,6 @@
         <ng-container *ngIf="loading">
           <tr *ngFor="let i of [1,2,3,4,5,6,7]" class="skeleton-row">
             <td><div class="skel skel-md"></div></td>
-            <td><div class="skel skel-sm"></div></td>
             <td><div class="skel skel-sm"></div></td>
             <td><div class="skel skel-sm"></div></td>
             <td><div class="skel skel-sm"></div></td>
@@ -244,8 +243,6 @@
               </span>
             </td>
 
-        
-
             <td class="actions-col">
               <button
                 class="action-btn info"
@@ -255,6 +252,7 @@
               </button>
 
               <button
+                *ngIf="canUpdate()"
                 class="action-btn edit"
                 pTooltip="Modifier"
                 (click)="edit(r)">
@@ -262,6 +260,7 @@
               </button>
 
               <button
+                *ngIf="canDelete()"
                 class="action-btn del"
                 pTooltip="Désactiver"
                 (click)="delete(r)">
@@ -271,7 +270,7 @@
           </tr>
 
           <tr *ngIf="rows.length === 0">
-            <td colspan="6" class="empty-msg">
+            <td colspan="5" class="empty-msg">
               <i class="pi pi-briefcase" style="font-size:2rem;opacity:.3"></i>
               <br />
               Aucun rôle projet trouvé.

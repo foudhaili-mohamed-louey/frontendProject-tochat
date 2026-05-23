@@ -213,14 +213,58 @@ export class RolesPermissionsManagementComponent implements OnInit {
   }
 
   togglePermission(permission?: PermissionResponseDTO): void {
-    if (!permission) return;
-    if (this.selectedPermissions.has(permission.id)) {
-      this.selectedPermissions.delete(permission.id);
-    } else {
-      this.selectedPermissions.add(permission.id);
+
+  if (!permission) return;
+
+  const isCurrentlyChecked = this.selectedPermissions.has(permission.id);
+
+  // =========================================================
+  // UNCHECK
+  // =========================================================
+  if (isCurrentlyChecked) {
+
+    this.selectedPermissions.delete(permission.id);
+
+    // if READ removed -> remove CREATE/UPDATE/DELETE too
+    if (permission.action === 'READ') {
+
+      this.permissions
+        .filter(p =>
+          p.moduleId === permission.moduleId &&
+          ['CREATE', 'UPDATE', 'DELETE'].includes(p.action)
+        )
+        .forEach(p => this.selectedPermissions.delete(p.id));
     }
-    this.cd.detectChanges();
+
   }
+
+  // =========================================================
+  // CHECK
+  // =========================================================
+  else {
+
+    this.selectedPermissions.add(permission.id);
+
+    // if CREATE/UPDATE/DELETE checked -> auto add READ
+    if (
+      permission.action === 'CREATE' ||
+      permission.action === 'UPDATE' ||
+      permission.action === 'DELETE'
+    ) {
+
+      const readPermission = this.permissions.find(p =>
+        p.moduleId === permission.moduleId &&
+        p.action === 'READ'
+      );
+
+      if (readPermission) {
+        this.selectedPermissions.add(readPermission.id);
+      }
+    }
+  }
+
+  this.cd.detectChanges();
+}
 
   toggleModule(moduleId: number): void {
     this.expandedModuleId =
