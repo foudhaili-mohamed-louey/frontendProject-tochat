@@ -8,4 +8,5 @@ export interface CreateDepartmentRequestDTO {
   phoneNumber: string;
   email: string;
   type: DepartmentType;
+  chefKeycloakId?: string | null;
 }

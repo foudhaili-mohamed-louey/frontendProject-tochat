@@ -189,3 +189,30 @@
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
+.chef-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.chef-avatar {
+  flex-shrink: 0;
+}
+
+.chef-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+}
+
+.chef-name {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.9rem;
+}
+
+.chef-meta {
+  font-size: 0.75rem;
+  color: #64748b;
+}

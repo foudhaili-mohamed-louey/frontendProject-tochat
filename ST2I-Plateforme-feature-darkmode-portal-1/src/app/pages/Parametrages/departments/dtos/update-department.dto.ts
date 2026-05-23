@@ -4,4 +4,5 @@ export interface UpdateDepartmentDTO {
   location?: string;
   phoneNumber?: string;
   email?: string;
+  chefKeycloakId?: string | null;
 }

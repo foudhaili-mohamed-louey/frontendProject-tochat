@@ -10,6 +10,8 @@ export interface DepartmentResponseDTO {
   phoneNumber?: string;
   email?: string;
   type: DepartmentType;
+  chefKeycloakId?: string | null;
+  chefDepartment?: UserMapperResponseDTO | null;
   active: boolean;
   createdAt: string;
   updatedAt: string;

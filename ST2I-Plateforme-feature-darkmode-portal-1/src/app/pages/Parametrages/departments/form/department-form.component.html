@@ -8,31 +8,34 @@
 
     <div class="formgrid3">
 
-      <!-- NOM -->
       <div class="field">
         <label>Nom *</label>
-        <input pInputText
-               name="name"
-               [(ngModel)]="form.name"
-               placeholder="Nom du département" />
+        <input
+          pInputText
+          name="name"
+          [(ngModel)]="form.name"
+          placeholder="Nom du département"
+        />
       </div>
 
-      <!-- CODE -->
       <div class="field">
         <label>Code *</label>
-        <input pInputText
-               name="code"
-               [(ngModel)]="form.code"
-               placeholder="Ex: RH, IT, FIN"
-               maxlength="10" />
+        <input
+          pInputText
+          name="code"
+          [(ngModel)]="form.code"
+          placeholder="Ex: RH, IT, FIN"
+          maxlength="10"
+        />
       </div>
 
-      <!-- TYPE -->
       <div class="field">
         <label>Type *</label>
-        <select class="p-inputtext select-field"
-                name="type"
-                [(ngModel)]="form.type">
+        <select
+          class="p-inputtext select-field"
+          name="type"
+          [(ngModel)]="form.type"
+        >
           <option value="" disabled>Sélectionner un type</option>
           <option *ngFor="let t of departmentTypes" [value]="t.value">
             {{ t.label }}
@@ -40,72 +43,174 @@
         </select>
       </div>
 
-      <!-- EMAIL -->
+      <div class="field chef-field" (click)="stopClose($event)">
+        <label>Chef département</label>
+
+        <div class="chef-dropdown">
+
+          <div class="chef-control" (click)="openChefDropdown($event)">
+            <div class="chef-selected" *ngIf="selectedChef; else chefPlaceholder">
+              <div class="mini-avatar">
+                {{ getUserInitials(selectedChef) }}
+              </div>
+
+              <div class="selected-info">
+                <span class="selected-name">
+                  {{ selectedChef.firstName }} {{ selectedChef.lastName }}
+                </span>
+                <span class="selected-meta">
+                  {{ selectedChef.profession || selectedChef.roleName || 'Utilisateur' }}
+                </span>
+              </div>
+            </div>
+
+            <ng-template #chefPlaceholder>
+              <span class="placeholder">Sélectionner un chef département</span>
+            </ng-template>
+
+            <button
+              *ngIf="selectedChef"
+              type="button"
+              class="clear-btn"
+              (click)="clearChef($event)"
+            >
+              <i class="pi pi-times"></i>
+            </button>
+
+            <i class="pi pi-chevron-down dropdown-icon"></i>
+          </div>
+
+          <div class="chef-panel" *ngIf="chefDropdownOpen">
+            <div class="search-wrapper">
+              <i class="pi pi-search"></i>
+              <input
+                name="chefSearch"
+                [(ngModel)]="chefSearch"
+                (input)="searchChefs()"
+                placeholder="Rechercher par nom..."
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="chef-option no-chef-option" (click)="clearChef($event)">
+              <div class="option-icon">
+                <i class="pi pi-user-minus"></i>
+              </div>
+              <div class="option-info">
+                <span class="option-name">Aucun chef</span>
+                <span class="option-meta">Département sans chef assigné</span>
+              </div>
+            </div>
+
+            <div class="loading-line" *ngIf="loadingChefs">
+              <i class="pi pi-spin pi-spinner"></i>
+              Chargement...
+            </div>
+
+            <div class="empty-line" *ngIf="!loadingChefs && chefUsers.length === 0">
+              Aucun utilisateur trouvé
+            </div>
+
+            <div
+              class="chef-option"
+              *ngFor="let u of chefUsers"
+              [class.selected]="form.chefKeycloakId === u.keycloakId"
+              (click)="selectChef(u)"
+            >
+              <div class="option-avatar">
+                {{ getUserInitials(u) }}
+              </div>
+
+              <div class="option-info">
+                <span class="option-name">{{ u.firstName }} {{ u.lastName }}</span>
+                <span class="option-meta">
+                  {{ u.profession || u.roleName || 'Utilisateur' }}
+                </span>
+              </div>
+
+              <i
+                *ngIf="form.chefKeycloakId === u.keycloakId"
+                class="pi pi-check selected-check"
+              ></i>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
       <div class="field">
         <label>Email *</label>
-        <input pInputText
-               type="email"
-               name="email"
-               [(ngModel)]="form.email"
-               placeholder="département@entreprise.com" />
+        <input
+          pInputText
+          type="email"
+          name="email"
+          [(ngModel)]="form.email"
+          placeholder="département@entreprise.com"
+        />
       </div>
 
-      <!-- TÉLÉPHONE -->
       <div class="field">
         <label>Téléphone</label>
-        <input pInputText
-               name="phoneNumber"
-               [(ngModel)]="form.phoneNumber"
-               placeholder="Ex: +216 XX XXX XXX" />
+        <input
+          pInputText
+          name="phoneNumber"
+          [(ngModel)]="form.phoneNumber"
+          placeholder="Ex: +216 XX XXX XXX"
+        />
       </div>
 
-      <!-- LOCALISATION -->
       <div class="field">
         <label>Localisation</label>
-        <input pInputText
-               name="location"
-               [(ngModel)]="form.location"
-               placeholder="Ex: Tunis, Bâtiment A" />
+        <input
+          pInputText
+          name="location"
+          [(ngModel)]="form.location"
+          placeholder="Ex: Tunis, Bâtiment A"
+        />
       </div>
 
-      <!-- DESCRIPTION -->
       <div class="field field-full">
         <label>Description</label>
-        <textarea class="p-inputtext textarea-field"
-                  name="description"
-                  rows="3"
-                  [(ngModel)]="form.description"
-                  placeholder="Décrivez le rôle et les responsabilités de ce département...">
-        </textarea>
+        <textarea
+          class="p-inputtext textarea-field"
+          name="description"
+          rows="3"
+          [(ngModel)]="form.description"
+          placeholder="Décrivez le rôle et les responsabilités de ce département..."
+        ></textarea>
       </div>
 
     </div>
 
-    <!-- INFO BOX -->
     <div class="info-box">
       <i class="pi pi-info-circle"></i>
       <div>
         <strong>Règles de création</strong>
         <ul>
           <li>Le <code>nom</code>, le <code>code</code> et le <code>type</code> sont obligatoires</li>
-          <li>Le <code>code</code> doit être unique dans le système (ex: RH, IT, FIN)</li>
+          <li>Le <code>code</code> doit être unique dans le système</li>
+          <li>Le chef département est optionnel</li>
           <li>L'email doit être une adresse valide</li>
-          <li>Le type <code>Opérationnel</code> permet d'associer le département à des projets</li>
-          <li>Le type <code>Support</code> est transversal et ne peut pas être lié à des projets</li>
-          <li>Le département sera <code>actif</code> par défaut après sa création</li>
         </ul>
       </div>
     </div>
-
   </div>
 
   <div class="footer-sticky">
-    <p-button icon="pi pi-save"
-              label="Sauvegarder"
-              (onClick)="save()"
-              severity="info"
-              [loading]="saving">
-    </p-button>
-  </div>
+    <p-button
+      icon="pi pi-arrow-left"
+      label="Retour"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="back()"
+    ></p-button>
 
+    <p-button
+      icon="pi pi-save"
+      label="Sauvegarder"
+      severity="info"
+      [loading]="saving"
+      (onClick)="save()"
+    ></p-button>
+  </div>
 </div>

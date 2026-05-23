@@ -42,6 +42,42 @@
       </span>
     </div>
     <div class="row">
+  <b>Chef département</b>
+
+  <div class="chef-wrapper" *ngIf="dept.chefDepartment; else noChef">
+
+    <div class="chef-avatar">
+      <img *ngIf="dept.chefDepartment.photoUrl"
+           [src]="dept.chefDepartment.photoUrl"
+           [alt]="dept.chefDepartment.firstName"
+           class="avatar-img"
+           (error)="onAvatarError($event, dept.chefDepartment.sex)" />
+
+      <div *ngIf="!dept.chefDepartment.photoUrl"
+           class="avatar-placeholder">
+        {{ dept.chefDepartment.firstName.charAt(0) }}
+        {{ dept.chefDepartment.lastName.charAt(0) }}
+      </div>
+    </div>
+
+    <div class="chef-info">
+      <span class="chef-name">
+        {{ dept.chefDepartment.firstName }}
+        {{ dept.chefDepartment.lastName }}
+      </span>
+
+      <span class="chef-meta">
+        {{ dept.chefDepartment.profession || dept.chefDepartment.roleName || 'Utilisateur' }}
+      </span>
+    </div>
+
+  </div>
+
+  <ng-template #noChef>
+    <span>—</span>
+  </ng-template>
+</div>
+    <div class="row">
       <b>Description</b>
       <span>{{ dept.description || '—' }}</span>
     </div>
