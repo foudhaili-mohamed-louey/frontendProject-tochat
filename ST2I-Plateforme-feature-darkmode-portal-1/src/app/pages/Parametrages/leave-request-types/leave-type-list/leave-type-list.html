@@ -1,0 +1,186 @@
+<p-toast position="top-right"></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="card ui-card">
+  <div class="bar">Filtres de recherche</div>
+
+  <div class="body">
+    <div class="filter-grid">
+
+      <div class="field">
+        <input
+          pInputText
+          placeholder="Rechercher par nom, code ou description"
+          [(ngModel)]="filters.keyword"
+        />
+      </div>
+
+      <div class="field">
+        <select class="p-inputtext" [(ngModel)]="filters.unit">
+          <option *ngFor="let u of unitOptions" [ngValue]="u.value">
+            {{ u.label }}
+          </option>
+        </select>
+      </div>
+
+      <div class="field">
+        <select class="p-inputtext" [(ngModel)]="filters.incrementMode">
+          <option *ngFor="let m of incrementModeOptions" [ngValue]="m.value">
+            {{ m.label }}
+          </option>
+        </select>
+      </div>
+
+      <div class="field">
+        <select class="p-inputtext" [(ngModel)]="filters.active">
+          <option *ngFor="let s of statusOptions" [ngValue]="s.value">
+            {{ s.label }}
+          </option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <p-button
+        icon="pi pi-search"
+        label="Rechercher"
+        severity="info"
+        (onClick)="search(0)">
+      </p-button>
+
+      <p-button
+        icon="pi pi-refresh"
+        label="Réinitialiser"
+        severity="danger"
+        [outlined]="true"
+        (onClick)="reset()">
+      </p-button>
+    </div>
+  </div>
+</div>
+
+<div class="card ui-card">
+  <div class="bar bar-row">
+    <div class="bar-title">
+      Liste des types de congé
+      <span class="total-badge">{{ totalElements }}</span>
+    </div>
+
+    <div class="bar-right">
+      <p-button
+        icon="pi pi-plus"
+        [rounded]="true"
+        (onClick)="add()"
+        styleClass="icon-btn"
+        pTooltip="Ajouter un type de congé">
+      </p-button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="leave-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Nom</th>
+          <th>Unité</th>
+          <th>Mode</th>
+          <th>Max</th>
+          <th>Statut</th>
+          <th style="width:130px">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="7" class="empty-msg">
+            <i class="pi pi-spin pi-spinner"></i>
+            Chargement...
+          </td>
+        </tr>
+
+        <tr *ngIf="!loading && rows.length === 0">
+          <td colspan="7" class="empty-msg">
+            Aucun type de congé trouvé.
+          </td>
+        </tr>
+
+        <tr *ngFor="let row of rows">
+          <td>
+            <span class="code-badge">{{ row.code }}</span>
+          </td>
+
+          <td>{{ row.name }}</td>
+
+          <td>
+            <span class="unit-badge">{{ getUnitLabel(row.unit) }}</span>
+          </td>
+
+          <td>
+            <span class="mode-badge" [ngClass]="row.incrementMode.toLowerCase()">
+              {{ getIncrementModeLabel(row.incrementMode) }}
+            </span>
+          </td>
+
+          <td>{{ row.maxBalance }}</td>
+
+          <td>
+            <span class="status-badge" [class.active]="row.active" [class.inactive]="!row.active">
+              {{ row.active ? 'Actif' : 'Inactif' }}
+            </span>
+          </td>
+
+          <td class="actions-col">
+            <p-button
+              icon="pi pi-info-circle"
+              [text]="true"
+              (onClick)="details(row)"
+              styleClass="action-btn info"
+              pTooltip="Détails">
+            </p-button>
+
+            <p-button
+              icon="pi pi-pencil"
+              [text]="true"
+              (onClick)="edit(row)"
+              styleClass="action-btn edit"
+              pTooltip="Modifier">
+            </p-button>
+
+            <p-button
+              [icon]="row.active ? 'pi pi-ban' : 'pi pi-check-circle'"
+              [text]="true"
+              (onClick)="toggleActive(row)"
+              [styleClass]="row.active ? 'action-btn deactivate' : 'action-btn activate'"
+              [pTooltip]="row.active ? 'Désactiver' : 'Activer'">
+            </p-button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button class="pg-btn" [disabled]="currentPage === 0" (click)="goToPage(currentPage - 1)">
+      <i class="pi pi-chevron-left"></i>
+    </button>
+
+    <button
+      *ngFor="let p of pages"
+      class="pg-btn"
+      [class.active]="p === currentPage"
+      (click)="goToPage(p)">
+      {{ p + 1 }}
+    </button>
+
+    <button class="pg-btn" [disabled]="currentPage === totalPages - 1" (click)="goToPage(currentPage + 1)">
+      <i class="pi pi-chevron-right"></i>
+    </button>
+
+    <span class="pg-info">
+      Page {{ currentPage + 1 }} / {{ totalPages }}
+      &nbsp;·&nbsp; {{ totalElements }} résultat(s)
+    </span>
+  </div>
+</div>

@@ -1,0 +1,140 @@
+<p-toast position="top-right"></p-toast>
+
+<div *ngIf="loading" class="card ui-card">
+  <div class="bar">Chargement...</div>
+
+  <div class="block">
+    <p class="loading-msg">
+      <i class="pi pi-spin pi-spinner"></i>
+      Chargement des données...
+    </p>
+  </div>
+</div>
+
+<div *ngIf="!loading && data" class="card ui-card">
+  <div class="bar">Correction du solde de congé</div>
+
+  <div class="block">
+
+    <div class="summary-card">
+      <div class="employee-summary">
+        <div class="avatar-large">
+          {{ getInitials(data.employee) }}
+        </div>
+
+        <div>
+          <h2>{{ getUserFullName(data.employee) }}</h2>
+
+          <p>
+            {{ data.employee?.profession || 'Employé' }}
+            <span *ngIf="data.employee?.email"> · {{ data.employee?.email }}</span>
+          </p>
+
+          <span class="department-badge" *ngIf="data.employee?.departmentName">
+            <i class="pi pi-building"></i>
+            {{ data.employee?.departmentName }}
+          </span>
+        </div>
+      </div>
+
+      <div class="status-zone">
+        <span class="status-badge" [class.active]="data.active" [class.inactive]="!data.active">
+          {{ data.active ? 'Actif' : 'Inactif' }}
+        </span>
+
+        <small>Le statut se gère depuis la liste.</small>
+      </div>
+    </div>
+
+    <div class="block-title">Informations non modifiables</div>
+
+    <div class="details-grid">
+      <div class="info-item">
+        <span>Type de congé</span>
+        <strong>{{ data.leaveType.name || '—' }}</strong>
+        <small>{{ data.leaveType.code }}</small>
+      </div>
+
+      <div class="info-item">
+        <span>Année</span>
+        <strong>{{ data.year }}</strong>
+      </div>
+
+      <div class="info-item">
+        <span>Unité</span>
+        <strong>{{ getUnitLabel() }}</strong>
+      </div>
+
+      <div class="info-item">
+        <span>Solde utilisé</span>
+        <strong>{{ data.usedBalance }}</strong>
+      </div>
+
+      <div class="info-item">
+        <span>Solde maximum autorisé</span>
+        <strong>{{ data.leaveType.maxBalance || 0 }}</strong>
+      </div>
+    </div>
+
+    <div class="block-title second">Correction du solde</div>
+
+    <div class="edit-grid">
+      <div class="field">
+        <label>Solde total *</label>
+        <input
+          pInputText
+          type="number"
+          min="0"
+          step="0.5"
+          [(ngModel)]="form.currentBalance"
+          placeholder="Ex: 22"
+        />
+
+        <small>
+          Doit être supérieur ou égal au solde utilisé.
+        </small>
+      </div>
+
+      <div class="preview-card">
+        <span>Nouveau solde restant</span>
+        <strong [ngClass]="getRemainingClass()">
+          {{ getCalculatedRemaining() }}
+        </strong>
+        <small>{{ getUnitLabel() }}</small>
+      </div>
+    </div>
+
+    <div class="warning-box">
+      <i class="pi pi-exclamation-triangle"></i>
+      <div>
+        <strong>Attention</strong>
+        <ul>
+          <li>Cette page sert uniquement à corriger le solde total.</li>
+          <li>L’employé, le type de congé et l’année ne sont pas modifiables.</li>
+          <li>Le solde restant est recalculé automatiquement: <code>solde total - solde utilisé</code>.</li>
+          <li>Le solde total ne peut pas dépasser le maximum configuré dans le type de congé.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-sticky">
+    <p-button
+      icon="pi pi-arrow-left"
+      label="Retour"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="saving"
+      (onClick)="back()">
+    </p-button>
+
+    <p-button
+      icon="pi pi-save"
+      label="Sauvegarder"
+      severity="info"
+      [loading]="saving"
+      (onClick)="save()">
+    </p-button>
+  </div>
+</div>

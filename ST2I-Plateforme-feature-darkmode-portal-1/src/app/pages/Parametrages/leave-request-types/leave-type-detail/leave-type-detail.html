@@ -1,0 +1,178 @@
+<p-toast position="top-right"></p-toast>
+
+<div *ngIf="loading" class="card ui-card">
+  <div class="bar">Chargement...</div>
+
+  <div class="block">
+    <p class="loading-msg">
+      <i class="pi pi-spin pi-spinner"></i>
+      Chargement des données...
+    </p>
+  </div>
+</div>
+
+<div *ngIf="!loading && data" class="card ui-card">
+
+  <div class="bar bar-row">
+    <div>Détails du type de congé</div>
+
+    <span
+      class="status-badge"
+      [class.active]="data.active"
+      [class.inactive]="!data.active"
+    >
+      {{ data.active ? 'Actif' : 'Inactif' }}
+    </span>
+  </div>
+
+  <div class="block">
+
+    <!-- Header summary -->
+    <div class="summary-card">
+      <div class="summary-left">
+        <span class="code-badge">{{ data.code }}</span>
+
+        <h2>{{ data.name }}</h2>
+
+        <p>
+          {{ data.description || 'Aucune description renseignée.' }}
+        </p>
+      </div>
+
+      <div class="summary-right">
+        <span>Solde principal</span>
+        <strong>{{ getMainBalanceLabel() }}</strong>
+      </div>
+    </div>
+
+    <!-- Solde configuration -->
+    <div class="block-title">Configuration du solde</div>
+
+    <div class="details-grid">
+
+      <div class="info-item">
+        <span>Unité</span>
+        <strong>{{ getUnitLabel(data.unit) }}</strong>
+      </div>
+
+      <div class="info-item">
+        <span>Mode d’incrémentation</span>
+        <strong>
+          <span class="mode-badge" [ngClass]="getModeClass()">
+            {{ getIncrementModeLabel(data.incrementMode) }}
+          </span>
+        </strong>
+      </div>
+
+      <div class="info-item">
+        <span>Solde maximum</span>
+        <strong>{{ data.maxBalance }}</strong>
+      </div>
+
+      <div class="info-item">
+        <span>Solde fixe</span>
+        <strong>{{ data.defaultBalance }}</strong>
+      </div>
+
+      <div class="info-item">
+        <span>Incrément mensuel</span>
+        <strong>{{ data.monthlyIncrement }}</strong>
+      </div>
+
+      <div class="info-item">
+        <span>Allocation annuelle</span>
+        <strong>{{ data.yearlyAllowance }}</strong>
+      </div>
+
+      <div class="info-item" *ngIf="data.incrementMode === 'MONTHLY'">
+        <span>Estimation annuelle</span>
+        <strong>{{ getEstimatedAnnualBalance() }}</strong>
+      </div>
+
+    </div>
+
+    <!-- Rules -->
+    <div class="block-title second">Règles appliquées</div>
+
+    <div class="rules-grid">
+
+      <div class="rule-card" [class.enabled]="data.carryOverEnabled">
+        <i
+          class="pi"
+          [ngClass]="data.carryOverEnabled ? 'pi-check-circle' : 'pi-times-circle'"
+        ></i>
+
+        <div>
+          <strong>Report limité</strong>
+          <span>{{ data.carryOverEnabled ? 'Activé' : 'Désactivé' }}</span>
+        </div>
+      </div>
+
+      <div class="rule-card" [class.enabled]="data.requiresJustification">
+        <i
+          class="pi"
+          [ngClass]="data.requiresJustification ? 'pi-check-circle' : 'pi-times-circle'"
+        ></i>
+
+        <div>
+          <strong>Justificatif requis</strong>
+          <span>{{ data.requiresJustification ? 'Oui' : 'Non' }}</span>
+        </div>
+      </div>
+
+      <div class="rule-card" [class.enabled]="data.requiresApproval">
+        <i
+          class="pi"
+          [ngClass]="data.requiresApproval ? 'pi-check-circle' : 'pi-times-circle'"
+        ></i>
+
+        <div>
+          <strong>Validation requise</strong>
+          <span>{{ data.requiresApproval ? 'Oui' : 'Non' }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Technical info -->
+    <div class="block-title second">Informations système</div>
+
+    <div class="details-grid">
+
+      <div class="info-item">
+        <span>Date de création</span>
+        <strong>{{ data.createdAt | date:'dd/MM/yyyy HH:mm' }}</strong>
+      </div>
+
+      <div class="info-item">
+        <span>Dernière modification</span>
+        <strong>{{ data.updatedAt | date:'dd/MM/yyyy HH:mm' }}</strong>
+      </div>
+
+    </div>
+
+    <div class="info-box">
+      <i class="pi pi-info-circle"></i>
+      <div>
+        <strong>Remarque</strong>
+        <ul>
+          <li>Cette page est en lecture seule.</li>
+          <li>La modification se fait depuis la page d’édition.</li>
+          <li>L’activation ou désactivation se fait depuis la liste.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-sticky">
+    <p-button
+      icon="pi pi-arrow-left"
+      label="Retour"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="back()"
+    ></p-button>
+  </div>
+
+</div>

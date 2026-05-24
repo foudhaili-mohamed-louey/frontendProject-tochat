@@ -11,8 +11,14 @@ export const appRoutes: Routes = [
     path: '',
     component: AppLayout,
     children: [
+      // =========================
+      // Dashboard
+      // =========================
       { path: '', component: Dashboard, data: { breadcrumb: 'Dashboard' } },
 
+      // =========================
+      // Departments
+      // =========================
       {
         path: 'Parametrages/departments',
         loadComponent: () => import('./app/pages/Parametrages/departments/list/department-list.component').then(m => m.DepartmentListComponent),
@@ -38,6 +44,30 @@ export const appRoutes: Routes = [
         data: { breadcrumb: 'Modifier le département', module: 'gestion des départments', action: 'UPDATE' }
       },
 
+      // =========================
+      // Leave Request Types
+      // RBAC + breadcrumb skipped for now
+      // =========================
+      {
+        path: 'Parametrages/leave-request-types',
+        loadComponent: () => import('./app/pages/Parametrages/leave-request-types/leave-type-list/leave-type-list').then(m => m.LeaveTypeListComponent)
+      },
+      {
+        path: 'Parametrages/leave-request-types/new',
+        loadComponent: () => import('./app/pages/Parametrages/leave-request-types/leave-type-form/leave-type-form').then(m => m.LeaveTypeFormComponent)
+      },
+      {
+        path: 'Parametrages/leave-request-types/:id/edit',
+        loadComponent: () => import('./app/pages/Parametrages/leave-request-types/leave-type-edit/leave-type-edit').then(m => m.LeaveTypeEditComponent)
+      },
+      {
+        path: 'Parametrages/leave-request-types/:id/details',
+        loadComponent: () => import('./app/pages/Parametrages/leave-request-types/leave-type-detail/leave-type-detail').then(m => m.LeaveTypeDetailsComponent)
+      },
+
+      // =========================
+      // Users
+      // =========================
       {
         path: 'administration/users',
         loadComponent: () => import('./app/pages/administration/users/users-list/users-list.component').then(m => m.UsersListComponent),
@@ -63,6 +93,9 @@ export const appRoutes: Routes = [
         data: { breadcrumb: 'Détails utilisateur', module: 'gestion des utilisateurs', action: 'READ' }
       },
 
+      // =========================
+      // Roles
+      // =========================
       {
         path: 'administration/roles',
         loadComponent: () => import('./app/pages/administration/roles/roles-list/roles-list').then(m => m.RolesListComponent),
@@ -94,6 +127,9 @@ export const appRoutes: Routes = [
         data: { breadcrumb: 'Permissions du rôle', module: 'gestion des roles', action: 'UPDATE' }
       },
 
+      // =========================
+      // Modules
+      // =========================
       {
         path: 'Parametrages/modules',
         loadComponent: () => import('./app/pages/Parametrages/modules/modules-list/modules-list').then(m => m.ModulesListComponent),
@@ -119,17 +155,19 @@ export const appRoutes: Routes = [
         data: { breadcrumb: 'Détails module', module: 'gestion des des modules', action: 'READ' }
       },
 
+      // =========================
+      // Traceability
+      // =========================
       {
         path: 'administration/tracability',
         loadComponent: () => import('./app/pages/administration/tracability/traceability/traceability').then(m => m.TraceLogListComponent),
         canActivate: [rbacGuard],
-        data: {
-          breadcrumb: 'Traçabilité',
-          module: 'traçabilité',
-          action: 'READ'
-        }
+        data: { breadcrumb: 'Traçabilité', module: 'traçabilité', action: 'READ' }
       },
 
+      // =========================
+      // Projects
+      // =========================
       {
         path: 'Parametrages/projects',
         loadComponent: () => import('./app/pages/Parametrages/projects/project-list/project-list.component').then(m => m.ProjectListComponent),
@@ -155,6 +193,9 @@ export const appRoutes: Routes = [
         data: { breadcrumb: 'Détails projet', module: 'gestion des projets', action: 'READ' }
       },
 
+      // =========================
+      // Project Roles
+      // =========================
       {
         path: 'Parametrages/project-roles',
         loadComponent: () => import('./app/pages/Parametrages/project-roles/project-role-list/project-role-list').then(m => m.ProjectRoleListComponent),
@@ -180,6 +221,9 @@ export const appRoutes: Routes = [
         data: { breadcrumb: 'Détails rôle projet', module: 'gestion les roles des projets', action: 'READ' }
       },
 
+      // =========================
+      // Role Categories
+      // =========================
       {
         path: 'Parametrages/role-categories',
         loadComponent: () => import('./app/pages/Parametrages/role-categories/role-category-list/role-category-list').then(m => m.RoleCategoryListComponent),
@@ -205,6 +249,9 @@ export const appRoutes: Routes = [
         data: { breadcrumb: 'Détails catégorie', module: 'gestion les Catégories des roles', action: 'READ' }
       },
 
+      // =========================
+      // Teams
+      // =========================
       {
         path: 'Parametrages/teams',
         loadComponent: () => import('./app/pages/Parametrages/teams/team-list/team-list').then(m => m.TeamListComponent),
@@ -235,24 +282,59 @@ export const appRoutes: Routes = [
         canActivate: [rbacGuard],
         data: { breadcrumb: 'Détails équipe', module: 'gestion des projets', action: 'READ' }
       },
+      // =========================
+      // Leave Balances
+      // RBAC + breadcrumb skipped for now
+      // No create route: balances are generated automatically
+      // =========================
+      {
+        path: 'Parametrages/leave-balances',
+        loadComponent: () => import('./app/pages/Parametrages/leave-balance/employee-leave-balance-list.component/employee-leave-balance-list.component').then(m => m.EmployeeLeaveBalanceListComponent)
+      },
+      {
+        path: 'Parametrages/leave-balances/:id/details',
+        loadComponent: () => import('./app/pages/Parametrages/leave-balance/employee-leave-balance-details.component/employee-leave-balance-details.component').then(m => m.EmployeeLeaveBalanceDetailsComponent)
+      },
+      {
+        path: 'Parametrages/leave-balances/:id/edit',
+        loadComponent: () => import('./app/pages/Parametrages/leave-balance/employee-leave-balance-edit.component/employee-leave-balance-edit.component').then(m => m.EmployeeLeaveBalanceEditComponent)
+      },
 
+      // =========================
+      // Static / UI pages
+      // =========================
       { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes'), data: { breadcrumb: 'UI Kit' } },
       { path: 'documentation', component: Documentation, data: { breadcrumb: 'Documentation' } },
       { path: 'pages', loadChildren: () => import('./app/pages/pages.routes'), data: { breadcrumb: 'Pages' } }
     ]
   },
 
+  // =========================
+  // Public routes
+  // =========================
   { path: 'landing', component: Landing, data: { breadcrumb: 'Landing' } },
   { path: 'notfound', component: Notfound, data: { breadcrumb: 'Not Found' } },
+
+  // =========================
+  // Portal
+  // =========================
   {
     path: 'portal',
     loadComponent: () => import('./app/pages/portal/portal.component').then(m => m.PortalComponent),
     data: { breadcrumb: 'Portal' }
   },
+
+  // =========================
+  // Auth
+  // =========================
   {
     path: 'auth',
     loadChildren: () => import('./app/pages/auth/auth.routes'),
     data: { breadcrumb: 'Authentification' }
   },
+
+  // =========================
+  // Fallback
+  // =========================
   { path: '**', redirectTo: '/notfound' }
 ];

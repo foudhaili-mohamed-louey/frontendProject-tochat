@@ -1,0 +1,1 @@
+export type LeaveIncrementMode = 'NONE' | 'MONTHLY' | 'YEARLY' | 'FIXED';

@@ -108,7 +108,17 @@ export class AppMenu {
                                 icon: 'pi pi-sitemap',
                                 routerLink: ['/Parametrages/teams/hierarchie'],
                                 visible: this.rbac.canRead('gestion des projets')
-                            }
+                            },
+                            {
+                                label: 'Types de congé',
+                                icon: 'pi pi-calendar-plus',
+                                routerLink: ['/Parametrages/leave-request-types']
+                            },
+                            {
+                                label: 'Soldes de congé',
+                                icon: 'pi pi-wallet',
+                                routerLink: ['/Parametrages/leave-balances']
+                            },
                         ]
                     }
                 ]

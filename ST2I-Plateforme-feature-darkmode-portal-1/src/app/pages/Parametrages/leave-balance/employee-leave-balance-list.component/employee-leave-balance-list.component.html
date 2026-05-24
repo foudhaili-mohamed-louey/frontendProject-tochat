@@ -1,0 +1,357 @@
+<p-toast position="top-right"></p-toast>
+
+<!-- ===== FILTER CARD ===== -->
+<div class="card ui-card">
+  <div class="bar">Filtres de recherche</div>
+
+  <div class="body">
+    <div class="filter-grid">
+
+      <div class="field employee-filter">
+        <label>Employé</label>
+
+        <p-select
+          class="w-full"
+          styleClass="smart-dropdown"
+          panelStyleClass="smart-panel"
+          appendTo="body"
+          [(ngModel)]="filters.idEmployee"
+          [options]="employees"
+          optionLabel="fullName"
+          optionValue="id"
+          [filter]="true"
+          filterBy="fullName,email,profession"
+          [loading]="loadingEmployees"
+          [virtualScroll]="true"
+          [virtualScrollItemSize]="54"
+          [scrollHeight]="'280px'"
+          placeholder="Tous les employés"
+          emptyMessage="Aucun employé trouvé"
+          emptyFilterMessage="Aucun employé trouvé"
+          (onFilter)="onEmployeeFilter($event)">
+
+          <ng-template let-emp pTemplate="item">
+            <div class="employee-option" [class.all-option]="emp.all">
+              <div class="avatar" *ngIf="!emp.all">
+                {{ emp.fullName?.charAt(0) || '?' }}
+              </div>
+
+              <div class="all-icon" *ngIf="emp.all">
+                <i class="pi pi-users"></i>
+              </div>
+
+              <div class="option-info">
+                <span class="option-name">{{ emp.fullName }}</span>
+
+                <span class="option-sub" *ngIf="!emp.all">
+                  {{ emp.profession || 'Employé' }}
+                  <span *ngIf="emp.email"> · {{ emp.email }}</span>
+                </span>
+
+                <span class="option-sub" *ngIf="emp.all">
+                  Afficher tous les employés
+                </span>
+              </div>
+            </div>
+          </ng-template>
+
+          <ng-template let-emp pTemplate="selectedItem">
+            <div class="employee-option selected" *ngIf="emp">
+              <i class="pi" [ngClass]="emp.all ? 'pi-users' : 'pi-user'"></i>
+              <span>{{ emp.fullName }}</span>
+            </div>
+          </ng-template>
+        </p-select>
+      </div>
+
+      <div class="field">
+        <label>Type de congé</label>
+
+        <p-select
+          class="w-full"
+          styleClass="smart-dropdown"
+          panelStyleClass="smart-panel"
+          appendTo="body"
+          [(ngModel)]="filters.idLeaveType"
+          [options]="leaveTypes"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name,code"
+          [loading]="loadingLeaveTypes"
+          placeholder="Tous les types"
+          emptyMessage="Aucun type trouvé"
+          emptyFilterMessage="Aucun type trouvé">
+
+          <ng-template let-type pTemplate="item">
+            <div class="leave-type-option" [class.all-option]="type.all">
+              <span class="type-icon">
+                <i class="pi" [ngClass]="type.all ? 'pi-list' : 'pi-calendar'"></i>
+              </span>
+
+              <div class="option-info">
+                <span class="option-name">{{ type.name }}</span>
+                <span class="option-sub" *ngIf="type.code">{{ type.code }}</span>
+              </div>
+            </div>
+          </ng-template>
+
+          <ng-template let-type pTemplate="selectedItem">
+            <div class="employee-option selected" *ngIf="type">
+              <i class="pi" [ngClass]="type.all ? 'pi-list' : 'pi-calendar'"></i>
+              <span>{{ type.name }}</span>
+            </div>
+          </ng-template>
+        </p-select>
+      </div>
+
+      <div class="field">
+        <label>Année</label>
+
+        <select class="p-inputtext" [(ngModel)]="filters.year">
+          <option [ngValue]="null">Toutes les années</option>
+          <option *ngFor="let year of years" [ngValue]="year">
+            {{ year }}
+          </option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Statut</label>
+
+        <select class="p-inputtext" [(ngModel)]="filters.active">
+          <option *ngFor="let s of statusOptions" [ngValue]="s.value">
+            {{ s.label }}
+          </option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <p-button
+        icon="pi pi-search"
+        label="Rechercher"
+        severity="info"
+        (onClick)="search(0)">
+      </p-button>
+
+      <p-button
+        icon="pi pi-refresh"
+        label="Réinitialiser"
+        severity="danger"
+        [outlined]="true"
+        (onClick)="reset()">
+      </p-button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== TABLE CARD ===== -->
+<div class="card ui-card">
+
+  <div class="bar">
+    <div class="bar-title">
+      Soldes de congé
+
+      <span class="total-badge" *ngIf="totalElements > 0">
+        {{ totalElements }}
+      </span>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Employé</th>
+          <th>Type de congé</th>
+          <th>Année</th>
+          <th>Solde</th>
+          <th>Utilisé</th>
+          <th>Restant</th>
+          <th>Statut</th>
+          <th style="width: 120px;">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <ng-container *ngIf="loading">
+          <tr *ngFor="let i of [1,2,3,4,5]" class="skeleton-row">
+            <td><div class="skel skel-lg"></div></td>
+            <td><div class="skel skel-md"></div></td>
+            <td><div class="skel skel-sm"></div></td>
+            <td><div class="skel skel-sm"></div></td>
+            <td><div class="skel skel-sm"></div></td>
+            <td><div class="skel skel-sm"></div></td>
+            <td><div class="skel skel-sm"></div></td>
+            <td><div class="skel skel-actions"></div></td>
+          </tr>
+        </ng-container>
+
+        <ng-container *ngIf="!loading">
+
+          <tr *ngFor="let row of rows" class="data-row">
+
+            <td>
+              <div class="employee-cell">
+                <div class="avatar">
+                  {{ getInitials(row.employee) }}
+                </div>
+
+                <div>
+                  <span class="main-name">
+                    {{ getUserFullName(row.employee) }}
+                  </span>
+
+                  <span class="sub-text">
+                    {{ row.employee?.profession || row.employee?.email || 'Employé' }}
+                  </span>
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <span class="leave-badge">
+                <i class="pi pi-calendar"></i>
+                {{ row.leaveType.name || 'Type inconnu' }}
+              </span>
+
+              <span class="sub-text code-line">
+                {{ row.leaveType.code }}
+              </span>
+            </td>
+
+            <td>
+              <span class="year-badge">
+                {{ row.year }}
+              </span>
+            </td>
+
+            <td>
+              <strong>{{ row.currentBalance }}</strong>
+            </td>
+
+            <td>
+              <div class="used-box">
+                <strong>{{ row.usedBalance }}</strong>
+
+                <div class="mini-progress">
+                  <span [style.width.%]="getUsagePercent(row)"></span>
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <span class="remaining-badge" [ngClass]="getRemainingClass(row)">
+                {{ row.remainingBalance }}
+              </span>
+            </td>
+
+            <td>
+              <span
+                class="status-badge"
+                [class.active]="row.active"
+                [class.inactive]="!row.active">
+
+                {{ row.active ? 'Actif' : 'Inactif' }}
+              </span>
+            </td>
+
+            <td class="actions-col">
+
+              <button
+                class="action-btn info"
+                pTooltip="Détails"
+                (click)="details(row)">
+
+                <i class="pi pi-info-circle"></i>
+              </button>
+
+              <button
+                class="action-btn edit"
+                pTooltip="Modifier"
+                (click)="edit(row)">
+
+                <i class="pi pi-pencil"></i>
+              </button>
+
+            </td>
+          </tr>
+
+          <tr *ngIf="rows.length === 0">
+            <td colspan="8" class="empty-msg">
+              <i
+                class="pi pi-calendar-times"
+                style="font-size:2rem;opacity:.3">
+              </i>
+
+              <br />
+
+              Aucun solde de congé trouvé.
+            </td>
+          </tr>
+
+        </ng-container>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== Pagination ===== -->
+  <div class="pagination-bar" *ngIf="totalPages > 1">
+
+    <span class="page-info">
+      Page {{ currentPage + 1 }} / {{ totalPages }}
+      &nbsp;·&nbsp; {{ totalElements }} solde(s)
+    </span>
+
+    <div class="page-controls">
+
+      <button
+        class="page-btn"
+        [disabled]="currentPage === 0"
+        (click)="onPageChange(0)">
+
+        <i class="pi pi-angle-double-left"></i>
+      </button>
+
+      <button
+        class="page-btn"
+        [disabled]="currentPage === 0"
+        (click)="onPageChange(currentPage - 1)">
+
+        <i class="pi pi-angle-left"></i>
+      </button>
+
+      <button
+        *ngFor="let p of pages"
+        class="page-btn"
+        [class.active]="p === currentPage"
+        (click)="onPageChange(p)">
+
+        {{ p + 1 }}
+      </button>
+
+      <button
+        class="page-btn"
+        [disabled]="currentPage === totalPages - 1"
+        (click)="onPageChange(currentPage + 1)">
+
+        <i class="pi pi-angle-right"></i>
+      </button>
+
+      <button
+        class="page-btn"
+        [disabled]="currentPage === totalPages - 1"
+        (click)="onPageChange(totalPages - 1)">
+
+        <i class="pi pi-angle-double-right"></i>
+      </button>
+
+    </div>
+  </div>
+
+</div>
