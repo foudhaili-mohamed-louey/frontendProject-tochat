@@ -1,0 +1,108 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="card ui-card">
+
+  <div class="bar">
+    Modifier une profession
+  </div>
+
+  <div class="loading-box" *ngIf="loading">
+    <i class="pi pi-spin pi-spinner"></i>
+    Chargement...
+  </div>
+
+  <ng-container *ngIf="!loading">
+
+    <div class="block">
+
+      <div class="block-title">
+        Informations de la profession
+      </div>
+
+      <div class="formgrid3">
+
+        <div class="field">
+          <label>Nom *</label>
+
+          <input
+            pInputText
+            placeholder="Ex: Développeur"
+            [(ngModel)]="form.name" />
+        </div>
+
+        <div class="field">
+          <label>Code *</label>
+
+          <input
+            pInputText
+            placeholder="Ex: DEVELOPPEUR"
+            [(ngModel)]="form.code" />
+        </div>
+
+        <div class="field">
+          <label>Département *</label>
+
+          <select
+            class="p-inputtext w-full"
+            [(ngModel)]="form.idDepartment"
+            [disabled]="loadingDepartments">
+
+            <option [ngValue]="undefined" disabled>
+              {{ loadingDepartments ? 'Chargement...' : 'Sélectionner un département' }}
+            </option>
+
+            <option
+              *ngFor="let department of departments"
+              [ngValue]="department.id">
+
+              {{ department.code }} - {{ department.name }}
+            </option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="info-box">
+
+        <i class="pi pi-info-circle"></i>
+
+        <div>
+
+          <strong>Informations</strong>
+
+          <ul>
+            <li>La modification met à jour les futurs utilisateurs</li>
+            <li>Les anciens utilisateurs liés restent conservés</li>
+            <li>Le code doit rester unique</li>
+          </ul>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="footer-sticky">
+
+      <p-button
+        icon="pi pi-times"
+        label="Annuler"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="saving"
+        (onClick)="cancel()">
+      </p-button>
+
+      <p-button
+        icon="pi pi-save"
+        label="Sauvegarder"
+        severity="info"
+        [loading]="saving"
+        (onClick)="save()">
+      </p-button>
+
+    </div>
+
+  </ng-container>
+
+</div>

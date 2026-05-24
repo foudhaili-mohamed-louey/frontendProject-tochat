@@ -86,7 +86,7 @@ export class AppMenu {
                                 visible: this.rbac.canRead('gestion des des modules')
                             },
                             {
-                                label: 'Rôles Projet',
+                                label: 'Projet-Rôles',
                                 icon: 'pi pi-id-card',
                                 routerLink: ['/Parametrages/project-roles'],
                                 visible: this.rbac.canRead('gestion les roles des projets')
@@ -118,6 +118,11 @@ export class AppMenu {
                                 label: 'Soldes de congé',
                                 icon: 'pi pi-wallet',
                                 routerLink: ['/Parametrages/leave-balances']
+                            },
+                            {
+                                label: 'Gestion des professions',
+                                icon: 'pi pi-briefcase',
+                                routerLink: ['/Parametrages/professions']
                             },
                         ]
                     }

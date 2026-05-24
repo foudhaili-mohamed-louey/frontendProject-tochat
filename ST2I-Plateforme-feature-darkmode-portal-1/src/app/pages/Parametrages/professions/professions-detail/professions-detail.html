@@ -1,0 +1,127 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="card ui-card">
+  <div class="bar bar-row">
+    <span>Détails de la profession</span>
+
+    <div class="bar-actions">
+      <p-button
+        icon="pi pi-arrow-left"
+        label="Retour"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="back()">
+      </p-button>
+
+      <p-button
+        icon="pi pi-pencil"
+        label="Modifier"
+        severity="info"
+        [disabled]="!profession"
+        (onClick)="edit()">
+      </p-button>
+    </div>
+  </div>
+
+  <div class="block">
+
+    <div *ngIf="loading" class="loading-box">
+      <i class="pi pi-spin pi-spinner"></i>
+      Chargement de la profession...
+    </div>
+
+    <ng-container *ngIf="!loading && profession">
+
+      <div class="hero">
+        <div class="hero-icon">
+          <i class="pi pi-id-card"></i>
+        </div>
+
+        <div>
+          <h2>{{ profession.name }}</h2>
+          <p>{{ profession.code }}</p>
+        </div>
+      </div>
+
+      <div class="details-grid">
+
+        <div class="info-card">
+          <span class="label">Identifiant</span>
+          <span class="value">#{{ profession.idProfession }}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Code</span>
+          <span class="code-badge">{{ profession.code }}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Nom</span>
+          <span class="value">{{ profession.name }}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Département</span>
+          <span class="department-badge" *ngIf="profession.departmentCode">
+            {{ profession.departmentCode }}
+          </span>
+          <span class="text-faint" *ngIf="!profession.departmentCode">—</span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Nom département</span>
+          <span class="value">{{ profession.departmentName || '—' }}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Type département</span>
+          <span class="type-badge" *ngIf="profession.departmentType">
+            {{ profession.departmentType }}
+          </span>
+          <span class="text-faint" *ngIf="!profession.departmentType">—</span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Statut</span>
+          <span class="status-badge" [class.inactive]="profession.active === false">
+            {{ profession.active === false ? 'Inactive' : 'Active' }}
+          </span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Créé le</span>
+          <span class="value">
+            {{ profession.createdAt ? (profession.createdAt | date:'dd/MM/yyyy HH:mm') : '—' }}
+          </span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Dernière modification</span>
+          <span class="value">
+            {{ profession.updatedAt ? (profession.updatedAt | date:'dd/MM/yyyy HH:mm') : '—' }}
+          </span>
+        </div>
+
+      </div>
+
+      <div class="info-box">
+        <i class="pi pi-info-circle"></i>
+        <div>
+          <strong>Utilisation</strong>
+          <ul>
+            <li>Cette profession est proposée selon le département sélectionné</li>
+            <li>Elle facilite la validation des circuits métier</li>
+            <li>Les permissions restent gérées par les rôles Keycloak / RBAC</li>
+          </ul>
+        </div>
+      </div>
+
+    </ng-container>
+
+    <div *ngIf="!loading && !profession" class="empty-box">
+      <i class="pi pi-info-circle"></i>
+      Aucune profession trouvée.
+    </div>
+
+  </div>
+</div>

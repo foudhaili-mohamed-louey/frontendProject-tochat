@@ -299,6 +299,49 @@ export const appRoutes: Routes = [
         path: 'Parametrages/leave-balances/:id/edit',
         loadComponent: () => import('./app/pages/Parametrages/leave-balance/employee-leave-balance-edit.component/employee-leave-balance-edit.component').then(m => m.EmployeeLeaveBalanceEditComponent)
       },
+      // =========================
+      // Professions
+      // =========================
+      {
+        path: 'Parametrages/professions',
+        loadComponent: () =>
+          import('./app/pages/Parametrages/professions/professions-list/professions-list')
+            .then(m => m.ProfessionsListComponent),
+
+        data: {
+          breadcrumb: 'Gestion des professions'
+        }
+      },
+      {
+        path: 'Parametrages/professions/new',
+        loadComponent: () =>
+          import('./app/pages/Parametrages/professions/professions-form/professions-form')
+            .then(m => m.ProfessionsFormComponent),
+
+        data: {
+          breadcrumb: 'Ajouter une profession'
+        }
+      },
+      {
+        path: 'Parametrages/professions/:id/edit',
+        loadComponent: () =>
+          import('./app/pages/Parametrages/professions/professions-edit/professions-edit')
+            .then(m => m.ProfessionsEditComponent),
+
+        data: {
+          breadcrumb: 'Modifier profession'
+        }
+      },
+      {
+        path: 'Parametrages/professions/:id/details',
+        loadComponent: () =>
+          import('./app/pages/Parametrages/professions/professions-detail/professions-detail')
+            .then(m => m.ProfessionsDetailComponent),
+
+        data: {
+          breadcrumb: 'Détails profession'
+        }
+      },
 
       // =========================
       // Static / UI pages
@@ -306,6 +349,7 @@ export const appRoutes: Routes = [
       { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes'), data: { breadcrumb: 'UI Kit' } },
       { path: 'documentation', component: Documentation, data: { breadcrumb: 'Documentation' } },
       { path: 'pages', loadChildren: () => import('./app/pages/pages.routes'), data: { breadcrumb: 'Pages' } }
+
     ]
   },
 

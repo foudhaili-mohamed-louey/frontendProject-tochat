@@ -1,0 +1,76 @@
+<p-toast position="top-right"></p-toast>
+
+<div class="card ui-card">
+  <div class="bar">Ajouter une profession</div>
+
+  <div class="block">
+    <div class="block-title">Informations de la profession</div>
+
+    <div class="formgrid3">
+
+      <div class="field">
+        <label>Nom *</label>
+        <input
+          pInputText
+          placeholder="Ex: Développeur"
+          [(ngModel)]="form.name" />
+      </div>
+
+      <div class="field">
+        <label>Code *</label>
+        <input
+          pInputText
+          placeholder="Ex: DEVELOPPEUR"
+          [(ngModel)]="form.code" />
+      </div>
+
+      <div class="field">
+        <label>Département *</label>
+        <select
+          class="p-inputtext w-full"
+          [(ngModel)]="form.idDepartment"
+          [disabled]="loadingDepartments">
+          <option [ngValue]="0" disabled>
+            {{ loadingDepartments ? 'Chargement...' : 'Sélectionner un département' }}
+          </option>
+
+          <option *ngFor="let department of departments" [ngValue]="department.id">
+            {{ department.code }} - {{ department.name }}
+          </option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class="info-box">
+      <i class="pi pi-info-circle"></i>
+      <div>
+        <strong>Règles de création</strong>
+        <ul>
+          <li>Le code de la profession doit être unique</li>
+          <li>La profession est liée logiquement à un département</li>
+          <li>Elle sera proposée dans la création d’utilisateur selon le département choisi</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-sticky">
+    <p-button
+      icon="pi pi-times"
+      label="Annuler"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="saving"
+      (onClick)="cancel()">
+    </p-button>
+
+    <p-button
+      icon="pi pi-save"
+      label="Sauvegarder"
+      severity="info"
+      [loading]="saving"
+      (onClick)="save()">
+    </p-button>
+  </div>
+</div>
