@@ -19,79 +19,102 @@ export class UsersService {
 
   constructor(private http: HttpClient) {}
 
-  // ================= CREATE =================
-  // POST /api/users → 201 + created user
   createUser(payload: UserCreateDTO): Observable<UserResponseDTO> {
-    return this.http.post<UserResponseDTO>(this.apiUrl, payload);
+    return this.http.post<UserResponseDTO>(
+      this.apiUrl,
+      payload
+    );
   }
 
-  // ================= UPDATE BY ADMIN =================
-  // PUT /api/users/{id}/admin → 200 + updated user
-  updateUserAsAdmin(id: string, payload: UserAdminUpdateDTO): Observable<UserResponseDTO> {
-    return this.http.put<UserResponseDTO>(`${this.apiUrl}/${id}/admin`, payload);
+  updateUserAsAdmin(
+    id: string,
+    payload: UserAdminUpdateDTO
+  ): Observable<UserResponseDTO> {
+    return this.http.put<UserResponseDTO>(
+      `${this.apiUrl}/${id}/admin`,
+      payload
+    );
   }
 
-  // ================= UPDATE OWN PROFILE =================
-  // PUT /api/users/{id}/profile → 200 + updated user
-  updateUserProfile(id: string, payload: UserProfileUpdateDTO): Observable<UserResponseDTO> {
-    return this.http.put<UserResponseDTO>(`${this.apiUrl}/${id}/profile`, payload);
+  updateUserProfile(
+    id: string,
+    payload: UserProfileUpdateDTO
+  ): Observable<UserResponseDTO> {
+    return this.http.put<UserResponseDTO>(
+      `${this.apiUrl}/${id}/profile`,
+      payload
+    );
   }
 
-  // ================= CHANGE OWN PASSWORD =================
-  // POST /api/users/{id}/change-password → 204 no content
-  changePassword(id: string, payload: UserPasswordChangeDTO): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${id}/change-password`, payload);
+  changePassword(
+    id: string,
+    payload: UserPasswordChangeDTO
+  ): Observable<void> {
+    return this.http.post<void>(
+      `${this.apiUrl}/${id}/change-password`,
+      payload
+    );
   }
 
-  // ================= RESET PASSWORD BY ADMIN =================
-  // POST /api/users/{id}/reset-password → 204 no content
   resetUserPassword(id: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${id}/reset-password`, {});
+    return this.http.post<void>(
+      `${this.apiUrl}/${id}/reset-password`,
+      {}
+    );
   }
 
-  // ================= FORGOT PASSWORD =================
-  // POST /api/users/forgot-password?email= → 200
   forgotPassword(email: string): Observable<void> {
     return this.http.post<void>(
       `${this.apiUrl}/forgot-password`,
       {},
-      { params: { email } }
+      {
+        params: new HttpParams().set('email', email)
+      }
     );
   }
 
-  // ================= DELETE =================
-  // DELETE /api/users/{id} → 204 no content
   deleteUser(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(
+      `${this.apiUrl}/${id}`
+    );
   }
 
-  // ================= ASSIGN ROLE =================
-  // POST /api/users/{id}/assign-role?roleMetadataId= → 200 + updated user
-  assignRole(userId: string, roleMetadataId: number): Observable<UserResponseDTO> {
+  assignRole(
+    userId: string,
+    roleMetadataId: number
+  ): Observable<UserResponseDTO> {
     return this.http.post<UserResponseDTO>(
       `${this.apiUrl}/${userId}/assign-role`,
       {},
-      { params: { roleMetadataId } }
+      {
+        params: new HttpParams().set(
+          'roleMetadataId',
+          roleMetadataId.toString()
+        )
+      }
     );
   }
 
-  // ================= GET BY ID =================
-  // GET /api/users/{id} → 200 + user
   getUserById(id: string): Observable<UserResponseDTO> {
-    return this.http.get<UserResponseDTO>(`${this.apiUrl}/${id}`);
+    return this.http.get<UserResponseDTO>(
+      `${this.apiUrl}/${id}`
+    );
   }
 
-  // ================= GET ALL — paginated =================
-  // GET /api/users?page=0&size=7
-  getAllUsers(page: number = 0, size: number = 7): Observable<PageResponse<UserResponseDTO>> {
+  getAllUsers(
+    page: number = 0,
+    size: number = 7
+  ): Observable<PageResponse<UserResponseDTO>> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
-    return this.http.get<PageResponse<UserResponseDTO>>(this.apiUrl, { params });
+
+    return this.http.get<PageResponse<UserResponseDTO>>(
+      this.apiUrl,
+      { params }
+    );
   }
 
-  // ================= SEARCH — paginated =================
-  // POST /api/users/search?page=0&size=7
   searchUsers(
     criteria: UserSearchCriteria,
     page: number = 0,
@@ -100,50 +123,83 @@ export class UsersService {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
+
     return this.http.post<PageResponse<UserResponseDTO>>(
       `${this.apiUrl}/search`,
       criteria,
       { params }
     );
   }
-   // ================= UPLOAD AVATAR =================
-  // POST /api/users/{id}/upload-avatar → { photoUrl: string }
-  uploadAvatar(keycloakId: string, file: File): Observable<{ photoUrl: string }> {
+
+  getByKeycloakId(
+    keycloakId: string
+  ): Observable<UserResponseDTO> {
+    return this.http.get<UserResponseDTO>(
+      `${this.apiUrl}/mapper/keycloak/${keycloakId}`
+    );
+  }
+
+  getByMapperId(
+    id: number
+  ): Observable<UserResponseDTO> {
+    return this.http.get<UserResponseDTO>(
+      `${this.apiUrl}/mapper/${id}`
+    );
+  }
+
+  getUsersByDepartment(
+    departmentId: number
+  ): Observable<UserResponseDTO[]> {
+    return this.http.get<UserResponseDTO[]>(
+      `${this.apiUrl}/mapper/by-department/${departmentId}`
+    );
+  }
+
+  uploadAvatar(
+    keycloakId: string,
+    file: File
+  ): Observable<{ photoUrl: string }> {
     const formData = new FormData();
     formData.append('file', file);
+
     return this.http.post<{ photoUrl: string }>(
       `${this.apiUrl}/${keycloakId}/upload-avatar`,
       formData
     );
   }
-  // INTER-SERVICE — batch fetch by keycloakIds
-// POST /api/users/batch
-getUsersByIds(keycloakIds: string[]): Observable<UserResponseDTO[]> {
-  return this.http.post<UserResponseDTO[]>(`${this.apiUrl}/batch`, keycloakIds);
-}
-// ================= GET PROFESSIONS =================
-// GET /api/users/professions → 200 + distinct profession list
-getProfessions(): Observable<string[]> {
-  return this.http.get<string[]>(`${this.apiUrl}/professions`);
-}
 
+  getUsersByIds(
+    keycloakIds: string[]
+  ): Observable<UserResponseDTO[]> {
+    return this.http.post<UserResponseDTO[]>(
+      `${this.apiUrl}/batch`,
+      keycloakIds
+    );
+  }
 
-searchUsersPrioritized(
-  request: {
-    criteria: UserSearchCriteria;
-    priorityUserIds: string[];
-  },
-  page: number = 0,
-  size: number = 7
-): Observable<PageResponse<UserResponseDTO>> {
-  const params = new HttpParams()
-    .set('page', page.toString())
-    .set('size', size.toString());
+  // Legacy endpoint, avoid using it for new profession table logic.
+  getProfessions(): Observable<string[]> {
+    return this.http.get<string[]>(
+      `${this.apiUrl}/professions`
+    );
+  }
 
-  return this.http.post<PageResponse<UserResponseDTO>>(
-    `${this.apiUrl}/search/prioritized`,
-    request,
-    { params }
-  );
-}
+  searchUsersPrioritized(
+    request: {
+      criteria: UserSearchCriteria;
+      priorityUserIds: string[];
+    },
+    page: number = 0,
+    size: number = 7
+  ): Observable<PageResponse<UserResponseDTO>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.post<PageResponse<UserResponseDTO>>(
+      `${this.apiUrl}/search/prioritized`,
+      request,
+      { params }
+    );
+  }
 }

@@ -5,7 +5,6 @@
 
   <div class="block">
 
-    <!-- ── AVATAR ROW (centered, full width) ── -->
     <div class="avatar-row">
       <div class="field avatar-field">
         <label>Photo de profil</label>
@@ -35,49 +34,40 @@
       </div>
     </div>
 
-    <!-- ── SECTION TITLE ── -->
     <div class="block-title">Informations utilisateur</div>
 
-    <!-- ── MAIN FORM GRID ── -->
     <div class="formgrid3">
 
-      <!-- Username -->
       <div class="field">
         <label>Username *</label>
         <input pInputText placeholder="Username" [(ngModel)]="form.username" />
       </div>
 
-      <!-- Nom -->
       <div class="field">
         <label>Nom *</label>
         <input pInputText placeholder="Nom" [(ngModel)]="form.lastName" />
       </div>
 
-      <!-- Prénom -->
       <div class="field">
         <label>Prénom *</label>
         <input pInputText placeholder="Prénom" [(ngModel)]="form.firstName" />
       </div>
 
-      <!-- Email -->
       <div class="field">
         <label>Email *</label>
         <input pInputText type="email" placeholder="Email" [(ngModel)]="form.email" />
       </div>
 
-      <!-- CIN -->
       <div class="field">
         <label>CIN *</label>
         <input pInputText placeholder="8 chiffres" maxlength="8" [(ngModel)]="form.cin" />
       </div>
 
-      <!-- Téléphone -->
       <div class="field">
         <label>Téléphone *</label>
         <input pInputText placeholder="8 chiffres" maxlength="8" [(ngModel)]="form.phone" />
       </div>
 
-      <!-- Sexe -->
       <div class="field">
         <label>Sexe *</label>
         <select class="p-inputtext w-full" [(ngModel)]="form.sex" (ngModelChange)="onSexChange()">
@@ -85,19 +75,11 @@
         </select>
       </div>
 
-      <!-- Date d'embauche -->
       <div class="field">
         <label>Date d'embauche *</label>
         <input class="p-inputtext w-full" type="date" [(ngModel)]="form.hireDate" />
       </div>
 
-      <!-- Profession -->
-      <div class="field">
-        <label>Profession *</label>
-        <input pInputText placeholder="Profession" [(ngModel)]="form.profession" />
-      </div>
-
-      <!-- Statut -->
       <div class="field">
         <label>Statut *</label>
         <select class="p-inputtext w-full" [(ngModel)]="form.isActive">
@@ -106,7 +88,6 @@
         </select>
       </div>
 
-      <!-- Rôle -->
       <div class="field">
         <label>Rôle *</label>
         <select class="p-inputtext w-full"
@@ -122,11 +103,11 @@
         </select>
       </div>
 
-      <!-- Département -->
       <div class="field" *ngIf="showDepartment">
         <label>Département *</label>
         <select class="p-inputtext w-full"
                 [(ngModel)]="form.departmentId"
+                (ngModelChange)="onDepartmentChange($event)"
                 [disabled]="departmentsLoading">
           <option [ngValue]="undefined" disabled>
             {{ departmentsLoading ? 'Chargement...' : 'Sélectionner un département' }}
@@ -137,9 +118,22 @@
         </select>
       </div>
 
+      <div class="field" *ngIf="showDepartment && form.departmentId">
+        <label>Profession *</label>
+        <select class="p-inputtext w-full"
+                [(ngModel)]="form.professionId"
+                [disabled]="professionsLoading">
+          <option [ngValue]="0" disabled>
+            {{ professionsLoading ? 'Chargement...' : 'Sélectionner une profession' }}
+          </option>
+          <option *ngFor="let profession of professions" [ngValue]="profession.idProfession">
+            {{ profession.name }} ({{ profession.code }})
+          </option>
+        </select>
+      </div>
+
     </div>
 
-    <!-- info box -->
     <div class="info-box">
       <i class="pi pi-shield"></i>
       <div>
@@ -149,6 +143,7 @@
           <li>Le CIN et le téléphone doivent contenir exactement <code>8 chiffres</code></li>
           <li>Le rôle assigné doit être strictement inférieur à votre niveau actuel</li>
           <li>Le département est obligatoire sauf pour les rôles <code>ADMIN</code> et <code>SUPER_ADMIN</code></li>
+          <li>La profession apparaît après le choix du département</li>
           <li>
             <i class="pi pi-key key-icon"></i>
             Un email de vérification sera envoyé automatiquement après la création
@@ -167,5 +162,4 @@
               [loading]="saving">
     </p-button>
   </div>
-
 </div>

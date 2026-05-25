@@ -17,6 +17,7 @@ export class ProfessionService {
   constructor(private http: HttpClient) {}
 
   create(dto: ProfessionCreateDTO): Observable<ProfessionResponseDTO> {
+
     return this.http.post<ProfessionResponseDTO>(
       this.apiUrl,
       dto
@@ -35,12 +36,14 @@ export class ProfessionService {
   }
 
   getById(id: number): Observable<ProfessionResponseDTO> {
+
     return this.http.get<ProfessionResponseDTO>(
       `${this.apiUrl}/${id}`
     );
   }
 
   activate(id: number): Observable<void> {
+
     return this.http.patch<void>(
       `${this.apiUrl}/${id}/activate`,
       {}
@@ -48,6 +51,7 @@ export class ProfessionService {
   }
 
   deactivate(id: number): Observable<void> {
+
     return this.http.patch<void>(
       `${this.apiUrl}/${id}/deactivate`,
       {}
@@ -71,12 +75,22 @@ export class ProfessionService {
     );
   }
 
+  // Used in profession pages
+  // Includes unique professions
   getActiveByDepartment(
     idDepartment: number
   ): Observable<ProfessionResponseDTO[]> {
 
     return this.http.get<ProfessionResponseDTO[]>(
       `${this.apiUrl}/department/${idDepartment}/active`
+    );
+  }
+  getSelectableByDepartment(
+    idDepartment: number
+  ): Observable<ProfessionResponseDTO[]> {
+
+    return this.http.get<ProfessionResponseDTO[]>(
+      `${this.apiUrl}/department/${idDepartment}/selectable`
     );
   }
 }

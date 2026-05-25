@@ -168,3 +168,20 @@
     font-size: 1.2rem;
   }
 }
+.profession-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.profession-code {
+  font-size: 0.75rem;
+  font-weight: 400;
+  opacity: 0.8;
+}

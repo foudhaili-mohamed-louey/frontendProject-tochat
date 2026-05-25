@@ -42,6 +42,22 @@
 
     </div>
 
+    <div class="checkbox-card">
+      <label class="checkbox-line">
+        <input
+          type="checkbox"
+          [(ngModel)]="form.uniqueByDepartment" />
+
+        <span>
+          Profession unique par département
+        </span>
+      </label>
+
+      <p>
+        Exemple : Chef Département SI, Directeur Général. Une seule profession unique est autorisée par département.
+      </p>
+    </div>
+
     <div class="info-box">
       <i class="pi pi-info-circle"></i>
       <div>
@@ -49,7 +65,8 @@
         <ul>
           <li>Le code de la profession doit être unique</li>
           <li>La profession est liée logiquement à un département</li>
-          <li>Elle sera proposée dans la création d’utilisateur selon le département choisi</li>
+          <li>Une profession normale sera proposée dans la création d’utilisateur selon le département choisi</li>
+          <li>Une profession unique est visuelle et ne sera pas sélectionnable dans le formulaire utilisateur</li>
         </ul>
       </div>
     </div>

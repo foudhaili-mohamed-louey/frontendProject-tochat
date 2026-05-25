@@ -200,14 +200,14 @@
               <td>
                 <span
                   class="profession-badge"
-                  *ngIf="user.profession">
+                 *ngIf="user.professionName || user.professionCode">
 
-                  {{ user.profession }}
+                  {{ user.professionName || user.professionCode }}
                 </span>
 
                 <span
                   class="text-faint"
-                  *ngIf="!user.profession">
+                  *ngIf="!user.professionName && !user.professionCode">
 
                   —
                 </span>

@@ -7,7 +7,7 @@ export interface UserAdminUpdateDTO {
   photoUrl?: string;
   sex: 'Male' | 'Female';
   hireDate: string;
-  profession: string;
+  professionId: number;
 
   isActive: boolean;
 

@@ -34,7 +34,7 @@
           <h2>{{ getUserFullName(data.employee) }}</h2>
 
           <p>
-            {{ data.employee?.profession || 'Employé' }}
+            {{ data.employee?.professionName || data.employee?.professionCode || 'Employé' }}
             <span *ngIf="data.employee?.email"> · {{ data.employee?.email }}</span>
           </p>
 

@@ -145,10 +145,10 @@
               </td>
 
               <td>
-                <span class="profession-badge" *ngIf="user.profession">
-                  {{ user.profession }}
+                <span class="profession-badge" *ngIf="user.professionName || user.professionCode">
+                 {{ user.professionName || user.professionCode }}
                 </span>
-                <span class="text-faint" *ngIf="!user.profession">—</span>
+                <span class="text-faint" *ngIf="!user.professionName && !user.professionCode">—</span>
               </td>
 
               <td>

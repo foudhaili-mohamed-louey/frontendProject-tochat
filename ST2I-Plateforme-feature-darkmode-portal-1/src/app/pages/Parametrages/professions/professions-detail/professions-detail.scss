@@ -134,7 +134,9 @@
 .code-badge,
 .department-badge,
 .type-badge,
-.status-badge {
+.status-badge,
+.profession-type-badge,
+.selectable-badge {
   display: inline-flex;
   align-items: center;
   width: fit-content;
@@ -158,6 +160,26 @@
 .type-badge {
   background: #fef3c7;
   color: #92400e;
+}
+
+.profession-type-badge {
+  background: #fef3c7;
+  color: #92400e;
+
+  &.normal {
+    background: #f1f5f9;
+    color: #475569;
+  }
+}
+
+.selectable-badge {
+  background: #dcfce7;
+  color: #15803d;
+
+  &.no {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
 }
 
 .status-badge {

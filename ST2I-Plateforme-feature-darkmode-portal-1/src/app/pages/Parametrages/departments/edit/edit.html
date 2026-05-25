@@ -82,7 +82,7 @@
                   {{ selectedChef.firstName }} {{ selectedChef.lastName }}
                 </span>
                 <span class="selected-meta">
-                  {{ selectedChef.profession || selectedChef.roleName || 'Utilisateur' }}
+                  {{ selectedChef.professionName || selectedChef.professionCode || selectedChef.roleName || 'Utilisateur' }}
                 </span>
               </div>
             </div>
@@ -147,7 +147,7 @@
               <div class="option-info">
                 <span class="option-name">{{ u.firstName }} {{ u.lastName }}</span>
                 <span class="option-meta">
-                  {{ u.profession || u.roleName || 'Utilisateur' }}
+                  {{ u.professionName || u.professionCode || u.roleName || 'Utilisateur' }}
                 </span>
               </div>
 

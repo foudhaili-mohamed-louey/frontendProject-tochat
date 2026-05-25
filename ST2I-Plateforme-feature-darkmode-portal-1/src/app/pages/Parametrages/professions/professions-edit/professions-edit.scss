@@ -79,6 +79,41 @@ select.p-inputtext {
   }
 }
 
+.checkbox-card {
+  margin-top: 1.1rem;
+  padding: 0.95rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #dbe4f3;
+  background: #f8fafc;
+
+  p {
+    margin: 0.35rem 0 0 1.75rem;
+    color: #64748b;
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+}
+
+.checkbox-line {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0;
+  cursor: pointer;
+  color: #1f2937;
+
+  input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--blue);
+    cursor: pointer;
+  }
+
+  span {
+    font-weight: 700;
+  }
+}
+
 .info-box {
   display: flex;
   align-items: flex-start;

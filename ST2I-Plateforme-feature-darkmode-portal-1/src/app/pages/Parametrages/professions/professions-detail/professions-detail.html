@@ -82,6 +82,24 @@
         </div>
 
         <div class="info-card">
+          <span class="label">Type profession</span>
+          <span
+            class="profession-type-badge"
+            [class.normal]="profession.uniqueByDepartment === false">
+            {{ profession.uniqueByDepartment ? 'Unique par département' : 'Normale' }}
+          </span>
+        </div>
+
+        <div class="info-card">
+          <span class="label">Utilisable utilisateur</span>
+          <span
+            class="selectable-badge"
+            [class.no]="profession.uniqueByDepartment === true">
+            {{ profession.uniqueByDepartment ? 'Non sélectionnable' : 'Sélectionnable' }}
+          </span>
+        </div>
+
+        <div class="info-card">
           <span class="label">Statut</span>
           <span class="status-badge" [class.inactive]="profession.active === false">
             {{ profession.active === false ? 'Inactive' : 'Active' }}
@@ -109,8 +127,8 @@
         <div>
           <strong>Utilisation</strong>
           <ul>
-            <li>Cette profession est proposée selon le département sélectionné</li>
-            <li>Elle facilite la validation des circuits métier</li>
+            <li>Une profession normale est proposée selon le département sélectionné</li>
+            <li>Une profession unique est visuelle, comme Chef Département ou Directeur Général</li>
             <li>Les permissions restent gérées par les rôles Keycloak / RBAC</li>
           </ul>
         </div>

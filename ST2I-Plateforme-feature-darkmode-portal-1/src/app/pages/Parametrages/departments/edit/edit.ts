@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DepartmentService } from '../services/department.service';
 import { UpdateDepartmentDTO } from '../dtos/update-department.dto';
 import { DepartmentType } from '../dtos/department-type';
+import { UserMapperResponseDTO } from '../dtos/user-mapper-response.dto';
 
 import { UsersService } from '../../../administration/users/services/users.service';
 import { UserResponseDTO } from '../../../administration/users/models/user-response.dto';
@@ -14,6 +15,8 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+
+type ChefUser = UserResponseDTO | UserMapperResponseDTO;
 
 @Component({
   selector: 'app-department-edit',
@@ -39,7 +42,7 @@ export class DepartmentEditComponent implements OnInit {
   chefDropdownOpen = false;
   chefSearch = '';
   chefUsers: UserResponseDTO[] = [];
-  selectedChef: UserResponseDTO | null = null;
+  selectedChef: ChefUser | null = null;
 
   currentType: DepartmentType | null = null;
 
@@ -103,10 +106,7 @@ export class DepartmentEditComponent implements OnInit {
         };
 
         if (dept.chefDepartment) {
-          this.selectedChef = {
-            ...dept.chefDepartment,
-            photoUrl: dept.chefDepartment.photoUrl || undefined
-          } as UserResponseDTO;
+          this.selectedChef = dept.chefDepartment;
 
           this.chefSearch = `${dept.chefDepartment.firstName ?? ''} ${dept.chefDepartment.lastName ?? ''}`.trim();
         } else {
@@ -165,8 +165,8 @@ export class DepartmentEditComponent implements OnInit {
 
   selectChef(user: UserResponseDTO): void {
     this.selectedChef = user;
-    this.form.chefKeycloakId = user.keycloakId;
-    this.chefSearch = `${user.firstName} ${user.lastName}`;
+    this.form.chefKeycloakId = user.keycloakId || null;
+    this.chefSearch = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
     this.chefDropdownOpen = false;
     this.cd.detectChanges();
   }
@@ -191,7 +191,7 @@ export class DepartmentEditComponent implements OnInit {
     this.searchChefs(true);
   }
 
-  getUserInitials(user: UserResponseDTO): string {
+  getUserInitials(user: ChefUser): string {
     const first = user.firstName?.charAt(0) || '';
     const last = user.lastName?.charAt(0) || '';
     return `${first}${last}`.toUpperCase() || '?';

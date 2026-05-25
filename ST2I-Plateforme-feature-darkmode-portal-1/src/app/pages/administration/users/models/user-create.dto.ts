@@ -14,7 +14,7 @@ export interface UserCreateDTO {
   photoUrl?: string; 
   sex: 'Male' | 'Female';
   hireDate: string; // format: YYYY-MM-DD
-  profession: string;
+  professionId: number;
 
   // ===== ROLE =====
   roleMetadataId: number;

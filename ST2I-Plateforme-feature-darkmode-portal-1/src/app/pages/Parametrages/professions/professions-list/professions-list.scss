@@ -49,7 +49,7 @@
 
 .filter-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(200px, 1fr));
+  grid-template-columns: repeat(5, minmax(200px, 1fr));
   gap: 1rem;
   align-items: center;
 
@@ -492,5 +492,22 @@
 
   .page-controls {
     justify-content: center;
+  }
+}
+.unique-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.22rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  background: #fef3c7;
+  color: #92400e;
+
+  &.normal {
+    background: #f1f5f9;
+    color: #475569;
   }
 }

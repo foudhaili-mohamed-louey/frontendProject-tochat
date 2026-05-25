@@ -4,7 +4,7 @@ export interface UserSearchCriteria {
   lastName?: string;
   cin?: string;
   sex?: 'Male' | 'Female';
-  profession?: string;
+   professionId?: number;
   roleMetadataId?: number;
   isActive?: boolean;
   emailVerified?: boolean;

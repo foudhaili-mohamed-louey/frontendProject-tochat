@@ -61,9 +61,15 @@
     <div class="bar">Informations Professionnelles</div>
 
     <div class="row">
-      <b>Profession</b>
-      <span>{{ user.profession || '—' }}</span>
-    </div>
+  <b>Profession</b>
+  <span class="profession-badge" *ngIf="user.professionName">
+    {{ user.professionName }}
+    <span class="profession-code" *ngIf="user.professionCode">
+      ({{ user.professionCode }})
+    </span>
+  </span>
+  <span *ngIf="!user.professionName">—</span>
+</div>
 
     <div class="row">
       <b>Rôle</b>

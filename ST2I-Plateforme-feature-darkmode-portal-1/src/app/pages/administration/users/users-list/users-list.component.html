@@ -73,14 +73,20 @@
         </select>
       </div>
 
-      <div class="field">
-        <select class="p-inputtext" [(ngModel)]="filters.profession">
-          <option [ngValue]="undefined">Profession</option>
-          <option *ngFor="let profession of professions" [ngValue]="profession">
-            {{ profession }}
-          </option>
-        </select>
-      </div>
+     <div class="field">
+  <select
+    class="p-inputtext"
+    [(ngModel)]="filters.professionId"
+    [disabled]="loadingProfessions">
+    <option [ngValue]="undefined">
+      {{ loadingProfessions ? 'Chargement...' : 'Profession' }}
+    </option>
+
+    <option *ngFor="let profession of professions" [ngValue]="profession.idProfession">
+      {{ profession.code }} - {{ profession.name }}
+    </option>
+  </select>
+</div>
 
       <div class="field">
         <select class="p-inputtext" [(ngModel)]="filters.departmentId">
@@ -207,10 +213,12 @@
               <span class="badge badge-red" *ngIf="!u.isActive">Inactif</span>
             </td>
 
-            <td>
-              <span class="profession-badge" *ngIf="u.profession">{{ u.profession }}</span>
-              <span class="text-faint" *ngIf="!u.profession">—</span>
-            </td>
+           <td>
+  <span class="profession-badge" *ngIf="u.professionName">
+    {{ u.professionCode || u.professionName }}
+  </span>
+  <span class="text-faint" *ngIf="!u.professionName">—</span>
+</td>
 
             <td>
               <span class="dept-badge" *ngIf="u.departmentCode">{{ u.departmentCode }}</span>

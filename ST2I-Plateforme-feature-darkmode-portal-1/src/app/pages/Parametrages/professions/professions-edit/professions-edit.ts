@@ -43,7 +43,8 @@ export class ProfessionsEditComponent implements OnInit {
   form: ProfessionUpdateDTO = {
     name: '',
     code: '',
-    idDepartment: undefined
+    idDepartment: undefined,
+    uniqueByDepartment: false
   };
 
   constructor(
@@ -95,7 +96,8 @@ export class ProfessionsEditComponent implements OnInit {
         this.form = {
           name: res.name,
           code: res.code,
-          idDepartment: res.idDepartment
+          idDepartment: res.idDepartment,
+          uniqueByDepartment: Boolean(res.uniqueByDepartment)
         };
 
         this.loading = false;
@@ -140,7 +142,8 @@ export class ProfessionsEditComponent implements OnInit {
     const payload: ProfessionUpdateDTO = {
       name: this.form.name.trim(),
       code: this.form.code.trim(),
-      idDepartment: Number(this.form.idDepartment)
+      idDepartment: Number(this.form.idDepartment),
+      uniqueByDepartment: Boolean(this.form.uniqueByDepartment)
     };
 
     this.professionService.update(this.professionId, payload).subscribe({

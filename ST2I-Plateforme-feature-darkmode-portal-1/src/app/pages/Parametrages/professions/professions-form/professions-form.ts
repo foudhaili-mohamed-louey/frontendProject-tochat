@@ -37,7 +37,8 @@ export class ProfessionsFormComponent implements OnInit {
   form: ProfessionCreateDTO = {
     name: '',
     code: '',
-    idDepartment: 0
+    idDepartment: 0,
+    uniqueByDepartment: false
   };
 
   constructor(
@@ -91,7 +92,8 @@ export class ProfessionsFormComponent implements OnInit {
     const payload: ProfessionCreateDTO = {
       name: this.form.name.trim(),
       code: this.form.code.trim(),
-      idDepartment: Number(this.form.idDepartment)
+      idDepartment: Number(this.form.idDepartment),
+      uniqueByDepartment: Boolean(this.form.uniqueByDepartment)
     };
 
     this.professionService.create(payload).subscribe({

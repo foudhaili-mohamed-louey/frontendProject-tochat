@@ -8,6 +8,8 @@ export interface ProfessionResponseDTO {
   departmentCode?: string;
   departmentType?: string;
 
+  uniqueByDepartment?: boolean;
+
   active: boolean;
   createdAt?: string;
   updatedAt?: string;

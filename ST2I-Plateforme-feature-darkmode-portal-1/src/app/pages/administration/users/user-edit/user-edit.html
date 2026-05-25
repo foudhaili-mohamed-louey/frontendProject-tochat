@@ -154,20 +154,30 @@
         </small>
       </div>
 
-      <!-- PROFESSION -->
-      <div class="field">
-        <label>Profession *</label>
-        <input pInputText
-               name="profession"
-               [(ngModel)]="form.profession"
-               required
-               minlength="2"
-               maxlength="30"
-               #profession="ngModel" />
-        <small class="error" *ngIf="profession.invalid && profession.touched">
-          Profession entre 2 et 30 caractères
-        </small>
-      </div>
+     <!-- PROFESSION -->
+<div class="field" *ngIf="showDepartment && form.departmentId">
+  <label>Profession *</label>
+  <select
+    class="p-inputtext w-full"
+    name="professionId"
+    [(ngModel)]="form.professionId"
+    required
+    [disabled]="professionsLoading"
+    #professionField="ngModel">
+
+    <option [ngValue]="0" disabled>
+      {{ professionsLoading ? 'Chargement...' : 'Sélectionner une profession' }}
+    </option>
+
+    <option *ngFor="let profession of professions" [ngValue]="profession.idProfession">
+      {{ profession.name }} ({{ profession.code }})
+    </option>
+  </select>
+
+  <small class="error" *ngIf="professionField.invalid && professionField.touched">
+    La profession est requise
+  </small>
+</div>
 
       <!-- STATUS -->
       <div class="field">
@@ -208,6 +218,7 @@
         <select class="p-inputtext w-full"
                 name="departmentId"
                 [(ngModel)]="form.departmentId"
+                (ngModelChange)="onDepartmentChange($event)"
                 [disabled]="departmentsLoading">
           <option [ngValue]="undefined" disabled>
             {{ departmentsLoading ? 'Chargement...' : 'Sélectionner un département' }}

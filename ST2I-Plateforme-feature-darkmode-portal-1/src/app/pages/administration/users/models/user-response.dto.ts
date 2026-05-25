@@ -12,7 +12,9 @@ export interface UserResponseDTO {
   photoUrl?: string;
   sex?: 'Male' | 'Female';
   hireDate?: string;
-  profession?: string;
+  professionId?: number | null;
+  professionName?: string | null;
+  professionCode?: string | null;
   roleMetadataId?: number;
   roleName?: string;
   roleLevel?: number;

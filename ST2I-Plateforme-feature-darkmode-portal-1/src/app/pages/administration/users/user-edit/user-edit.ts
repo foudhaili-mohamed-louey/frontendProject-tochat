@@ -6,18 +6,21 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { UsersService } from '../services/users.service';
 import { RolesService } from '../../roles/services/roles.service';
 import { DepartmentService } from '../../../Parametrages/departments/services/department.service';
+import { ProfessionService } from '../../../Parametrages/professions/services/profession.service';
+
 import { UserAdminUpdateDTO } from '../models/user-admin-update.dto';
 import { UserResponseDTO } from '../models/user-response.dto';
 import { RoleResponseDTO } from '../../roles/models/role-models/role-response.dto';
 import { DepartmentResponseDTO } from '../../../Parametrages/departments/dtos/department-response.dto';
+import { ProfessionResponseDTO } from '../../../Parametrages/professions/dtos/profession-response.dto';
 
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
-const FREE_ROLES    = ['ADMIN', 'SUPER_ADMIN'];
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
+const FREE_ROLES = ['ADMIN', 'SUPER_ADMIN'];
+const MAX_FILE_SIZE = 2 * 1024 * 1024;
 
 @Component({
   selector: 'app-user-edit',
@@ -33,36 +36,39 @@ export class UserEditComponent implements OnInit {
 
   userId!: string;
 
-  loading            = true;
-  saving             = false;
-  uploading          = false;
-  rolesLoading       = false;
+  loading = true;
+  saving = false;
+  uploading = false;
+  rolesLoading = false;
   departmentsLoading = false;
+  professionsLoading = false;
 
-  today      = new Date().toISOString().split('T')[0];
+  today = new Date().toISOString().split('T')[0];
+
   sexOptions: ('Male' | 'Female')[] = ['Male', 'Female'];
-  manageableRoles: RoleResponseDTO[]   = [];
+  manageableRoles: RoleResponseDTO[] = [];
   departments: DepartmentResponseDTO[] = [];
+  professions: ProfessionResponseDTO[] = [];
+
   showDepartment = false;
 
-  // local assets — always available as fallback
-  readonly defaultMale   = 'assets/images/default-user-male.png';
+  readonly defaultMale = 'assets/images/default-user-male.png';
   readonly defaultFemale = 'assets/images/default-user-female.png';
 
   photoPreview = 'assets/images/default-user-male.png';
 
   form: UserAdminUpdateDTO = {
-    firstName:      '',
-    lastName:       '',
-    email:          '',
-    phone:          '',
-    photoUrl:       '',
-    sex:            'Male',
-    hireDate:       '',
-    profession:     '',
-    isActive:       true,
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    photoUrl: '',
+    sex: 'Male',
+    hireDate: '',
+    professionId: 0,
+    isActive: true,
     roleMetadataId: 0,
-    departmentId:   undefined
+    departmentId: undefined
   };
 
   constructor(
@@ -71,36 +77,41 @@ export class UserEditComponent implements OnInit {
     private usersService: UsersService,
     private rolesService: RolesService,
     private departmentService: DepartmentService,
+    private professionService: ProfessionService,
     private cdr: ChangeDetectorRef,
     private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    if (!id) { this.router.navigate(['/administration/users']); return; }
+
+    if (!id) {
+      this.router.navigate(['/administration/users']);
+      return;
+    }
+
     this.userId = id;
+
     this.loadManageableRoles();
     this.loadDepartments();
     this.loadUser();
   }
 
-  // ── photo preview helpers ─────────────────────────────────────────
-
   onSexChange(): void {
     if (!this.form.photoUrl?.trim()) {
       this.photoPreview = this.form.sex === 'Female'
-        ? this.defaultFemale : this.defaultMale;
+        ? this.defaultFemale
+        : this.defaultMale;
       this.cdr.markForCheck();
     }
   }
 
   onPreviewError(): void {
     this.photoPreview = this.form.sex === 'Female'
-      ? this.defaultFemale : this.defaultMale;
+      ? this.defaultFemale
+      : this.defaultMale;
     this.cdr.markForCheck();
   }
-
-  // ── file picker ───────────────────────────────────────────────────
 
   triggerFilePicker(): void {
     this.fileInput.nativeElement.value = '';
@@ -112,79 +123,85 @@ export class UserEditComponent implements OnInit {
     if (!file) return;
 
     if (file.size > MAX_FILE_SIZE) {
-      this.messageService.add({
-        severity: 'error', summary: 'Erreur',
-        detail: 'La taille du fichier dépasse 2 Mo', life: 5000
-      });
+      this.showError('La taille du fichier dépasse 2 Mo');
       return;
     }
 
-    // show local preview immediately — instant feedback
     const reader = new FileReader();
+
     reader.onload = (e) => {
       this.photoPreview = e.target?.result as string;
       this.cdr.markForCheck();
     };
+
     reader.readAsDataURL(file);
 
-    // user already exists — upload right away
     this.uploading = true;
     this.cdr.markForCheck();
 
     this.usersService.uploadAvatar(this.userId, file).subscribe({
       next: (res) => {
         this.form.photoUrl = res.photoUrl;
-        this.photoPreview  = res.photoUrl;
-        this.uploading     = false;
+        this.photoPreview = res.photoUrl;
+        this.uploading = false;
         this.cdr.markForCheck();
+
         this.messageService.add({
-          severity: 'success', summary: 'Photo mise à jour',
-          detail: 'La photo de profil a été uploadée avec succès', life: 3000
+          severity: 'success',
+          summary: 'Photo mise à jour',
+          detail: 'La photo de profil a été uploadée avec succès',
+          life: 3000
         });
       },
       error: () => {
-        this.uploading    = false;
+        this.uploading = false;
         this.photoPreview = this.form.sex === 'Female'
-          ? this.defaultFemale : this.defaultMale;
+          ? this.defaultFemale
+          : this.defaultMale;
         this.cdr.markForCheck();
-        this.messageService.add({
-          severity: 'error', summary: 'Erreur',
-          detail: "Échec de l'upload de la photo", life: 5000
-        });
+
+        this.showError("Échec de l'upload de la photo");
       }
     });
   }
 
   removePhoto(): void {
     this.form.photoUrl = '';
-    this.photoPreview  = this.form.sex === 'Female'
-      ? this.defaultFemale : this.defaultMale;
+    this.photoPreview = this.form.sex === 'Female'
+      ? this.defaultFemale
+      : this.defaultMale;
     this.cdr.markForCheck();
   }
 
-  // ── data loading ──────────────────────────────────────────────────
-
   loadManageableRoles(): void {
     this.rolesLoading = true;
+
     this.rolesService.getManageableRoles().subscribe({
       next: (roles) => {
         this.manageableRoles = roles;
-        this.rolesLoading    = false;
+        this.rolesLoading = false;
         this.cdr.markForCheck();
       },
-      error: () => { this.rolesLoading = false; }
+      error: () => {
+        this.rolesLoading = false;
+        this.cdr.markForCheck();
+      }
     });
   }
 
   loadDepartments(): void {
     this.departmentsLoading = true;
+
     this.departmentService.getActiveDepartments().subscribe({
       next: (data) => {
-        this.departments        = data;
+        this.departments = data;
         this.departmentsLoading = false;
         this.cdr.markForCheck();
       },
-      error: () => { this.departmentsLoading = false; }
+      error: () => {
+        this.departmentsLoading = false;
+        this.cdr.markForCheck();
+      }
     });
   }
 
@@ -192,94 +209,159 @@ export class UserEditComponent implements OnInit {
     this.usersService.getUserById(this.userId).subscribe({
       next: (u: UserResponseDTO) => {
         this.form = {
-          firstName:      u.firstName      ?? '',
-          lastName:       u.lastName       ?? '',
-          email:          u.email          ?? '',
-          phone:          u.phone          ?? '',
-          photoUrl:       u.photoUrl       ?? '',
-          sex:            this.parseSex(u.sex),
-          hireDate:       u.hireDate       ?? '',
-          profession:     u.profession     ?? '',
-          isActive:       u.isActive       ?? true,
+          firstName: u.firstName ?? '',
+          lastName: u.lastName ?? '',
+          email: u.email ?? '',
+          phone: u.phone ?? '',
+          photoUrl: u.photoUrl ?? '',
+          sex: this.parseSex(u.sex),
+          hireDate: u.hireDate ?? '',
+          professionId: u.professionId ?? 0,
+          isActive: u.isActive ?? true,
           roleMetadataId: u.roleMetadataId ?? 0,
-          departmentId:   u.departmentId   ?? undefined
+          departmentId: u.departmentId ?? undefined
         };
 
-        // set initial photo preview
         this.photoPreview = u.photoUrl?.trim()
           ? u.photoUrl
           : (u.sex === 'Female' ? this.defaultFemale : this.defaultMale);
 
         this.showDepartment = !FREE_ROLES.includes((u.roleName ?? '').toUpperCase());
 
+        if (this.showDepartment && this.form.departmentId) {
+          this.loadProfessionsByDepartment(Number(this.form.departmentId), this.form.professionId);
+        }
+
         this.loading = false;
         this.cdr.markForCheck();
       },
-      error: () => this.router.navigate(['/administration/users'])
+      error: () => {
+        this.router.navigate(['/administration/users']);
+      }
     });
   }
 
-  // ── role change ───────────────────────────────────────────────────
-
   onRoleChange(roleId: number): void {
     const selected = this.manageableRoles.find(r => r.id === roleId);
+
     if (selected && FREE_ROLES.includes(selected.name.toUpperCase())) {
-      this.showDepartment    = false;
+      this.showDepartment = false;
       this.form.departmentId = undefined;
+      this.form.professionId = 0;
+      this.professions = [];
     } else {
       this.showDepartment = true;
     }
+
     this.cdr.markForCheck();
   }
 
-  // ── save ─────────────────────────────────────────────────────────
+  onDepartmentChange(departmentId: number): void {
+    this.form.professionId = 0;
+    this.professions = [];
+
+    if (!departmentId) {
+      this.cdr.markForCheck();
+      return;
+    }
+
+    this.loadProfessionsByDepartment(Number(departmentId));
+  }
+
+  private loadProfessionsByDepartment(
+    departmentId: number,
+    selectedProfessionId?: number
+  ): void {
+    this.professionsLoading = true;
+    this.cdr.markForCheck();
+
+    this.professionService.getSelectableByDepartment(departmentId).subscribe({
+      next: (data) => {
+        this.professions = data || [];
+
+        if (selectedProfessionId) {
+          this.form.professionId = selectedProfessionId;
+        }
+
+        this.professionsLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.professions = [];
+        this.professionsLoading = false;
+        this.cdr.markForCheck();
+        this.showError('Erreur lors du chargement des professions');
+      }
+    });
+  }
 
   save(formRef: NgForm): void {
     if (formRef.invalid) return;
 
     if (!this.form.roleMetadataId) {
-      this.messageService.add({
-        severity: 'error', summary: 'Erreur',
-        detail: 'Le rôle est requis', life: 5000
-      });
+      this.showError('Le rôle est requis');
       return;
     }
 
     if (this.showDepartment && !this.form.departmentId) {
-      this.messageService.add({
-        severity: 'error', summary: 'Erreur',
-        detail: 'Le département est requis pour ce rôle', life: 5000
-      });
+      this.showError('Le département est requis pour ce rôle');
+      return;
+    }
+
+    if (this.showDepartment && !this.form.professionId) {
+      this.showError('La profession est requise');
       return;
     }
 
     this.saving = true;
     this.cdr.markForCheck();
 
-    this.usersService.updateUserAsAdmin(this.userId, this.form).subscribe({
+    const payload: UserAdminUpdateDTO = {
+      ...this.form,
+      firstName: this.form.firstName.trim(),
+      lastName: this.form.lastName.trim(),
+      email: this.form.email.trim(),
+      phone: this.form.phone.trim(),
+      departmentId: this.showDepartment ? Number(this.form.departmentId) : undefined,
+      professionId: Number(this.form.professionId)
+    };
+
+    this.usersService.updateUserAsAdmin(this.userId, payload).subscribe({
       next: () => {
         this.saving = false;
         this.cdr.markForCheck();
+
         this.messageService.add({
-          severity: 'success', summary: 'Succès',
-          detail: 'Utilisateur modifié avec succès', life: 3000
+          severity: 'success',
+          summary: 'Succès',
+          detail: 'Utilisateur modifié avec succès',
+          life: 3000
         });
+
         setTimeout(() => this.router.navigate(['/administration/users']), 1500);
       },
       error: (err) => {
         this.saving = false;
         this.cdr.markForCheck();
-        this.messageService.add({
-          severity: 'error', summary: 'Erreur',
-          detail: err?.error?.message || err?.error?.error || err?.message
-                  || 'Erreur lors de la modification',
-          life: 5000
-        });
+
+        this.showError(
+          err?.error?.message ||
+          err?.error?.error ||
+          err?.message ||
+          'Erreur lors de la modification'
+        );
       }
     });
   }
 
-  // ── helpers ───────────────────────────────────────────────────────
+  private showError(detail: string): void {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail,
+      life: 5000
+    });
+  }
 
   private parseSex(value?: string): 'Male' | 'Female' {
     return value === 'Female' ? 'Female' : 'Male';

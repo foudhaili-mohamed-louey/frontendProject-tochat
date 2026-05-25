@@ -143,7 +143,8 @@ export class EmployeeLeaveBalanceListComponent implements OnInit, OnDestroy {
               id: u.id,
               fullName: this.getUserFullName(u),
               email: u.email,
-              profession: u.profession,
+              professionName: u.professionName,
+              professionCode: u.professionCode,
               all: false
             }))
           ];

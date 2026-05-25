@@ -51,12 +51,12 @@
            [src]="dept.chefDepartment.photoUrl"
            [alt]="dept.chefDepartment.firstName"
            class="avatar-img"
-           (error)="onAvatarError($event, dept.chefDepartment.sex)" />
+           (error)="onAvatarError($event, dept.chefDepartment.sex || undefined)" />
 
       <div *ngIf="!dept.chefDepartment.photoUrl"
            class="avatar-placeholder">
-        {{ dept.chefDepartment.firstName.charAt(0) }}
-        {{ dept.chefDepartment.lastName.charAt(0) }}
+        {{ dept.chefDepartment.firstName?.charAt(0) }}
+{{ dept.chefDepartment.lastName?.charAt(0) }}
       </div>
     </div>
 
@@ -67,7 +67,7 @@
       </span>
 
       <span class="chef-meta">
-        {{ dept.chefDepartment.profession || dept.chefDepartment.roleName || 'Utilisateur' }}
+        {{ dept.chefDepartment.professionName || dept.chefDepartment.professionCode || dept.chefDepartment.roleName || 'Utilisateur' }}
       </span>
     </div>
 
@@ -137,14 +137,14 @@
              [src]="u.photoUrl"
              [alt]="u.firstName"
              class="avatar-img"
-             (error)="onAvatarError($event, u.sex)" />
+             (error)="onAvatarError($event, u.sex || undefined)" />
         <div *ngIf="!u.photoUrl" class="avatar-placeholder">
-          {{ u.firstName.charAt(0) }}{{ u.lastName.charAt(0) }}
+          {{ u.firstName?.charAt(0) }}{{ u.lastName?.charAt(0) }}
         </div>
       </div>
       <div class="user-info">
         <span class="user-name">{{ u.firstName }} {{ u.lastName }}</span>
-        <span class="user-meta">{{ u.profession || '—' }}</span>
+        <span class="user-meta">{{ u.professionName || u.professionCode || u.roleName || '—' }}</span>
       </div>
       <div class="user-right">
         <span class="role-badge">{{ u.roleName || '—' }}</span>

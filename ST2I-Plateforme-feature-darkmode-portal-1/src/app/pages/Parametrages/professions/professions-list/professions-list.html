@@ -108,6 +108,14 @@
         </select>
       </div>
 
+      <div class="field">
+  <select class="p-inputtext" [(ngModel)]="filters.uniqueByDepartment">
+    <option [ngValue]="undefined">Tous les types</option>
+    <option [ngValue]="false">Professions normales</option>
+    <option [ngValue]="true">Profession unique</option>
+  </select>
+</div>
+
     </div>
 
     <div class="actions">
@@ -164,6 +172,7 @@
           <th>Code</th>
           <th>Nom</th>
           <th>Département</th>
+          <th>Type</th>
           <th>Statut</th>
           <th style="width: 140px;">Actions</th>
         </tr>
@@ -198,6 +207,13 @@
 
               <span class="text-faint" *ngIf="!r.departmentCode">
                 —
+              </span>
+            </td>
+            <td>
+              <span
+                class="unique-badge"
+                [class.normal]="r.uniqueByDepartment === false">
+                {{ r.uniqueByDepartment ? 'Unique' : 'Normale' }}
               </span>
             </td>
 
@@ -235,7 +251,7 @@
           </tr>
 
           <tr *ngIf="rows.length === 0">
-            <td colspan="5" class="empty-msg">
+            <td colspan="6" class="empty-msg">
               <i class="pi pi-briefcase" style="font-size:2rem;opacity:.3"></i>
               <br />
               Aucune profession trouvée.

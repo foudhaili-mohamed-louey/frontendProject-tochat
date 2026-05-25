@@ -46,13 +46,13 @@ export class ProfessionsListComponent implements OnInit, OnDestroy {
   pageSize = 7;
   totalElements = 0;
   totalPages = 0;
-  isSearchMode = false;
 
   filters: ProfessionSearchCriteriaDTO = {
     name: '',
     code: '',
     idDepartment: undefined,
-    active: true
+    active: true,
+    uniqueByDepartment: undefined
   };
 
   showDeleteConfirm = false;
@@ -141,8 +141,14 @@ export class ProfessionsListComponent implements OnInit, OnDestroy {
       criteria.active = this.filters.active;
     }
 
+    if (
+      this.filters.uniqueByDepartment !== undefined &&
+      this.filters.uniqueByDepartment !== null
+    ) {
+      criteria.uniqueByDepartment = this.filters.uniqueByDepartment;
+    }
+
     this.loading = true;
-    this.isSearchMode = true;
     this.refresh();
 
     this.professionService.search(criteria, page, this.pageSize)
@@ -183,7 +189,8 @@ export class ProfessionsListComponent implements OnInit, OnDestroy {
       name: '',
       code: '',
       idDepartment: undefined,
-      active: true
+      active: true,
+      uniqueByDepartment: undefined
     };
 
     this.search(0);
@@ -219,7 +226,7 @@ export class ProfessionsListComponent implements OnInit, OnDestroy {
   }
 
   confirmDelete(): void {
-    if (!this.professionToDelete) return;
+    if (!this.professionToDelete?.idProfession) return;
 
     this.deleting = true;
     this.refresh();
@@ -263,12 +270,13 @@ export class ProfessionsListComponent implements OnInit, OnDestroy {
   }
 
   export(): void {
-    const header = ['Code', 'Nom', 'Département', 'Statut'];
+    const header = ['Code', 'Nom', 'Département', 'Type', 'Statut'];
 
     const csvRows = this.rows.map(r => [
       r.code || '—',
       r.name || '—',
       r.departmentCode || '—',
+      r.uniqueByDepartment ? 'Unique' : 'Normale',
       r.active === false ? 'Inactive' : 'Active'
     ].join(','));
 

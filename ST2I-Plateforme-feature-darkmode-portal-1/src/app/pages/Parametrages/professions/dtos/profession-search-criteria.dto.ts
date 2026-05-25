@@ -3,4 +3,5 @@ export interface ProfessionSearchCriteriaDTO {
   code?: string;
   idDepartment?: number;
   active?: boolean;
+  uniqueByDepartment?: boolean;
 }
