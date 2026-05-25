@@ -66,97 +66,100 @@
         </div>
       </div>
 
+      <div class="field chef-field">
+  <label>Chef département</label>
+
+  <div class="chef-dropdown" (click)="stopClose($event)">
+
+    <div class="chef-control" (click)="openChefDropdown($event)">
+      <div class="chef-selected" *ngIf="selectedChef; else chefPlaceholder">
+        <div class="mini-avatar">
+          {{ getUserInitials(selectedChef) }}
+        </div>
+
+        <div class="selected-info">
+          <span class="selected-name">
+            {{ selectedChef.firstName }} {{ selectedChef.lastName }}
+          </span>
+          <span class="selected-meta">
+            {{ selectedChef.professionName || selectedChef.professionCode || selectedChef.roleName || 'Utilisateur' }}
+          </span>
+        </div>
+      </div>
+
+      <ng-template #chefPlaceholder>
+        <span class="placeholder">Sélectionner un chef département</span>
+      </ng-template>
+
+      <button
+        *ngIf="selectedChef"
+        type="button"
+        class="clear-btn"
+        (click)="clearChefAndOpen($event)"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+
+      <i class="pi pi-chevron-down dropdown-icon"></i>
+    </div>
+
+    <div class="chef-panel" *ngIf="chefDropdownOpen" (click)="stopClose($event)">
+      <div class="search-wrapper">
+        <i class="pi pi-search"></i>
+        <input
+          name="chefSearch"
+          [(ngModel)]="chefSearch"
+          (input)="searchChefs()"
+          placeholder="Rechercher par nom..."
+          autocomplete="off"
+        />
+      </div>
+
       <div class="chef-option no-chef-option" (click)="clearChef($event)">
-        <label>Chef département</label>
+        <div class="option-icon">
+          <i class="pi pi-user-minus"></i>
+        </div>
+        <div class="option-info">
+          <span class="option-name">Aucun chef</span>
+          <span class="option-meta">Département sans chef assigné</span>
+        </div>
+      </div>
 
-        <div class="chef-dropdown">
+      <div class="loading-line" *ngIf="loadingChefs">
+        <i class="pi pi-spin pi-spinner"></i>
+        Chargement...
+      </div>
 
-          <div class="chef-control" (click)="openChefDropdown($event)">
-            <div class="chef-selected" *ngIf="selectedChef; else chefPlaceholder">
-              <div class="mini-avatar">
-                {{ getUserInitials(selectedChef) }}
-              </div>
+      <div class="empty-line" *ngIf="!loadingChefs && chefUsers.length === 0">
+        Aucun utilisateur trouvé
+      </div>
 
-              <div class="selected-info">
-                <span class="selected-name">
-                  {{ selectedChef.firstName }} {{ selectedChef.lastName }}
-                </span>
-                <span class="selected-meta">
-                  {{ selectedChef.professionName || selectedChef.professionCode || selectedChef.roleName || 'Utilisateur' }}
-                </span>
-              </div>
-            </div>
+      <div
+        class="chef-option"
+        *ngFor="let u of chefUsers"
+        [class.selected]="form.chefKeycloakId === u.keycloakId"
+        (click)="selectChef(u, $event)"
+      >
+        <div class="option-avatar">
+          {{ getUserInitials(u) }}
+        </div>
 
-            <ng-template #chefPlaceholder>
-              <span class="placeholder">Sélectionner un chef département</span>
-            </ng-template>
+        <div class="option-info">
+          <span class="option-name">{{ u.firstName }} {{ u.lastName }}</span>
+          <span class="option-meta">
+            {{ u.professionName || u.professionCode || u.roleName || 'Utilisateur' }}
+          </span>
+        </div>
 
-            <button
-              *ngIf="selectedChef"
-              type="button"
-              class="clear-btn"
-              (click)="clearChef($event)"
-            >
-              <i class="pi pi-times"></i>
-            </button>
+        <i
+          *ngIf="form.chefKeycloakId === u.keycloakId"
+          class="pi pi-check selected-check"
+        ></i>
+      </div>
+    </div>
 
-            <i class="pi pi-chevron-down dropdown-icon"></i>
-          </div>
-
-          <div class="chef-panel" *ngIf="chefDropdownOpen">
-            <div class="search-wrapper">
-              <i class="pi pi-search"></i>
-              <input
-                name="chefSearch"
-                [(ngModel)]="chefSearch"
-                (input)="searchChefs()"
-                placeholder="Rechercher par nom..."
-                autocomplete="off"
-              />
-            </div>
-
-            <div class="chef-option no-chef-option" (click)="clearChef($event)">
-              <div class="option-icon">
-                <i class="pi pi-user-minus"></i>
-              </div>
-              <div class="option-info">
-                <span class="option-name">Aucun chef</span>
-                <span class="option-meta">Département sans chef assigné</span>
-              </div>
-            </div>
-
-            <div class="loading-line" *ngIf="loadingChefs">
-              <i class="pi pi-spin pi-spinner"></i>
-              Chargement...
-            </div>
-
-            <div class="empty-line" *ngIf="!loadingChefs && chefUsers.length === 0">
-              Aucun utilisateur trouvé
-            </div>
-
-            <div
-              class="chef-option"
-              *ngFor="let u of chefUsers"
-              [class.selected]="form.chefKeycloakId === u.keycloakId"
-              (click)="selectChef(u)"
-            >
-              <div class="option-avatar">
-                {{ getUserInitials(u) }}
-              </div>
-
-              <div class="option-info">
-                <span class="option-name">{{ u.firstName }} {{ u.lastName }}</span>
-                <span class="option-meta">
-                  {{ u.professionName || u.professionCode || u.roleName || 'Utilisateur' }}
-                </span>
-              </div>
-
-              <i
-                *ngIf="form.chefKeycloakId === u.keycloakId"
-                class="pi pi-check selected-check"
-              ></i>
-            </div>
-          </div>
+  </div>
+</div>
 
         </div>
       </div>
@@ -192,7 +195,7 @@
         ></textarea>
       </div>
 
-    </div>
+    
 
     <div class="info-box">
       <i class="pi pi-info-circle"></i>
@@ -205,8 +208,7 @@
         </ul>
       </div>
     </div>
-  </div>
-
+  
   <div class="footer-sticky">
     <p-button
       type="button"

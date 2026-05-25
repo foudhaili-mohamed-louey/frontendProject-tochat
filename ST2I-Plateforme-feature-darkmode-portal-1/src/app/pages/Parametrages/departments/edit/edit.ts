@@ -163,13 +163,17 @@ export class DepartmentEditComponent implements OnInit {
     });
   }
 
-  selectChef(user: UserResponseDTO): void {
-    this.selectedChef = user;
-    this.form.chefKeycloakId = user.keycloakId || null;
-    this.chefSearch = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
-    this.chefDropdownOpen = false;
-    this.cd.detectChanges();
+  selectChef(user: UserResponseDTO, event?: Event): void {
+  if (event) {
+    event.stopPropagation();
   }
+
+  this.selectedChef = user;
+  this.form.chefKeycloakId = user.keycloakId || null;
+  this.chefSearch = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+  this.chefDropdownOpen = false;
+  this.cd.detectChanges();
+}
 
   clearChef(event?: Event): void {
     if (event) event.stopPropagation();

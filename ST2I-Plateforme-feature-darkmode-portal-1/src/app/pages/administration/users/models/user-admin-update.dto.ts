@@ -6,6 +6,7 @@ export interface UserAdminUpdateDTO {
   phone: string;
   photoUrl?: string;
   sex: 'Male' | 'Female';
+  cin: string;
   hireDate: string;
   professionId: number;
 

@@ -126,6 +126,21 @@
         </small>
       </div>
 
+      <!-- CIN -->
+<div class="field">
+  <label>CIN *</label>
+  <input pInputText
+         name="cin"
+         [(ngModel)]="form.cin"
+         required
+         pattern="^[0-9]{8}$"
+         maxlength="8"
+         #cin="ngModel" />
+  <small class="error" *ngIf="cin.invalid && cin.touched">
+    Le CIN doit contenir 8 chiffres
+  </small>
+</div>
+
       <!-- SEX -->
       <div class="field">
         <label>Sexe *</label>
@@ -154,30 +169,7 @@
         </small>
       </div>
 
-     <!-- PROFESSION -->
-<div class="field" *ngIf="showDepartment && form.departmentId">
-  <label>Profession *</label>
-  <select
-    class="p-inputtext w-full"
-    name="professionId"
-    [(ngModel)]="form.professionId"
-    required
-    [disabled]="professionsLoading"
-    #professionField="ngModel">
-
-    <option [ngValue]="0" disabled>
-      {{ professionsLoading ? 'Chargement...' : 'Sélectionner une profession' }}
-    </option>
-
-    <option *ngFor="let profession of professions" [ngValue]="profession.idProfession">
-      {{ profession.name }} ({{ profession.code }})
-    </option>
-  </select>
-
-  <small class="error" *ngIf="professionField.invalid && professionField.touched">
-    La profession est requise
-  </small>
-</div>
+  
 
       <!-- STATUS -->
       <div class="field">
@@ -231,6 +223,30 @@
 
     </div>
   </div>
+    <!-- PROFESSION -->
+<div class="field" *ngIf="showDepartment && form.departmentId">
+  <label>Profession *</label>
+  <select
+    class="p-inputtext w-full"
+    name="professionId"
+    [(ngModel)]="form.professionId"
+    required
+    [disabled]="professionsLoading"
+    #professionField="ngModel">
+
+    <option [ngValue]="0" disabled>
+      {{ professionsLoading ? 'Chargement...' : 'Sélectionner une profession' }}
+    </option>
+
+    <option *ngFor="let profession of professions" [ngValue]="profession.idProfession">
+      {{ profession.name }} ({{ profession.code }})
+    </option>
+  </select>
+
+  <small class="error" *ngIf="professionField.invalid && professionField.touched">
+    La profession est requise
+  </small>
+</div>
 
   <div class="footer-sticky">
     <p-button type="submit"
