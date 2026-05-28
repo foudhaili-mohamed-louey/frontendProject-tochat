@@ -93,7 +93,7 @@ export class TeamHierarchyComponent implements OnInit {
   ngOnInit(): void {
     this.loadAllTeams();
   }
-  private readonly MODULE_NAME = 'gestion des équipes';
+  private readonly MODULE_NAME = 'gestion des projets';
   canManageHierarchy(): boolean {
   return this.rbacService.canUpdate(this.MODULE_NAME);
 }

@@ -15,8 +15,10 @@ export interface EmployeeLeaveBalanceResponseDTO {
   usedBalance: number;
   remainingBalance: number;
 
+  firstAccrualDate?: string | null;
+
   active: boolean;
 
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string | null;
+  updatedAt?: string | null;
 }

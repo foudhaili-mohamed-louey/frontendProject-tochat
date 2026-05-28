@@ -6,11 +6,20 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
+import { SelectModule } from 'primeng/select';
 import { MessageService } from 'primeng/api';
 
 import { EmployeeLeaveBalanceService } from '../services/employee-leave-balance.service';
 import { EmployeeLeaveBalanceResponseDTO } from '../dtos/employee-leave-balance-response.dto';
+import { EmployeeLeaveBalanceUpdateDTO } from '../dtos/employee-leave-balance-update.dto';
+
 import { UserResponseDTO } from '@/app/pages/administration/users/models/user-response.dto';
+
+type BalanceOption = {
+  label: string;
+  code: string;
+  value: number;
+};
 
 @Component({
   selector: 'app-employee-leave-balance-edit',
@@ -22,17 +31,30 @@ import { UserResponseDTO } from '@/app/pages/administration/users/models/user-re
     FormsModule,
     ButtonModule,
     InputTextModule,
-    ToastModule
+    ToastModule,
+    SelectModule
   ],
   providers: [MessageService]
 })
 export class EmployeeLeaveBalanceEditComponent implements OnInit {
 
-  id!: number;
+  idEmployee!: number;
+
   loading = true;
   saving = false;
 
-  data: EmployeeLeaveBalanceResponseDTO | null = null;
+  currentYear = new Date().getFullYear();
+
+  employee: UserResponseDTO | null = null;
+
+  balances: EmployeeLeaveBalanceResponseDTO[] = [];
+  balanceOptions: BalanceOption[] = [];
+
+  selectedBalanceId: number | null = null;
+  selectedBalance: EmployeeLeaveBalanceResponseDTO | null = null;
+
+  originalCurrentBalance = 0;
+  validationMessage = '';
 
   form = {
     currentBalance: 0
@@ -47,30 +69,160 @@ export class EmployeeLeaveBalanceEditComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const idParam = this.route.snapshot.paramMap.get('id');
+    const idParam = this.route.snapshot.paramMap.get('idEmployee');
 
-    if (!idParam) {
+    if (!idParam || isNaN(Number(idParam))) {
       this.back();
       return;
     }
 
-    this.id = Number(idParam);
-    this.load();
+    this.idEmployee = Number(idParam);
+    this.loadCurrentYearBalances();
   }
 
-  load(): void {
+  loadCurrentYearBalances(): void {
     this.loading = true;
     this.cd.detectChanges();
 
-    this.balanceService.getById(this.id).subscribe({
+    this.balanceService.search(
+      {
+        idEmployee: this.idEmployee,
+        year: this.currentYear,
+        active: true
+      },
+      0,
+      100
+    ).subscribe({
       next: (res) => {
-        this.data = res;
-        this.form.currentBalance = Number(res.currentBalance || 0);
+        this.balances = res?.content || [];
+
+        if (this.balances.length > 0) {
+          this.employee = this.balances[0].employee || null;
+
+          this.balanceOptions = this.balances.map(balance => ({
+            label: `${balance.leaveType?.name || 'Type inconnu'} (${balance.leaveType?.code || '—'})`,
+            code: balance.leaveType?.code || '',
+            value: balance.idBalance
+          }));
+
+          this.selectedBalanceId = this.balances[0].idBalance;
+          this.onBalanceSelected();
+        } else {
+          this.employee = null;
+          this.balanceOptions = [];
+          this.selectedBalance = null;
+          this.selectedBalanceId = null;
+        }
+
         this.loading = false;
         this.cd.detectChanges();
       },
-      error: (err: any) => {
+      error: (err) => {
         this.loading = false;
+        this.balances = [];
+        this.balanceOptions = [];
+        this.selectedBalance = null;
+        this.selectedBalanceId = null;
+        this.showError(this.extractErrorMessage(err));
+        this.cd.detectChanges();
+      }
+    });
+  }
+
+  onBalanceSelected(): void {
+    this.selectedBalance =
+      this.balances.find(balance => balance.idBalance === this.selectedBalanceId) || null;
+
+    if (!this.selectedBalance) {
+      this.originalCurrentBalance = 0;
+      this.form.currentBalance = 0;
+      this.validationMessage = '';
+      return;
+    }
+
+    this.originalCurrentBalance = Number(this.selectedBalance.currentBalance || 0);
+    this.form.currentBalance = this.originalCurrentBalance;
+
+    this.onBalanceChange();
+  }
+
+  onBalanceChange(): void {
+    this.validationMessage = '';
+
+    if (!this.selectedBalance) {
+      this.validationMessage = 'Veuillez choisir un type de congé.';
+      return;
+    }
+
+    const currentBalance = Number(this.form.currentBalance);
+    const usedBalance = Number(this.selectedBalance.usedBalance || 0);
+    const maxBalance = this.getMaxBalance();
+
+    if (this.form.currentBalance === null || this.form.currentBalance === undefined) {
+      this.validationMessage = 'Le solde total est requis.';
+      return;
+    }
+
+    if (isNaN(currentBalance)) {
+      this.validationMessage = 'Le solde total doit être un nombre valide.';
+      return;
+    }
+
+    if (currentBalance < 0) {
+      this.validationMessage = 'Le solde total ne peut pas être négatif.';
+      return;
+    }
+
+    if (currentBalance < usedBalance) {
+      this.validationMessage = 'Le solde total ne peut pas être inférieur au solde utilisé.';
+      return;
+    }
+
+    if (maxBalance > 0 && currentBalance > maxBalance) {
+      this.validationMessage = `Le solde total ne peut pas dépasser le maximum autorisé (${maxBalance}).`;
+      return;
+    }
+  }
+
+  save(): void {
+    this.onBalanceChange();
+
+    if (this.validationMessage) {
+      this.showError(this.validationMessage);
+      return;
+    }
+
+    if (!this.selectedBalance) {
+      this.showError('Veuillez choisir un type de congé.');
+      return;
+    }
+
+    const dto: EmployeeLeaveBalanceUpdateDTO = {
+      currentBalance: Number(this.form.currentBalance)
+    };
+
+    this.saving = true;
+    this.cd.detectChanges();
+
+    this.balanceService.update(this.selectedBalance.idBalance, dto).subscribe({
+      next: () => {
+        this.saving = false;
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Succès',
+          detail: 'Solde corrigé avec succès',
+          life: 2500
+        });
+
+        this.cd.detectChanges();
+
+        setTimeout(() => {
+          this.loadCurrentYearBalances();
+        }, 500);
+      },
+      error: (err) => {
+        this.saving = false;
         this.showError(this.extractErrorMessage(err));
         this.cd.detectChanges();
       }
@@ -78,13 +230,11 @@ export class EmployeeLeaveBalanceEditComponent implements OnInit {
   }
 
   getUserFullName(user?: UserResponseDTO | null): string {
-    if (!user) return 'Employé non disponible';
+    if (!user) return `Employé #${this.idEmployee}`;
 
-    const first = user.firstName || '';
-    const last = user.lastName || '';
-    const fullName = `${first} ${last}`.trim();
+    const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
 
-    return fullName || user.username || user.email || 'Employé sans nom';
+    return fullName || user.username || user.email || `Employé #${this.idEmployee}`;
   }
 
   getInitials(user?: UserResponseDTO | null): string {
@@ -96,18 +246,27 @@ export class EmployeeLeaveBalanceEditComponent implements OnInit {
     return `${first}${last}`.toUpperCase() || '?';
   }
 
+  getDepartment(user?: UserResponseDTO | null): string {
+    return user?.departmentName || user?.departmentCode || '—';
+  }
+
+  getProfession(user?: UserResponseDTO | null): string {
+    return user?.professionName || user?.professionCode || '—';
+  }
+
   getUnitLabel(): string {
-    const unit = this.data?.leaveType?.unit;
-    return unit === 'MONTH' ? 'Mois' : 'Jour';
+    return this.selectedBalance?.leaveType?.unit === 'MONTH' ? 'mois' : 'jours';
+  }
+
+  getMaxBalance(): number {
+    return Number(this.selectedBalance?.leaveType?.maxBalance || 0);
   }
 
   getCalculatedRemaining(): number {
     const current = Number(this.form.currentBalance || 0);
-    const used = Number(this.data?.usedBalance || 0);
+    const used = Number(this.selectedBalance?.usedBalance || 0);
 
-    const remaining = current - used;
-
-    return Number(Math.max(0, remaining).toFixed(2));
+    return Number(Math.max(0, current - used).toFixed(2));
   }
 
   getRemainingClass(): string {
@@ -118,81 +277,29 @@ export class EmployeeLeaveBalanceEditComponent implements OnInit {
     return 'success';
   }
 
-  getMaxBalance(): number {
-    return Number(this.data?.leaveType?.maxBalance || 0);
+  getUsagePercent(): number {
+    const current = Number(this.form.currentBalance || 0);
+    const used = Number(this.selectedBalance?.usedBalance || 0);
+
+    if (current <= 0) return 0;
+
+    return Math.max(0, Math.min(100, Math.round((used / current) * 100)));
   }
 
-  private validate(): boolean {
-    if (!this.data) return this.showError('Données introuvables.');
-
-    if (this.form.currentBalance === null || this.form.currentBalance === undefined) {
-      return this.showError('Le solde total est requis.');
-    }
-
-    if (Number(this.form.currentBalance) < 0) {
-      return this.showError('Le solde total ne peut pas être négatif.');
-    }
-
-    if (Number(this.form.currentBalance) < Number(this.data.usedBalance || 0)) {
-      return this.showError('Le solde total ne peut pas être inférieur au solde déjà utilisé.');
-    }
-
-    const maxBalance = this.getMaxBalance();
-
-    if (maxBalance > 0 && Number(this.form.currentBalance) > maxBalance) {
-      return this.showError(`Le solde total ne peut pas dépasser le maximum du type de congé (${maxBalance}).`);
-    }
-
-    return true;
+  back(): void {
+    this.router.navigate(['/Parametrages/leave-balances']);
   }
 
-  save(): void {
-    if (!this.validate()) return;
-
-    this.saving = true;
-    this.cd.detectChanges();
-
-    this.balanceService.update(this.id, {
-      currentBalance: Number(this.form.currentBalance)
-    } as any).subscribe({
-      next: () => {
-        this.saving = false;
-        this.cd.detectChanges();
-
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Succès',
-          detail: 'Solde modifié avec succès',
-          life: 3000
-        });
-
-        setTimeout(() => this.back(), 1000);
-      },
-      error: (err: any) => {
-        this.saving = false;
-        this.showError(this.extractErrorMessage(err));
-        this.cd.detectChanges();
-      }
-    });
-  }
-
-  private showError(detail: string): false {
+  private showError(detail: string): void {
     this.messageService.add({
       severity: 'error',
       summary: 'Erreur',
       detail,
       life: 5000
     });
-
-    this.cd.detectChanges();
-    return false;
   }
 
   private extractErrorMessage(err: any): string {
     return err?.error?.message || err?.error?.error || err?.message || 'Erreur lors de la modification';
-  }
-
-  back(): void {
-    this.router.navigate(['/Parametrages/leave-balances']);
   }
 }

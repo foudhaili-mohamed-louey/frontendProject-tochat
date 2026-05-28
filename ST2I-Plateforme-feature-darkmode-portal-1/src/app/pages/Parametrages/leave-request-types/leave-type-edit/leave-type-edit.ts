@@ -13,6 +13,7 @@ import { LeaveTypeRequestDTO } from '../dtos/leave-type-request.dto';
 import { LeaveTypeResponseDTO } from '../dtos/leave-type-response.dto';
 import { LeaveUnit } from '../dtos/leave-unit';
 import { LeaveIncrementMode } from '../dtos/leave-increment-mode';
+import { GenderRestriction } from '../dtos/gender-restriction';
 
 @Component({
   selector: 'app-leave-type-edit',
@@ -41,8 +42,16 @@ export class LeaveTypeEditComponent implements OnInit {
     maxBalance: 0,
     carryOverEnabled: false,
     requiresJustification: false,
-    requiresApproval: true
+    requiresApproval: true,
+    allowsHalfDay: false,
+genderRestriction: null
+    
   };
+  genderOptions: { label: string; value: GenderRestriction | null }[] = [
+  { label: 'Tous les employés', value: null },
+  { label: 'Hommes uniquement', value: 'MALE' },
+  { label: 'Femmes uniquement', value: 'FEMALE' }
+];
 
   units: { label: string; value: LeaveUnit }[] = [
     { label: 'Jour', value: 'DAY' },
@@ -95,7 +104,9 @@ export class LeaveTypeEditComponent implements OnInit {
           maxBalance: data.maxBalance ?? 0,
           carryOverEnabled: data.carryOverEnabled ?? false,
           requiresJustification: data.requiresJustification ?? false,
-          requiresApproval: data.requiresApproval ?? true
+          requiresApproval: data.requiresApproval ?? true,
+          allowsHalfDay: data.allowsHalfDay ?? false,
+          genderRestriction: data.genderRestriction ?? null
         };
 
         this.loading = false;

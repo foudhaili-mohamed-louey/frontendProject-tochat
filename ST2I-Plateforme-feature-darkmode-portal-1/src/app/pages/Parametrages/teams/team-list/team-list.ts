@@ -95,7 +95,7 @@ export class TeamListComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
     clearTimeout(this.projectSearchTimeout);
   }
-  private readonly MODULE_NAME = 'gestion des équipes';
+  private readonly MODULE_NAME = 'gestion des projets';
 
 canCreate(): boolean {
   return this.rbacService.canCreate(this.MODULE_NAME);

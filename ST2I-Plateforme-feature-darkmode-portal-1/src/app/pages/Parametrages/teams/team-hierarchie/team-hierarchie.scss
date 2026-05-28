@@ -573,3 +573,10 @@
     flex-direction: column;
   }
 }
+.save-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem;
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
+}

@@ -3,123 +3,173 @@
 <div *ngIf="loading" class="card ui-card">
   <div class="bar">Chargement...</div>
 
-  <div class="block">
-    <p class="loading-msg">
-      <i class="pi pi-spin pi-spinner"></i>
-      Chargement des données...
-    </p>
+  <div class="loading-zone">
+    <i class="pi pi-spin pi-spinner"></i>
+    Chargement des soldes de l’année courante...
   </div>
 </div>
 
-<div *ngIf="!loading && data" class="card ui-card">
-  <div class="bar">Correction du solde de congé</div>
+<div *ngIf="!loading" class="edit-page">
+  <div class="hero">
+    <div>
+      <span class="eyebrow">Correction des soldes</span>
+      <h1>Modifier les soldes de congé</h1>
+      <p>Modification uniquement pour l’année courante {{ currentYear }}.</p>
+    </div>
 
-  <div class="block">
+    <div class="year-badge">
+      <strong>{{ currentYear }}</strong>
+      <span>Année courante</span>
+    </div>
+  </div>
 
-    <div class="summary-card">
-      <div class="employee-summary">
-        <div class="avatar-large">
-          {{ getInitials(data.employee) }}
+  <div class="content-grid">
+    <div class="left-col">
+      <div class="employee-card">
+        <div class="avatar">
+          <img
+            *ngIf="employee?.photoUrl"
+            [src]="employee?.photoUrl"
+            class="avatar-img"
+            alt="avatar"
+          />
+
+          <span *ngIf="!employee?.photoUrl">
+            {{ getInitials(employee) }}
+          </span>
         </div>
 
         <div>
-          <h2>{{ getUserFullName(data.employee) }}</h2>
+          <h2>{{ getUserFullName(employee) }}</h2>
+          <p>{{ employee?.email || 'Email non disponible' }}</p>
 
-          <p>
-            {{ data.employee?.professionName || data.employee?.professionCode || 'Employé' }}
-            <span *ngIf="data.employee?.email"> · {{ data.employee?.email }}</span>
-          </p>
+          <div class="chips">
+            <span>
+              <i class="pi pi-building"></i>
+              {{ getDepartment(employee) }}
+            </span>
 
-          <span class="department-badge" *ngIf="data.employee?.departmentName">
-            <i class="pi pi-building"></i>
-            {{ data.employee?.departmentName }}
-          </span>
+            <span>
+              <i class="pi pi-briefcase"></i>
+              {{ getProfession(employee) }}
+            </span>
+          </div>
         </div>
       </div>
 
-      <div class="status-zone">
-        <span class="status-badge" [class.active]="data.active" [class.inactive]="!data.active">
-          {{ data.active ? 'Actif' : 'Inactif' }}
-        </span>
+      <div class="form-card">
+        <div class="section-title">
+          <h3>Type de congé à corriger</h3>
+          <p>Sélectionnez le type de congé puis saisissez le nouveau solde total.</p>
+        </div>
 
-        <small>Le statut se gère depuis la liste.</small>
+        <div class="field">
+          <label>Type de congé *</label>
+
+          <p-select
+            class="w-full"
+            styleClass="smart-dropdown"
+            appendTo="body"
+            [(ngModel)]="selectedBalanceId"
+            [options]="balanceOptions"
+            optionLabel="label"
+            optionValue="value"
+            [filter]="true"
+            filterBy="label,code"
+            placeholder="Choisir un type de congé"
+            emptyMessage="Aucun solde trouvé"
+            emptyFilterMessage="Aucun type trouvé"
+            [disabled]="saving || balances.length === 0"
+            (onChange)="onBalanceSelected()">
+          </p-select>
+        </div>
+
+        <div class="field" *ngIf="selectedBalance">
+          <label>Nouveau solde total *</label>
+
+          <input
+            pInputText
+            type="number"
+            min="0"
+            step="0.5"
+            [(ngModel)]="form.currentBalance"
+            [disabled]="saving"
+            placeholder="Ex : 22"
+            (ngModelChange)="onBalanceChange()"
+          />
+
+          <small>
+            Ancien solde : {{ originalCurrentBalance }} {{ getUnitLabel() }}
+          </small>
+        </div>
+
+        <div *ngIf="selectedBalance" class="validation-box" [class.error]="validationMessage">
+          <i
+            class="pi"
+            [ngClass]="validationMessage ? 'pi-exclamation-triangle' : 'pi-check-circle'">
+          </i>
+
+          <span>
+            {{ validationMessage || 'Le solde saisi est valide.' }}
+          </span>
+        </div>
+
+        <div *ngIf="balances.length === 0" class="empty-box">
+          <i class="pi pi-calendar-times"></i>
+          Aucun solde trouvé pour l’année {{ currentYear }}.
+        </div>
       </div>
     </div>
 
-    <div class="block-title">Informations non modifiables</div>
+    <div class="right-col">
+      <div class="preview-card" *ngIf="selectedBalance">
+        <span class="preview-label">Aperçu après correction</span>
 
-    <div class="details-grid">
-      <div class="info-item">
-        <span>Type de congé</span>
-        <strong>{{ data.leaveType.name || '—' }}</strong>
-        <small>{{ data.leaveType.code }}</small>
-      </div>
-
-      <div class="info-item">
-        <span>Année</span>
-        <strong>{{ data.year }}</strong>
-      </div>
-
-      <div class="info-item">
-        <span>Unité</span>
-        <strong>{{ getUnitLabel() }}</strong>
-      </div>
-
-      <div class="info-item">
-        <span>Solde utilisé</span>
-        <strong>{{ data.usedBalance }}</strong>
-      </div>
-
-      <div class="info-item">
-        <span>Solde maximum autorisé</span>
-        <strong>{{ data.leaveType.maxBalance || 0 }}</strong>
-      </div>
-    </div>
-
-    <div class="block-title second">Correction du solde</div>
-
-    <div class="edit-grid">
-      <div class="field">
-        <label>Solde total *</label>
-        <input
-          pInputText
-          type="number"
-          min="0"
-          step="0.5"
-          [(ngModel)]="form.currentBalance"
-          placeholder="Ex: 22"
-        />
-
-        <small>
-          Doit être supérieur ou égal au solde utilisé.
-        </small>
-      </div>
-
-      <div class="preview-card">
-        <span>Nouveau solde restant</span>
-        <strong [ngClass]="getRemainingClass()">
+        <div class="big-number" [ngClass]="getRemainingClass()">
           {{ getCalculatedRemaining() }}
-        </strong>
-        <small>{{ getUnitLabel() }}</small>
-      </div>
-    </div>
+        </div>
 
-    <div class="warning-box">
-      <i class="pi pi-exclamation-triangle"></i>
-      <div>
-        <strong>Attention</strong>
+        <small>{{ getUnitLabel() }} restant(s)</small>
+
+        <div class="progress">
+          <span [style.width.%]="getUsagePercent()"></span>
+        </div>
+
+        <div class="preview-row">
+          <span>Type</span>
+          <strong>{{ selectedBalance.leaveType.name }}</strong>
+        </div>
+
+        <div class="preview-row">
+          <span>Solde utilisé</span>
+          <strong>{{ selectedBalance.usedBalance }}</strong>
+        </div>
+
+        <div class="preview-row">
+          <span>Nouveau total</span>
+          <strong>{{ form.currentBalance || 0 }}</strong>
+        </div>
+
+        <div class="preview-row">
+          <span>Maximum autorisé</span>
+          <strong>{{ getMaxBalance() || '—' }}</strong>
+        </div>
+      </div>
+
+      <div class="rules-card">
+        <h3>Règles</h3>
+
         <ul>
-          <li>Cette page sert uniquement à corriger le solde total.</li>
-          <li>L’employé, le type de congé et l’année ne sont pas modifiables.</li>
-          <li>Le solde restant est recalculé automatiquement: <code>solde total - solde utilisé</code>.</li>
-          <li>Le solde total ne peut pas dépasser le maximum configuré dans le type de congé.</li>
+          <li>Seuls les soldes de {{ currentYear }} sont chargés.</li>
+          <li>Le type de congé est sélectionné ici.</li>
+          <li>Le solde total ne doit pas être inférieur au solde utilisé.</li>
+          <li>Le solde restant est recalculé automatiquement.</li>
         </ul>
       </div>
     </div>
-
   </div>
 
-  <div class="footer-sticky">
+  <div class="footer-actions">
     <p-button
       icon="pi pi-arrow-left"
       label="Retour"
@@ -134,6 +184,7 @@
       label="Sauvegarder"
       severity="info"
       [loading]="saving"
+      [disabled]="saving || !selectedBalance || !!validationMessage"
       (onClick)="save()">
     </p-button>
   </div>

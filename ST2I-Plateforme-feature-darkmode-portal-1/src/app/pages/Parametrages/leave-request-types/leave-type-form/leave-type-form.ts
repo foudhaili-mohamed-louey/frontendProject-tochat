@@ -12,6 +12,7 @@ import { LeaveTypeService } from '../services/leave-type.service';
 import { LeaveTypeRequestDTO } from '../dtos/leave-type-request.dto';
 import { LeaveUnit } from '../dtos/leave-unit';
 import { LeaveIncrementMode } from '../dtos/leave-increment-mode';
+import { GenderRestriction } from '../dtos/gender-restriction';
 
 @Component({
   selector: 'app-leave-type-form',
@@ -36,8 +37,16 @@ export class LeaveTypeFormComponent {
     maxBalance: 0,
     carryOverEnabled: false,
     requiresJustification: false,
-    requiresApproval: true
+    requiresApproval: true,
+    allowsHalfDay: false,
+    genderRestriction: null
   };
+
+  genderOptions: { label: string; value: GenderRestriction | null }[] = [
+  { label: 'Tous les employés', value: null },
+  { label: 'Hommes uniquement', value: 'MALE' },
+  { label: 'Femmes uniquement', value: 'FEMALE' }
+];
 
   units: { label: string; value: LeaveUnit }[] = [
     { label: 'Jour', value: 'DAY' },

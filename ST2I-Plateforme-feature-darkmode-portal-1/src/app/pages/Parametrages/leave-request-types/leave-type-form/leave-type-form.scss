@@ -254,3 +254,15 @@ input[pInputText],
     grid-template-columns: 1fr;
   }
 }
+.gender-card {
+  cursor: default;
+
+  span {
+    width: 100%;
+  }
+}
+
+.gender-select {
+  width: 100%;
+  margin-top: 0.65rem;
+}

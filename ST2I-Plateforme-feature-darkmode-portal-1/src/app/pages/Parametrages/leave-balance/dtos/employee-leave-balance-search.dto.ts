@@ -3,4 +3,6 @@ export interface EmployeeLeaveBalanceSearchDTO {
   idLeaveType?: number | null;
   year?: number | null;
   active?: boolean | null;
+  keyword?: string | null;
+departmentId?: number | null;
 }

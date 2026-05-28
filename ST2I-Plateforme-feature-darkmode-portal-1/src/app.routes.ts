@@ -283,22 +283,22 @@ export const appRoutes: Routes = [
         data: { breadcrumb: 'Détails équipe', module: 'gestion des projets', action: 'READ' }
       },
       // =========================
-      // Leave Balances
-      // RBAC + breadcrumb skipped for now
-      // No create route: balances are generated automatically
-      // =========================
-      {
-        path: 'Parametrages/leave-balances',
-        loadComponent: () => import('./app/pages/Parametrages/leave-balance/employee-leave-balance-list.component/employee-leave-balance-list.component').then(m => m.EmployeeLeaveBalanceListComponent)
-      },
-      {
-        path: 'Parametrages/leave-balances/:id/details',
-        loadComponent: () => import('./app/pages/Parametrages/leave-balance/employee-leave-balance-details.component/employee-leave-balance-details.component').then(m => m.EmployeeLeaveBalanceDetailsComponent)
-      },
-      {
-        path: 'Parametrages/leave-balances/:id/edit',
-        loadComponent: () => import('./app/pages/Parametrages/leave-balance/employee-leave-balance-edit.component/employee-leave-balance-edit.component').then(m => m.EmployeeLeaveBalanceEditComponent)
-      },
+        // Leave Balances
+        // Details and Edit are separated 100%
+        // =========================
+        {
+          path: 'Parametrages/leave-balances',
+          loadComponent: () => import('./app/pages/Parametrages/leave-balance/employee-leave-balance-list.component/employee-leave-balance-list.component').then(m => m.EmployeeLeaveBalanceListComponent)
+        },
+        {
+          path: 'Parametrages/leave-balances/employee/:idEmployee/details',
+          loadComponent: () => import('./app/pages/Parametrages/leave-balance/employee-leave-balance-details.component/employee-leave-balance-details.component').then(m => m.EmployeeLeaveBalanceDetailsComponent)
+        },
+        {
+          path: 'Parametrages/leave-balances/employee/:idEmployee/edit',
+          loadComponent: () => import('./app/pages/Parametrages/leave-balance/employee-leave-balance-edit.component/employee-leave-balance-edit.component').then(m => m.EmployeeLeaveBalanceEditComponent)
+        },
+
       // =========================
       // Professions
       // =========================

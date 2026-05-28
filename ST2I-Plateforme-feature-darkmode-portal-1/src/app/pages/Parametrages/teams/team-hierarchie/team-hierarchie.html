@@ -14,16 +14,6 @@
         [disabled]="loadingTeams || loadingTeam || saving"
         (onClick)="reload()">
       </p-button>
-
-      <p-button
-        *ngIf="canManageHierarchy()"
-        icon="pi pi-save"
-        label="Sauvegarder"
-        severity="info"
-        [loading]="saving"
-        [disabled]="!selectedTeamId || loadingTeam || loadingMembers || members.length === 0"
-        (onClick)="save()">
-      </p-button>
     </div>
   </div>
 
@@ -260,6 +250,18 @@
               {{ isHierarchyLocallyValid() ? 'Prêt à sauvegarder' : 'Un seul leader requis' }}
             </span>
           </div>
+        </div>
+
+        <div class="save-actions">
+          <p-button
+            *ngIf="canManageHierarchy()"
+            icon="pi pi-save"
+            label="Sauvegarder la hiérarchie"
+            severity="info"
+            [loading]="saving"
+            [disabled]="!selectedTeamId || loadingTeam || loadingMembers || members.length === 0"
+            (onClick)="save()">
+          </p-button>
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 import { LeaveUnit } from './leave-unit';
 import { LeaveIncrementMode } from './leave-increment-mode';
+import { GenderRestriction } from './gender-restriction';
 
 export interface LeaveTypeResponseDTO {
   idLeaveType: number;
@@ -19,6 +20,9 @@ export interface LeaveTypeResponseDTO {
   carryOverEnabled: boolean;
   requiresJustification: boolean;
   requiresApproval: boolean;
+
+  allowsHalfDay: boolean;
+  genderRestriction?: GenderRestriction | null;
 
   active: boolean;
 

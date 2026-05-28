@@ -118,7 +118,12 @@
           </td>
 
           <td>
-            <span class="mode-badge" [ngClass]="row.incrementMode.toLowerCase()">
+            <span class="mode-badge" [ngClass]="{
+              'monthly':    row.incrementMode === 'MONTHLY',
+              'yearly':     row.incrementMode === 'YEARLY',
+              'mode-fixed': row.incrementMode === 'FIXED',
+              'none':       row.incrementMode === 'NONE'
+            }">
               {{ getIncrementModeLabel(row.incrementMode) }}
             </span>
           </td>

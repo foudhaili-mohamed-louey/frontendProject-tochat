@@ -295,3 +295,15 @@ input[pInputText],
   color: #64748b;
   font-size: 0.85rem;
 }
+.gender-card {
+  cursor: default;
+
+  span {
+    width: 100%;
+  }
+}
+
+.gender-select {
+  width: 100%;
+  margin-top: 0.65rem;
+}

@@ -122,10 +122,33 @@
         <input type="checkbox" [(ngModel)]="form.requiresApproval" />
         <span>
           <strong>Validation requise</strong>
-          <small>Le congé doit passer par le workflow d’approbation.</small>
+          <small>Le congé doit passer par le workflow d'approbation.</small>
         </span>
       </label>
+
+      <label class="check-card">
+        <input type="checkbox" [(ngModel)]="form.allowsHalfDay" />
+        <span>
+          <strong>Demi-journée autorisée</strong>
+          <small>Permet à l'employé de demander uniquement matin ou après-midi.</small>
+        </span>
+      </label>
+
+      <div class="check-card gender-card">
+        <span>
+          <strong>Restriction par genre</strong>
+          <small>Limiter ce type de congé à un genre spécifique.</small>
+
+          <select class="p-inputtext select-field gender-select"
+                  [(ngModel)]="form.genderRestriction">
+            <option *ngFor="let g of genderOptions" [ngValue]="g.value">
+              {{ g.label }}
+            </option>
+          </select>
+        </span>
+      </div>
     </div>
+
   </div>
 
   <div class="footer-sticky">

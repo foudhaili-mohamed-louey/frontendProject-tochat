@@ -56,7 +56,7 @@
       </div>
 
       <div class="info-item">
-        <span>Mode d’incrémentation</span>
+        <span>Mode d'incrémentation</span>
         <strong>
           <span class="mode-badge" [ngClass]="getModeClass()">
             {{ getIncrementModeLabel(data.incrementMode) }}
@@ -132,6 +132,30 @@
         </div>
       </div>
 
+      <div class="rule-card" [class.enabled]="data.allowsHalfDay">
+        <i
+          class="pi"
+          [ngClass]="data.allowsHalfDay ? 'pi-check-circle' : 'pi-times-circle'"
+        ></i>
+
+        <div>
+          <strong>Demi-journée autorisée</strong>
+          <span>{{ data.allowsHalfDay ? 'Oui' : 'Non' }}</span>
+        </div>
+      </div>
+
+      <div class="rule-card" [class.enabled]="data.genderRestriction">
+        <i
+          class="pi"
+          [ngClass]="data.genderRestriction ? 'pi-user' : 'pi-users'"
+        ></i>
+
+        <div>
+          <strong>Restriction par genre</strong>
+          <span>{{ getGenderRestrictionLabel() }}</span>
+        </div>
+      </div>
+
     </div>
 
     <!-- Technical info -->
@@ -157,8 +181,8 @@
         <strong>Remarque</strong>
         <ul>
           <li>Cette page est en lecture seule.</li>
-          <li>La modification se fait depuis la page d’édition.</li>
-          <li>L’activation ou désactivation se fait depuis la liste.</li>
+          <li>La modification se fait depuis la page d'édition.</li>
+          <li>L'activation ou désactivation se fait depuis la liste.</li>
         </ul>
       </div>
     </div>

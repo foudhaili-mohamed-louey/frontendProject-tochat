@@ -12,27 +12,18 @@ import { SelectModule } from 'primeng/select';
 import { MessageService } from 'primeng/api';
 
 import { EmployeeLeaveBalanceService } from '../services/employee-leave-balance.service';
-import { EmployeeLeaveBalanceResponseDTO } from '../dtos/employee-leave-balance-response.dto';
 import { EmployeeLeaveBalanceSearchDTO } from '../dtos/employee-leave-balance-search.dto';
+import { EmployeeLeaveBalanceSummaryDTO } from '../dtos/employee-leave-balance-summary.dto';
 
-import { LeaveTypeService } from '../../leave-request-types/services/leave-type.service';
-import { LeaveTypeResponseDTO } from '../../leave-request-types/dtos/leave-type-response.dto';
-
-import { UsersService } from '@/app/pages/administration/users/services/users.service';
 import { UserResponseDTO } from '@/app/pages/administration/users/models/user-response.dto';
 
-type LeaveTypeOption = {
+import { DepartmentService } from '@/app/pages/Parametrages/departments/services/department.service';
+import { DepartmentResponseDTO } from '@/app/pages/Parametrages/departments/dtos/department-response.dto';
+
+type DepartmentOption = {
   id: number | null;
   name: string;
   code?: string;
-  all?: boolean;
-};
-
-type EmployeeOption = {
-  id: number | null;
-  fullName: string;
-  email?: string;
-  profession?: string;
   all?: boolean;
 };
 
@@ -54,14 +45,11 @@ type EmployeeOption = {
 })
 export class EmployeeLeaveBalanceListComponent implements OnInit, OnDestroy {
 
-  rows: EmployeeLeaveBalanceResponseDTO[] = [];
+  rows: EmployeeLeaveBalanceSummaryDTO[] = [];
   loading = false;
 
-  loadingEmployees = false;
-  loadingLeaveTypes = false;
-
-  employees: EmployeeOption[] = [];
-  leaveTypes: LeaveTypeOption[] = [];
+  departments: DepartmentOption[] = [];
+  loadingDepartments = false;
 
   currentPage = 0;
   pageSize = 5;
@@ -69,139 +57,66 @@ export class EmployeeLeaveBalanceListComponent implements OnInit, OnDestroy {
   totalPages = 0;
 
   filters: EmployeeLeaveBalanceSearchDTO = {
-    idEmployee: null,
-    idLeaveType: null,
-    year: new Date().getFullYear(),
-    active: null
+    keyword: null,
+    departmentId: null
   };
 
-  years: number[] = [];
-
-  statusOptions: { label: string; value: boolean | null }[] = [
-    { label: 'Tous les statuts', value: null },
-    { label: 'Actif', value: true },
-    { label: 'Inactif', value: false }
-  ];
-
-  private employeeSearchTimeout: any;
   private destroy$ = new Subject<void>();
 
   constructor(
     private balanceService: EmployeeLeaveBalanceService,
-    private leaveTypeService: LeaveTypeService,
-    private usersService: UsersService,
+    private departmentService: DepartmentService,
     private router: Router,
     private cd: ChangeDetectorRef,
     private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
-    this.initYears();
-    this.loadEmployees();
-    this.loadLeaveTypes();
+    this.loadDepartments();
     this.search(0);
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    clearTimeout(this.employeeSearchTimeout);
   }
 
-  private initYears(): void {
-    const current = new Date().getFullYear();
-    this.years = Array.from({ length: 7 }, (_, i) => current - 3 + i);
-  }
-
-  loadEmployees(searchTerm: string = ''): void {
-    this.loadingEmployees = true;
+  loadDepartments(): void {
+    this.loadingDepartments = true;
     this.cd.detectChanges();
 
-    const keyword = searchTerm?.trim() || '';
-
-    this.usersService.searchUsers(
-      {
-        firstName: keyword,
-        lastName: keyword,
-        isActive: true
-      } as any,
-      0,
-      20
-    )
+    this.departmentService.getActiveDepartments()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (res) => {
-          const content = res?.content || [];
-
-          this.employees = [
+        next: (res: DepartmentResponseDTO[]) => {
+          this.departments = [
             {
               id: null,
-              fullName: 'Tous les employés',
+              name: 'Tous les départements',
               all: true
             },
-            ...content.map((u: UserResponseDTO) => ({
-              id: u.id,
-              fullName: this.getUserFullName(u),
-              email: u.email,
-              professionName: u.professionName,
-              professionCode: u.professionCode,
+            ...res.map((d: DepartmentResponseDTO) => ({
+              id: (d as any).idDepartment || (d as any).id,
+              name: d.name,
+              code: d.code,
               all: false
             }))
           ];
 
-          this.loadingEmployees = false;
+          this.loadingDepartments = false;
           this.cd.detectChanges();
         },
         error: () => {
-          this.employees = [{ id: null, fullName: 'Tous les employés', all: true }];
-          this.loadingEmployees = false;
-          this.showError('Erreur lors du chargement des employés');
-          this.cd.detectChanges();
-        }
-      });
-  }
-
-  onEmployeeFilter(event: any): void {
-    const searchTerm = event?.filter || '';
-
-    clearTimeout(this.employeeSearchTimeout);
-
-    this.employeeSearchTimeout = setTimeout(() => {
-      this.loadEmployees(searchTerm);
-    }, 300);
-  }
-
-  loadLeaveTypes(): void {
-    this.loadingLeaveTypes = true;
-    this.cd.detectChanges();
-
-    this.leaveTypeService.search({ active: true }, 0, 100)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => {
-          const content = res?.content || [];
-
-          this.leaveTypes = [
+          this.departments = [
             {
               id: null,
-              name: 'Tous les types de congé',
+              name: 'Tous les départements',
               all: true
-            },
-            ...content.map((lt: LeaveTypeResponseDTO) => ({
-              id: lt.idLeaveType,
-              name: lt.name,
-              code: lt.code,
-              all: false
-            }))
+            }
           ];
 
-          this.loadingLeaveTypes = false;
-          this.cd.detectChanges();
-        },
-        error: () => {
-          this.leaveTypes = [{ id: null, name: 'Tous les types de congé', all: true }];
-          this.loadingLeaveTypes = false;
-          this.showError('Erreur lors du chargement des types de congé');
+          this.loadingDepartments = false;
+          this.showError('Erreur lors du chargement des départements');
           this.cd.detectChanges();
         }
       });
@@ -214,37 +129,33 @@ export class EmployeeLeaveBalanceListComponent implements OnInit, OnDestroy {
 
     const criteria: EmployeeLeaveBalanceSearchDTO = {};
 
-    if (this.filters.idEmployee !== null && this.filters.idEmployee !== undefined) {
-      criteria.idEmployee = this.filters.idEmployee;
+    const keyword = this.filters.keyword?.trim();
+
+    if (keyword) {
+      criteria.keyword = keyword;
     }
 
-    if (this.filters.idLeaveType !== null && this.filters.idLeaveType !== undefined) {
-      criteria.idLeaveType = this.filters.idLeaveType;
+    if (this.filters.departmentId !== null && this.filters.departmentId !== undefined) {
+      criteria.departmentId = Number(this.filters.departmentId);
     }
 
-    if (this.filters.year !== null && this.filters.year !== undefined) {
-      criteria.year = this.filters.year;
-    }
-
-    if (this.filters.active !== null && this.filters.active !== undefined) {
-      criteria.active = this.filters.active;
-    }
-
-    this.balanceService.search(criteria, page, this.pageSize)
+    this.balanceService.searchEmployeeSummaries(criteria, page, this.pageSize)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          this.rows = res.content || [];
-          this.totalElements = res.totalElements;
-          this.totalPages = res.totalPages;
-          this.currentPage = res.number;
+          this.rows = res?.content || [];
+          this.totalElements = res?.totalElements || 0;
+          this.totalPages = res?.totalPages || 0;
+          this.currentPage = res?.number || 0;
           this.loading = false;
           this.cd.detectChanges();
         },
         error: () => {
           this.rows = [];
+          this.totalElements = 0;
+          this.totalPages = 0;
           this.loading = false;
-          this.showError('Erreur lors du chargement des soldes de congé');
+          this.showError('Erreur lors du chargement des employés');
           this.cd.detectChanges();
         }
       });
@@ -252,14 +163,10 @@ export class EmployeeLeaveBalanceListComponent implements OnInit, OnDestroy {
 
   reset(): void {
     this.filters = {
-      idEmployee: null,
-      idLeaveType: null,
-      year: new Date().getFullYear(),
-      active: null
+      keyword: null,
+      departmentId: null
     };
 
-    this.loadEmployees();
-    this.loadLeaveTypes();
     this.search(0);
   }
 
@@ -268,15 +175,21 @@ export class EmployeeLeaveBalanceListComponent implements OnInit, OnDestroy {
     this.search(page);
   }
 
-  
+  details(row: EmployeeLeaveBalanceSummaryDTO): void {
+  this.router.navigate([
+    '/Parametrages/leave-balances/employee',
+    row.idEmployee,
+    'details'
+  ]);
+}
 
-  details(row: EmployeeLeaveBalanceResponseDTO): void {
-    this.router.navigate(['/Parametrages/leave-balances', row.idBalance, 'details']);
-  }
-
-  edit(row: EmployeeLeaveBalanceResponseDTO): void {
-    this.router.navigate(['/Parametrages/leave-balances', row.idBalance, 'edit']);
-  }
+update(row: EmployeeLeaveBalanceSummaryDTO): void {
+  this.router.navigate([
+    '/Parametrages/leave-balances/employee',
+    row.idEmployee,
+    'edit'
+  ]);
+}
 
   get pages(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i);
@@ -301,23 +214,16 @@ export class EmployeeLeaveBalanceListComponent implements OnInit, OnDestroy {
     return `${first}${last}`.toUpperCase() || '?';
   }
 
-  getRemainingClass(row: EmployeeLeaveBalanceResponseDTO): string {
-    const remaining = Number(row.remainingBalance || 0);
-
-    if (remaining <= 0) return 'danger';
-    if (remaining <= 3) return 'warning';
-    return 'success';
+  getDepartment(user?: UserResponseDTO | null): string {
+    return user?.departmentName || user?.departmentCode || '—';
   }
 
-  getUsagePercent(row: EmployeeLeaveBalanceResponseDTO): number {
-    const current = Number(row.currentBalance || 0);
-    const used = Number(row.usedBalance || 0);
+  getProfession(user?: UserResponseDTO | null): string {
+    return user?.professionName || user?.professionCode || '—';
+  }
 
-    if (current <= 0) return 0;
-
-    const percent = (used / current) * 100;
-
-    return Math.max(0, Math.min(100, Math.round(percent)));
+  getStatusLabel(user?: UserResponseDTO | null): string {
+    return user?.isActive ? 'Actif' : 'Inactif';
   }
 
   private showError(detail: string): void {

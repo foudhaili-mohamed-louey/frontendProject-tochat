@@ -2,162 +2,16 @@
 
 <div *ngIf="loading" class="card ui-card">
   <div class="bar">Chargement...</div>
-
-  <div class="block">
-    <p class="loading-msg">
-      <i class="pi pi-spin pi-spinner"></i>
-      Chargement des données...
-    </p>
+  <div class="block loading-zone">
+    <i class="pi pi-spin pi-spinner"></i>
+    Chargement des soldes de congé...
   </div>
 </div>
 
-<div *ngIf="!loading && data" class="card ui-card">
-
+<div *ngIf="!loading" class="card ui-card">
   <div class="bar bar-row">
-    <div>Détails du solde de congé</div>
+    <div>Détails des soldes de congé</div>
 
-    <span class="status-badge" [class.active]="data.active" [class.inactive]="!data.active">
-      {{ data.active ? 'Actif' : 'Inactif' }}
-    </span>
-  </div>
-
-  <div class="block">
-
-    <!-- Summary -->
-    <div class="summary-card">
-      <div class="employee-summary">
-        <div class="avatar-large">
-          {{ getInitials(data.employee) }}
-        </div>
-
-        <div>
-          <h2>{{ getUserFullName(data.employee) }}</h2>
-
-          <p>
-            {{ data.employee?.professionName || data.employee?.professionCode || 'Employé' }}
-            <span *ngIf="data.employee?.email"> · {{ data.employee?.email }}</span>
-          </p>
-
-          <span class="department-badge" *ngIf="data.employee?.departmentName">
-            <i class="pi pi-building"></i>
-            {{ data.employee?.departmentName }}
-          </span>
-        </div>
-      </div>
-
-      <div class="balance-summary">
-        <span>Solde restant</span>
-        <strong [ngClass]="getRemainingClass()">
-          {{ data.remainingBalance }}
-        </strong>
-        <small>{{ getUnitLabel() }}</small>
-      </div>
-    </div>
-
-    <!-- Balance numbers -->
-    <div class="block-title">Solde</div>
-
-    <div class="stats-grid">
-      <div class="stat-card blue">
-        <span>Solde total</span>
-        <strong>{{ data.currentBalance }}</strong>
-        <small>{{ getUnitLabel() }}</small>
-      </div>
-
-      <div class="stat-card orange">
-        <span>Solde utilisé</span>
-        <strong>{{ data.usedBalance }}</strong>
-        <small>{{ getUnitLabel() }}</small>
-      </div>
-
-      <div class="stat-card green" [ngClass]="getRemainingClass()">
-        <span>Solde restant</span>
-        <strong>{{ data.remainingBalance }}</strong>
-        <small>{{ getUnitLabel() }}</small>
-      </div>
-    </div>
-
-    <div class="usage-card">
-      <div class="usage-header">
-        <span>Taux d'utilisation</span>
-        <strong>{{ getUsagePercent() }}%</strong>
-      </div>
-
-      <div class="usage-progress">
-        <span [style.width.%]="getUsagePercent()"></span>
-      </div>
-    </div>
-
-    <!-- Leave Type -->
-    <div class="block-title second">Type de congé</div>
-
-    <div class="details-grid">
-      <div class="info-item">
-        <span>Code</span>
-        <strong>{{ data.leaveType.code || '—' }}</strong>
-      </div>
-
-      <div class="info-item">
-        <span>Nom</span>
-        <strong>{{ data.leaveType.name || '—' }}</strong>
-      </div>
-
-      <div class="info-item">
-        <span>Unité</span>
-        <strong>{{ getUnitLabel() }}</strong>
-      </div>
-
-      <div class="info-item">
-        <span>Mode</span>
-        <strong>{{ getModeLabel() }}</strong>
-      </div>
-
-      <div class="info-item">
-        <span>Solde maximum</span>
-        <strong>{{ data.leaveType.maxBalance || 0 }}</strong>
-      </div>
-
-      <div class="info-item">
-        <span>Justificatif</span>
-        <strong>{{ data.leaveType.requiresJustification ? 'Requis' : 'Non requis' }}</strong>
-      </div>
-    </div>
-
-    <!-- System -->
-    <div class="block-title second">Informations système</div>
-
-    <div class="details-grid">
-      <div class="info-item">
-        <span>Année</span>
-        <strong>{{ data.year }}</strong>
-      </div>
-
-      <div class="info-item">
-        <span>Date de création</span>
-        <strong>{{ data.createdAt | date:'dd/MM/yyyy HH:mm' }}</strong>
-      </div>
-
-      <div class="info-item">
-        <span>Dernière modification</span>
-        <strong>{{ data.updatedAt | date:'dd/MM/yyyy HH:mm' }}</strong>
-      </div>
-    </div>
-
-    <div class="info-box">
-      <i class="pi pi-info-circle"></i>
-      <div>
-        <strong>Remarque</strong>
-        <ul>
-          <li>Cette page est en lecture seule.</li>
-          <li>Le solde utilisé sera mis à jour automatiquement après validation des demandes.</li>
-          <li>Les modifications manuelles doivent rester réservées aux responsables autorisés.</li>
-        </ul>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="footer-sticky">
     <p-button
       icon="pi pi-arrow-left"
       label="Retour"
@@ -165,5 +19,221 @@
       [outlined]="true"
       (onClick)="back()">
     </p-button>
+  </div>
+
+  <div class="block">
+    <div class="hero-card">
+      <div class="employee-box">
+        <div class="avatar-xl">
+          <img
+            *ngIf="employee?.photoUrl"
+            [src]="employee?.photoUrl"
+            class="avatar-img"
+            alt="avatar"
+          />
+
+          <span *ngIf="!employee?.photoUrl">
+            {{ getInitials(employee) }}
+          </span>
+        </div>
+
+        <div>
+          <h2>{{ getUserFullName(employee) }}</h2>
+          <p>{{ employee?.email || 'Email non disponible' }}</p>
+
+          <div class="badges">
+            <span>
+              <i class="pi pi-building"></i>
+              {{ getDepartment(employee) }}
+            </span>
+
+            <span>
+              <i class="pi pi-briefcase"></i>
+              {{ getProfession(employee) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="year-box">
+        <label>Année</label>
+
+        <p-select
+          class="w-full"
+          styleClass="year-dropdown"
+          appendTo="body"
+          [(ngModel)]="selectedYear"
+          [options]="years"
+          optionLabel="label"
+          optionValue="value"
+          (onChange)="onYearChange()">
+        </p-select>
+
+        <small *ngIf="selectedYear !== currentYear">
+          Historique en lecture seule
+        </small>
+
+        <small *ngIf="selectedYear === currentYear">
+          Année courante
+        </small>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <div>
+        <h3>Types de congé et soldes</h3>
+        <p>Consultez les soldes de l’employé pour l’année sélectionnée.</p>
+      </div>
+
+      <span class="readonly-pill">
+        <i class="pi pi-lock"></i>
+        Lecture seule
+      </span>
+    </div>
+
+    <div *ngIf="loadingBalances" class="mini-loading">
+      <i class="pi pi-spin pi-spinner"></i>
+      Chargement des soldes...
+    </div>
+
+    <div *ngIf="!loadingBalances && balances.length === 0" class="empty-zone">
+      <i class="pi pi-calendar-times"></i>
+      <h3>Aucun solde trouvé</h3>
+      <p>Aucun solde de congé trouvé pour l’année {{ selectedYear }}.</p>
+    </div>
+
+    <div *ngIf="!loadingBalances && balances.length > 0" class="balance-grid">
+      <button
+        type="button"
+        class="balance-card"
+        *ngFor="let balance of balances"
+        [class.selected]="selectedBalance?.idBalance === balance.idBalance"
+        (click)="selectBalance(balance)">
+
+        <div class="balance-head">
+          <span class="code">{{ balance.leaveType.code }}</span>
+
+          <span
+            class="status"
+            [class.active]="balance.active"
+            [class.inactive]="!balance.active">
+            {{ balance.active ? 'Actif' : 'Inactif' }}
+          </span>
+        </div>
+
+        <h3>{{ balance.leaveType.name }}</h3>
+
+        <div class="numbers">
+          <div>
+            <span>Total</span>
+            <strong>{{ balance.currentBalance }}</strong>
+          </div>
+
+          <div>
+            <span>Utilisé</span>
+            <strong>{{ balance.usedBalance }}</strong>
+          </div>
+
+          <div>
+            <span>Restant</span>
+            <strong [ngClass]="getRemainingClass(balance)">
+              {{ balance.remainingBalance }}
+            </strong>
+          </div>
+        </div>
+
+        <div class="progress">
+          <span [style.width.%]="getUsagePercent(balance)"></span>
+        </div>
+      </button>
+    </div>
+
+    <div *ngIf="selectedBalance" class="details-panel">
+      <div class="panel-header">
+        <div>
+          <h3>{{ selectedBalance.leaveType.name }}</h3>
+          <p>{{ selectedBalance.leaveType.code }} · {{ selectedBalance.year }}</p>
+        </div>
+
+        <span class="readonly-pill dark">
+          <i class="pi pi-eye"></i>
+          Consultation
+        </span>
+      </div>
+
+      <div class="details-grid">
+        <div class="info-card">
+          <span>Année</span>
+          <strong>{{ selectedBalance.year }}</strong>
+        </div>
+
+        <div class="info-card">
+          <span>Unité</span>
+          <strong>{{ getUnitLabel(selectedBalance) }}</strong>
+        </div>
+
+        <div class="info-card">
+          <span>Mode d’incrémentation</span>
+          <strong>{{ getModeLabel(selectedBalance) }}</strong>
+        </div>
+
+        <div class="info-card">
+          <span>Solde total</span>
+          <strong>{{ selectedBalance.currentBalance }}</strong>
+        </div>
+
+        <div class="info-card">
+          <span>Solde utilisé</span>
+          <strong>{{ selectedBalance.usedBalance }}</strong>
+        </div>
+
+        <div class="info-card">
+          <span>Solde restant</span>
+          <strong [ngClass]="getRemainingClass(selectedBalance)">
+            {{ selectedBalance.remainingBalance }}
+          </strong>
+        </div>
+
+        <div class="info-card">
+          <span>Justificatif</span>
+          <strong>
+            {{ selectedBalance.leaveType.requiresJustification ? 'Requis' : 'Non requis' }}
+          </strong>
+        </div>
+
+        <div class="info-card">
+          <span>Demi-journée</span>
+          <strong>
+            {{ selectedBalance.leaveType.allowsHalfDay ? 'Autorisée' : 'Non autorisée' }}
+          </strong>
+        </div>
+
+        <div class="info-card">
+          <span>Solde maximum</span>
+          <strong>{{ selectedBalance.leaveType.maxBalance || 0 }}</strong>
+        </div>
+
+        <div class="info-card">
+          <span>Report autorisé</span>
+          <strong>
+            {{ selectedBalance.leaveType.carryOverEnabled ? 'Oui' : 'Non' }}
+          </strong>
+        </div>
+
+        <div class="info-card">
+          <span>Première incrémentation</span>
+          <strong>
+            {{ selectedBalance.firstAccrualDate ? (selectedBalance.firstAccrualDate | date:'dd/MM/yyyy') : '—' }}
+          </strong>
+        </div>
+
+        <div class="info-card">
+          <span>Dernière modification</span>
+          <strong>
+            {{ selectedBalance.updatedAt ? (selectedBalance.updatedAt | date:'dd/MM/yyyy HH:mm') : '—' }}
+          </strong>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

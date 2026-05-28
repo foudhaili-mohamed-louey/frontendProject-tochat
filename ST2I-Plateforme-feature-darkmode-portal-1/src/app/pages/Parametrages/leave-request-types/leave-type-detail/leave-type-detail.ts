@@ -48,6 +48,20 @@ export class LeaveTypeDetailsComponent implements OnInit {
     this.id = Number(idParam);
     this.load();
   }
+  getGenderRestrictionLabel(): string {
+  if (!this.data?.genderRestriction) {
+    return 'Tous les employés';
+  }
+
+  switch (this.data.genderRestriction) {
+    case 'MALE':
+      return 'Hommes uniquement';
+    case 'FEMALE':
+      return 'Femmes uniquement';
+    default:
+      return 'Tous les employés';
+  }
+}
 
   load(): void {
     this.loading = true;
